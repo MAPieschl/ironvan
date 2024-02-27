@@ -8,10 +8,9 @@ const DEVICE_ADDR = 0x08;
 //    b100 - PCB version 1.0.0
 //    v010 - firmware version 0.1.0
 // NOTE:  All DEVICE_TYPE strings will be 14 bytes (ASCII)
-const DEVICE_TYPE = "util_b100_v010"
+const DEVICE_TYPE = "util_b100_v010";
 
-    void
-    setup()
+void setup()
 {
   // -- Enable pull-up resistors on I2C line --
 
