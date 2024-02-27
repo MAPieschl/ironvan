@@ -15,7 +15,7 @@ class Bus:
 				# Request device type from address (addr)
 
 				# ???  Update to block data to accept 14 characters  ???
-				msg = i2c_msg.read(addr, 2)
+				msg = i2c_msg.read(addr, 4)
 
 				print(msg)
 
