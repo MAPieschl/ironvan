@@ -8,7 +8,7 @@ class Bus:
 		self.bus = SMBus(1)
 
 		# Stores {device address}: type
-		self.devices = [];
+		self.devices = {};
 		
 		for addr in range(0x03, 0x77):
 			try:
@@ -18,7 +18,9 @@ class Bus:
 				deviceType = self.bus.read_byte_data(addr, 0)
 
 				# ???  Fix dictionary syntax ???
-				self.devices.append({addr}: deviceType)
+				self.devices[addr] = deviceType
+
+				print(self.devices)
 				
 			except:
 				continue	
@@ -35,4 +37,4 @@ class Bus:
 		#	- ltsy - lighting system device (1 per bus)
 		#	- temp - thermostat device (1 per bus)
 
-		# 
+		return
