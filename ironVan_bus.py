@@ -7,7 +7,7 @@ class Bus:
 		# Initialize bus from location -1 on RPi
 		self.bus = SMBus(1)
 
-		# Stores {device address}: type
+		# Stores {device address: type}
 		self.devices = {};
 		
 		for addr in range(0x08, 0x09):
@@ -18,11 +18,11 @@ class Bus:
 				msg = i2c_msg.read(addr, 14)
 				self.bus.i2c_rdwr(msg)
 				print("before")
-				deviceType = self.asciiList2Str()
+				self.asciiList2Str()
 				print("after")
 
 				# ???  Fix dictionary syntax ???
-				self.devices[addr] = deviceType
+				#self.devices[addr] = deviceType
 
 				print(self.devices)
 				
@@ -66,4 +66,3 @@ class Bus:
 		for x in charList:
 			outputStr += asciiTable[x]
 		print(5)
-		return outputStr
