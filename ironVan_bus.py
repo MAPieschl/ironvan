@@ -17,9 +17,9 @@ class Bus:
 				# ???  Update to block data to accept 14 characters  ???
 				msg = i2c_msg.read(addr, 14)
 
-				print(msg)
-
 				deviceType = self.bus.i2c_rdwr(msg)
+
+				print(list(msg))
 
 				print(deviceType)
 
