@@ -10,23 +10,24 @@ class Bus:
 		# Stores {device address: type}
 		self.devices = {};
 		
-		for addr in range(0x08, 0x09):
+		for addr in range(0x03, 0x77):
 			try:
 				# Request device type from address (addr)
 
-				# ???  Update to block data to accept 14 characters  ???
+				# Request 14 char DEVICE_TYPE from each device
 				msg = i2c_msg.read(addr, 14)
 				self.bus.i2c_rdwr(msg)
 				
 				deviceType = self.asciiList2Str(msg)
 
-				# ???  Fix dictionary syntax ???
+				# Store device type defined by address
 				self.devices[addr] = deviceType
-
-				print(self.devices)
 				
 			except:
 				continue	
+
+		
+		print("Devices found on bus: ", self.devices)
 				
 	def sendCommandCLI(self):
 		while(True):
@@ -43,7 +44,7 @@ class Bus:
 		return
 	
 	def asciiList2Str(self, msg):
-		print(1)
+		
 		asciiTable = {
 			0: "NUL",
 			1: "SOH",
@@ -57,12 +58,12 @@ class Bus:
 			117: "u",
 			118: "v"
 		}
-		print(2)
+		
 		charList = list(msg)
-		print(3)
+		
 		outputStr = ''
-		print(4)
+		
 		for x in charList:
 			outputStr += asciiTable[x]
-		print(5)
+			
 		return outputStr
