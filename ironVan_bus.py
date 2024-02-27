@@ -18,7 +18,7 @@ class Bus:
 				msg = i2c_msg.read(addr, 14)
 				self.bus.i2c_rdwr(msg)
 				print("before")
-				deviceType = self.asciiList2Str(msg)
+				deviceType = self.asciiList2Str()
 				print("after")
 
 				# ???  Fix dictionary syntax ???
@@ -43,7 +43,7 @@ class Bus:
 
 		return
 	
-	def asciiList2Str(msg):
+	def asciiList2Str():
 		print(1)
 		asciiTable = {
 			0: "NUL",
