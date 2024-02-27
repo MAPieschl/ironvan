@@ -1,14 +1,14 @@
 #include <Wire.h>
 
 // Constant device address set
-const DEVICE_ADDR = 0x08;
+const byte DEVICE_ADDR = 0x08;
 
 // Device type is a device signature to signify to the control center the commands that the board will accept:
 //    util - board type "utilities"
 //    b100 - PCB version 1.0.0
 //    v010 - firmware version 0.1.0
 // NOTE:  All DEVICE_TYPE strings will be 14 bytes (ASCII)
-const DEVICE_TYPE = "util_b100_v010";
+const char DEVICE_TYPE[] = "util_b100_v010";
 
 // Request number used to determine what value to return to the master. Value is set in receiveEvent() and used in requestEvent(). DEFAULT:  Send DEVICE_TYPE
 byte requestNumber;
@@ -52,11 +52,10 @@ void loop()
 
 void receiveEvent(int howMany)
 {
-}
 
 while (Wire.available())
 {
-  msg = Wire.read();
+  byte msg = Wire.read();
 
   switch (msg)
   {
@@ -109,10 +108,11 @@ while (Wire.available())
     digitalWrite(9, LOW);
     break;
 
-  case default:
+  default:
     requestNumber = msg;
     break;
   }
+}
 }
 
 void requestEvent()
@@ -122,7 +122,7 @@ void requestEvent()
   case 0x20:
     Wire.write("hello world!!!");
     break;
-  case default:
+  default:
     Wire.write(DEVICE_TYPE);
     break;
   }
