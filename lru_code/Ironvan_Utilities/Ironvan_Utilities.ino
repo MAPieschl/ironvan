@@ -120,7 +120,9 @@ void requestEvent()
   switch (requestNumber)
   {
   case 0x20:
-  Wire.write("hello world!!!") case default:
+    Wire.write("hello world!!!");
+    break;
+  case default:
     Wire.write(DEVICE_TYPE);
     break;
   }
