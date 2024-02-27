@@ -105,5 +105,5 @@ void receiveEvent(int howMany)
 
 void requestEvent()
 {
-  Wire.write([ 0x01, 0x02 ], 2);
+  Wire.write("wire");
 }
