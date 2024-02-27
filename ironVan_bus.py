@@ -1,4 +1,4 @@
-from smbus2 import SMBus
+from smbus2 import SMBus, i2c_msg
 
 import ironVan_log as log
 
@@ -15,7 +15,8 @@ class Bus:
 				# Request device type from address (addr)
 
 				# ???  Update to block data to accept 14 characters  ???
-				deviceType = self.bus.read_byte_data(addr, 0)
+				msg = i2c_msg.read(addr, 1)
+				deviceType = self.bus.i2c_rdwr(msg)
 
 				print(deviceType)
 
