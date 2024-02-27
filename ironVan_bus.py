@@ -8,17 +8,18 @@ class Bus:
 		self.bus = SMBus(1)
 
 		# Stores {device address: type}
-		self.devices = {};
+		self.devices = {}
 		
-		for addr in range(0x03, 0x77):
+		for addr in range(0x08, 0x09):
 			try:
 				# Request device type from address (addr)
 
 				# Request 14 char DEVICE_TYPE from each device
-				msg = i2c_msg.read(addr, 14)
-				self.bus.i2c_rdwr(msg)
+				#msg = i2c_msg.read(addr, 14)
+				#self.bus.i2c_rdwr(msg)
+				msg = self.bus.read_i2c_block_data(addr, 0x20, 14)
 				
-				deviceType = self.asciiList2Str(msg)
+				deviceType = self.rawMsg2Str(msg)
 
 				# Store device type defined by address
 				self.devices[addr] = deviceType
@@ -26,7 +27,6 @@ class Bus:
 			except:
 				continue	
 
-		
 		print("Devices found on bus: ", self.devices)
 				
 	def sendCommandCLI(self):
@@ -43,27 +43,13 @@ class Bus:
 
 		return
 	
-	def asciiList2Str(self, msg):
-		
-		asciiTable = {
-			0: "NUL",
-			1: "SOH",
-			48: "0",
-			49: "1",
-			95: "_",
-			98: "b",
-			105: "i",
-			108: "l",
-			116: "t",
-			117: "u",
-			118: "v"
-		}
-		
+	def rawMsg2Str(self, msg):
+		# Store the raw message in a list as integers representing ASCII values, then 
 		charList = list(msg)
 		
 		outputStr = ''
 		
 		for x in charList:
-			outputStr += asciiTable[x]
+			outputStr += chr(x)
 			
 		return outputStr
