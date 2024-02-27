@@ -10,7 +10,7 @@ class Bus:
 		# Stores {device address}: type
 		self.devices = {};
 		
-		for addr in range(0x03, 0x77):
+		for addr in range(0x08, 0x09):
 			try:
 				# Request device type from address (addr)
 
