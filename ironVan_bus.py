@@ -16,8 +16,7 @@ class Bus:
 
 				# ???  Update to block data to accept 14 characters  ???
 				msg = i2c_msg.read(addr, 14)
-
-				deviceType = self.bus.i2c_rdwr(msg)
+				self.bus.i2c_rdwr(msg)
 
 				# ???  Fix dictionary syntax ???
 				self.devices[addr] = self.asciiList2Str(msg)
@@ -42,7 +41,7 @@ class Bus:
 		return
 	
 	def asciiList2Str(msg):
-
+		print(1)
 		asciiTable = {
 			0: "NUL",
 			1: "SOH",
@@ -56,12 +55,12 @@ class Bus:
 			117: "u",
 			118: "v"
 		}
-
+		print(2)
 		charList = list(msg)
-
+		print(3)
 		outputStr = ''
-
+		print(4)
 		for x in charList:
 			outputStr += asciiTable[x]
-		
+		print(5)
 		return outputStr
