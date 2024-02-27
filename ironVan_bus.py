@@ -19,12 +19,8 @@ class Bus:
 
 				deviceType = self.bus.i2c_rdwr(msg)
 
-				print(list(msg))
-
-				print(deviceType)
-
 				# ???  Fix dictionary syntax ???
-				self.devices[addr] = deviceType
+				self.devices[addr] = self.asciiList2Str(msg)
 
 				print(self.devices)
 				
@@ -44,3 +40,28 @@ class Bus:
 		#	- temp - thermostat device (1 per bus)
 
 		return
+	
+	def asciiList2Str(msg):
+
+		asciiTable = {
+			0: "NUL",
+			1: "SOH",
+			48: "0",
+			49: "1",
+			95: "_",
+			98: "b",
+			105: "i",
+			108: "l",
+			116: "t",
+			117: "u",
+			118: "v"
+		}
+
+		charList = list(msg)
+
+		outputStr = ''
+
+		for x in charList:
+			outputStr += asciiTable[x]
+		
+		return outputStr
