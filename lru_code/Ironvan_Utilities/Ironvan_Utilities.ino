@@ -97,6 +97,9 @@ void receiveEvent(int howMany)
       // Opens grey water tank valve
       digitalWrite(9, LOW);
       break;
+
+    case 0x0f:
+      break;
     }
   }
 }

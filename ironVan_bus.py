@@ -17,6 +17,8 @@ class Bus:
 				# ???  Update to block data to accept 14 characters  ???
 				deviceType = self.bus.read_byte_data(addr, 0)
 
+				print(deviceType)
+
 				# ???  Fix dictionary syntax ???
 				self.devices[addr] = deviceType
 
