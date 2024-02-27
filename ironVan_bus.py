@@ -15,7 +15,7 @@ class Bus:
 				# Request device type from address (addr)
 
 				# ???  Update to block data to accept 14 characters  ???
-				deviceType = self.bus.read_i2c_block_data(addr, 0, 14)
+				deviceType = self.bus.read_byte_data(addr, 0)
 
 				# ???  Fix dictionary syntax ???
 				self.devices[addr] = deviceType
