@@ -18,7 +18,7 @@ class Bus:
 				msg = i2c_msg.read(addr, 14)
 				self.bus.i2c_rdwr(msg)
 				print("before")
-				self.asciiList2Str()
+				#self.asciiList2Str()
 				print("after")
 
 				# ???  Fix dictionary syntax ???
