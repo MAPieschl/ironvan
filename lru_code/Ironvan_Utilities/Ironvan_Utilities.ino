@@ -105,5 +105,5 @@ void receiveEvent(int howMany)
 
 void requestEvent()
 {
-  Wire.write("wire");
+  Wire.write(DEVICE_TYPE);
 }
