@@ -10,13 +10,11 @@ class Bus:
 		# Stores {device address: type}
 		self.devices = {}
 		
-		for addr in range(0x08, 0x09):
+		for addr in range(0x03, 0x77):
 			try:
 				# Request device type from address (addr)
 
 				# Request 14 char DEVICE_TYPE from each device
-				#msg = i2c_msg.read(addr, 14)
-				#self.bus.i2c_rdwr(msg)
 				msg = self.bus.read_i2c_block_data(addr, 0x20, 14)
 				
 				deviceType = self.rawMsg2Str(msg)
