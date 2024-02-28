@@ -149,7 +149,3 @@ class Bus:
 					case 'request_status':
 						msg = self.bus.read_i2c_block_data(self.devices[deviceType], 0x21, 1)
 
-						match 
-
-					case _:
-
