@@ -13,6 +13,9 @@ const char DEVICE_TYPE[] = "util_b100_v010";
 // Request number used to determine what value to return to the master. Value is set in receiveEvent() and used in requestEvent(). DEFAULT:  Send DEVICE_TYPE
 byte requestNumber;
 
+//
+bool pinValues;
+
 void setup()
 {
   // -- Enable pull-up resistors on I2C line --
@@ -46,8 +49,8 @@ void setup()
 
 void loop()
 {
-  // -- Empty loop - program runs purely from off of interrupts once initialized --
-  delay(100);
+  // -- Constantly read pin values --
+  pinValues = PINB;
 }
 
 void receiveEvent(int howMany)
@@ -122,5 +125,7 @@ void requestEvent()
   case 0x20:
     Wire.write(DEVICE_TYPE);
     break;
+  case 0x21:
+    Wire.write(PINB);
   }
 }
