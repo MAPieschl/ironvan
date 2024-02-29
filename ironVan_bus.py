@@ -34,7 +34,7 @@ class Bus:
 				
 				deviceType = self.rawMsg2Str(msg)
 
-				# Store device type defined by address if found
+				# Store device type defined by address if found - stored separate from self.storeDevices to allow for future development of dynamic addressing
 				self.deviceAddress[deviceType] = addr
 				
 			except:
@@ -43,9 +43,13 @@ class Bus:
 		print("Devices found on bus: ", self.deviceAddress)
 		print("Initializing devices...")
 
+		self.storedDevices = {}
+		self.value = []
+
 		for deviceType in self.deviceAddress:
 			deviceName = input(f"A device of type {deviceType} was found at address {self.deviceAddress[deviceType]}. What would you like to name this device? ... ")
-			self.storedDevices[deviceName] = super.Devices()
+
+			self.storedDevices[deviceType] = Device(deviceType)
 		
 		print(self.storedDevices)
 				
