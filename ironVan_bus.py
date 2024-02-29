@@ -12,12 +12,13 @@ from smbus2 import SMBus, i2c_msg
 
 import ironVan_log as log
 
-class Device:
+class Device():
 	def __init__(self, deviceType: str):
 		if('util' in deviceType):
-			self.status = super.utilComm(deviceType, 'request_status')
+			#self.status = super.utilComm(deviceType, 'request_status')
+			self.status = 'good'
 
-class Bus:
+class Bus():
 	def __init__(self):
 		# Initialize bus from location -1 on RPi
 		self.bus = SMBus(1)
