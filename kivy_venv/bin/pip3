@@ -1,5 +1,5 @@
 #!/bin/sh
-'''exec' "/Users/mike/Library/CloudStorage/OneDrive-Personal/Ironvan/1. SC/ironvan/kivy_venv/bin/python3" "$0" "$@"
+'''exec' "/Users/mike/Library/CloudStorage/OneDrive-Personal/Ironvan/1_SC/ironvan/kivy_venv/bin/python3" "$0" "$@"
 ' '''
 # -*- coding: utf-8 -*-
 import re
