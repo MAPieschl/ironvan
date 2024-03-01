@@ -8,15 +8,24 @@
 # -- Bus().deviceAddress - dictionary containing key/value pair of {type: addr}
 # -- Bus().storedDevices
 
-from smbus2 import SMBus, i2c_msg
+try:	
+	from smbus2 import SMBus, i2c_msg
+
+except:
+		pass
 
 import ironVan_log as log
 
 class Device():
-	def __init__(self, deviceType: str):
+	def __init__(self, deviceName: str, deviceType: str, deviceAddr: str):
+
+		self.name = deviceName
+		self.type = deviceType
+		self.address = deviceAddr
+
 		# Choose type of device
 		
-		# --- UTILTIES ---
+		# --- UTILITIES ---
 		if('util' in deviceType):
 			# Choose PCB version
 			
@@ -35,23 +44,29 @@ class Device():
 						'grey_tank_heater_off': 0x05,
 						'grey_tank_valve_close': 0x06,
 						'grey_tank_valve_open': 0x07
-						
+					}
+
 					# Define available requests
 					
 					self.request = {
-						'device_type':	[0x20, 14]
+						'device_type':	[0x20, 14],
 						'status':  [0x21, 1]
 					}
 					
 			# --- LIGHTING ---
 
 class Bus():
-	def __init__(self):
+	def __init__(self, screenManager, log):
 		# Initialize bus from location -1 on RPi
-		self.bus = SMBus(1)
+		try:
+			self.bus = SMBus(1)
+
+		except:
+			print('No active bus...')
+			return
 
 		# Stores {device type: addr}
-		self.deviceAddress = {}
+		deviceAddress = {}
 		
 		for addr in range(0x03, 0x77):
 			try:
@@ -63,24 +78,24 @@ class Bus():
 				deviceType = self.rawMsg2Str(msg)
 
 				# Store device type defined by address if found - stored separate from self.storeDevices to allow for future development of dynamic addressing
-				self.deviceAddress[deviceType] = addr
+				deviceAddress[deviceType] = addr
 				
 			except:
 				continue	
 
-		print("Devices found on bus: ", self.deviceAddress)
+		print("Devices found on bus: ", deviceAddress)
 		print("Initializing devices...")
 
 		# Temp code -- should be replaced with subroutine that checks a log document to see if device has previously been stored, then either automatically runs the Device() setup or sends user to a GUI setup page
-		self.storedDevices = {}
+		self.activeDevices = {}
 		self.value = []
 
 		for deviceType in self.deviceAddress:
 			deviceName = input(f"A device of type {deviceType} was found at address {self.deviceAddress[deviceType]}. What would you like to name this device? ... ")
 
-			self.storedDevices[deviceName] = Device(deviceType)
+			self.activeDevices[deviceName] = Device(deviceName, deviceType, self.deviceAddress[deviceType])
 		
-		print(self.storedDevices['Utilities'].command)
+		print(self.activeDevices['Utilities'].command)
 				
 	def sendCommandCLI(self):
 		while(True):
@@ -88,15 +103,21 @@ class Bus():
 			cmd = int(input("Command: "))
 			self.bus.write_byte_data(addr, 0, cmd)
 
-	def send(self, deviceMessage):
-		# deviceMessage is a nested object that contains attributes from the Device() class. The final attribute should be .request['request'] or .command['command']
+	def send(self, msgType: str, addr: int, message: int):
+		# Channel through which all commands and requests should be sent outside of the initial scan for active devicess
+		#
+		# Parameters:
+		# - msgType - 'request' or 'command'
+		# - addr - Device().address
+		# - message - Device().command['x_command'] or Device().request('')
+
+		if('command' in msgType):
+			self.write_byte_data(addr, 0, message)
+			return 'command sent'
 		
-		if('command' in deviceMessage):
-			# Needs to look up the address
-			self.write_byte_data()
-			return
-		elif('command' in deviceMessage):
-			msg = rawMsg2Str(self.read_i2c_block_data())
+		elif('request' in msgType):
+			msg = self.rawMsg2Str(self.read_i2c_block_data(addr, message[0], message[1]))
+			return msg
 	
 	def rawMsg2Str(self, msg):
 		# Store the raw message in a list as integers representing ASCII values, then 
@@ -108,6 +129,3 @@ class Bus():
 			outputStr += chr(x)
 			
 		return outputStr
-	
-	## --- Device Specific Commands -> Routed from self.sendCommand() --- ##
-
