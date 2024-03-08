@@ -1,4 +1,5 @@
 #:kivy 2.3.0
+#:import SwapTransition kivy.uix.screenmanager.SwapTransition
 
 MDFloatLayout:
 
@@ -14,6 +15,7 @@ MDFloatLayout:
             id: nav_button_home
             icon: 'home'
             md_bg_color: app.theme_cls.primary_light
+            ripple_scale: 0
             pos_hint: {'center_x': 1.0, 'center_y': 0.93}
             size_hint: (1.2, 0.0875)
             on_release: app.navButtonRouter('nav_button_home')
@@ -22,6 +24,7 @@ MDFloatLayout:
             id: nav_button_electricity
             icon: 'lightning-bolt'
             md_bg_color: app.theme_cls.primary_light
+            ripple_scale: 0
             pos_hint: {'center_x': 0.7, 'center_y': 0.83}
             size_hint: (1.2, 0.0875)
             on_release: app.navButtonRouter('nav_button_electricity')
@@ -30,6 +33,7 @@ MDFloatLayout:
             id: nav_button_hvac
             icon: 'tailwind'
             md_bg_color: app.theme_cls.primary_light
+            ripple_scale: 0
             pos_hint: {'center_x': 0.7, 'center_y': 0.73}
             size_hint: (1.2, 0.0875)
             on_release: app.navButtonRouter('nav_button_hvac')
@@ -38,6 +42,7 @@ MDFloatLayout:
             id: nav_button_water
             icon: 'faucet'
             md_bg_color: app.theme_cls.primary_light
+            ripple_scale: 0
             pos_hint: {'center_x': 0.7, 'center_y': 0.63}
             size_hint: (1.2, 0.0875)
             on_release: app.navButtonRouter('nav_button_water')
@@ -46,6 +51,7 @@ MDFloatLayout:
             id: nav_button_lights
             icon: 'lightbulb-on'
             md_bg_color: app.theme_cls.primary_light
+            ripple_scale: 0
             pos_hint: {'center_x': 0.7, 'center_y': 0.53}
             size_hint: (1.2, 0.0875)
             on_release: app.navButtonRouter('nav_button_lights')
@@ -54,6 +60,7 @@ MDFloatLayout:
             id: nav_button_theme
             icon: 'theme-light-dark'
             md_bg_color: app.theme_cls.primary_light
+            ripple_scale: 0
             pos_hint: {'center_x': 0.7, 'center_y': 0.27}
             size_hint: (1.2, 0.0875)
             on_release: app.switchTheme()
@@ -62,6 +69,7 @@ MDFloatLayout:
             id: nav_button_settings
             icon: 'tune-vertical'
             md_bg_color: app.theme_cls.primary_light
+            ripple_scale: 0
             pos_hint: {'center_x': 0.7, 'center_y': 0.17}
             size_hint: (1.2, 0.0875)
             on_release: app.navButtonRouter('nav_button_settings')
@@ -70,7 +78,76 @@ MDFloatLayout:
             id: nav_button_power
             icon: 'power'
             md_bg_color: app.theme_cls.primary_light
+            ripple_scale: 0
             pos_hint: {'center_x': 0.7, 'center_y': 0.07}
             size_hint: (1.2, 0.0875)
             on_release: app.navButtonRouter('nav_button_power')
 
+    PageManager:
+        id: page_manager
+        transition: SwapTransition(duration = 0.25)
+
+        AppHomeScreen:
+            name: 'app_home_page'
+
+            MDFloatLayout:
+                id: app_home_page_layout
+                size_hint: (0.95, 1)
+                pos_hint: {'center_x': 0.525, 'center_y': 0.5}
+
+                # ---- Build Weather Card ----
+
+                MDCard:
+                    id: weather_quick_card
+                    md_bg_color: app.theme_cls.bg_darkest
+                    size_hint: (0.4, 0.9)
+                    pos_hint: {'center_x': 0.275, 'center_y': 0.5}
+
+                # ---- Build Thermostat Card ----
+
+                MDCard:
+                    id: thermostat_quick_card
+                    md_bg_color: app.theme_cls.bg_darkest
+                    size_hint: (0.4, 0.2)
+                    pos_hint: {'center_x': 0.725, 'center_y': 0.85}
+
+                # ---- Build BEMU Card ----
+
+                MDCard:
+                    id: bemu_quick_card
+                    md_bg_color: app.theme_cls.bg_darkest
+                    size_hint: (0.4, 0.2)
+                    pos_hint: {'center_x': 0.725, 'center_y': 0.6}
+                    on_release: app.navButtonRouter('nav_button_electricity')
+
+                # ---- Build WS Card ----
+
+                MDCard:
+                    id: ws_quick_card
+                    md_bg_color: app.theme_cls.bg_darkest
+                    size_hint: (0.4, 0.2)
+                    pos_hint: {'center_x': 0.725, 'center_y': 0.35}
+
+                # ---- Build LS Card ----
+
+                MDCard:
+                    id: ls_quick_card
+                    md_bg_color: app.theme_cls.bg_darkest
+                    size_hint: (0.4, 0.15)
+                    pos_hint: {'center_x': 0.725, 'center_y': 0.125}
+
+        BEMUHomeScreen:
+            name: 'bemu_home_page'
+
+            MDFloatLayout:
+                id: bemu_home_page_layout
+                size_hint: (0.95, 1)
+                pos_hint: {'center_x': 0.525, 'center_y': 0.5}
+
+                # ---- Build Weather Card ----
+
+                MDCard:
+                    id: bemu_home_card
+                    md_bg_color: app.theme_cls.bg_darkest
+                    size_hint: (0.85, 0.9)
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
