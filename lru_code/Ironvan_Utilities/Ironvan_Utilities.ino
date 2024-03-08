@@ -23,7 +23,7 @@ void setup()
   // 0 - pull-up resistors enabled / 1 - pull-up resistors disabled
   MCUCR &= ~(1 << PUD);
 
-  // With DDCn set to 0 (input), 0 - pull-up disabled for pin / pull-up enabled for pin
+  // With DDCn set to 0 (input), 0 - pull-up disabled for pin / 1 - pull-up enabled for pin
   PORTC |= (1 << PC5 | 1 << PC4);
 
   // 0 - pin configured as input / 1 - pin configured as output

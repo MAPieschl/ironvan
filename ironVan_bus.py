@@ -54,6 +54,28 @@ class Device():
 					}
 					
 			# --- LIGHTING ---
+			# Note:  Light system is currently set up for "on/off" functionality sending one byte in the command sequence. For full functionality, send two bytes -> one stating which light to affect (0x00 - 0x03) and the send stating the value of the PWM signal (0 - 255)
+			if('ltsy' in deviceType):
+			# Choose PCB version
+			
+			if("b100" in deviceType):
+				# Choose firmware major version
+
+				if("v0" in deviceType):
+					# Define available commands
+
+					self.command = {
+						'ls_1_toggle': 0x00,
+						'ls_2_toggle': 0x01,
+						'ls_3_toggle': 0x02,
+						'ls_4_toggle': 0x03
+					}
+
+					# Define available requests
+					
+					self.request = {
+						'device_type':	[0x20, 14]
+					}
 
 class Bus():
 	def __init__(self, screenManager, log):

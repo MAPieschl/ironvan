@@ -1,0 +1,76 @@
+#:kivy 2.3.0
+
+MDFloatLayout:
+
+    # ---- Build Side Navigation ----
+
+    MDFloatLayout:
+        id: nav_bar_layout
+        md_bg_color: app.theme_cls.bg_darkest
+        size_hint: (0.05, 1)
+        pos_hint: {'center_x': 0.025, 'center_y': 0.5}
+
+        MDIconButton:
+            id: nav_button_home
+            icon: 'home'
+            md_bg_color: app.theme_cls.primary_light
+            pos_hint: {'center_x': 1.0, 'center_y': 0.93}
+            size_hint: (1.2, 0.0875)
+            on_release: app.navButtonRouter('nav_button_home')
+
+        MDIconButton:
+            id: nav_button_electricity
+            icon: 'lightning-bolt'
+            md_bg_color: app.theme_cls.primary_light
+            pos_hint: {'center_x': 0.7, 'center_y': 0.83}
+            size_hint: (1.2, 0.0875)
+            on_release: app.navButtonRouter('nav_button_electricity')
+
+        MDIconButton:
+            id: nav_button_hvac
+            icon: 'tailwind'
+            md_bg_color: app.theme_cls.primary_light
+            pos_hint: {'center_x': 0.7, 'center_y': 0.73}
+            size_hint: (1.2, 0.0875)
+            on_release: app.navButtonRouter('nav_button_hvac')
+
+        MDIconButton:
+            id: nav_button_water
+            icon: 'faucet'
+            md_bg_color: app.theme_cls.primary_light
+            pos_hint: {'center_x': 0.7, 'center_y': 0.63}
+            size_hint: (1.2, 0.0875)
+            on_release: app.navButtonRouter('nav_button_water')
+
+        MDIconButton:
+            id: nav_button_lights
+            icon: 'lightbulb-on'
+            md_bg_color: app.theme_cls.primary_light
+            pos_hint: {'center_x': 0.7, 'center_y': 0.53}
+            size_hint: (1.2, 0.0875)
+            on_release: app.navButtonRouter('nav_button_lights')
+
+        MDIconButton:
+            id: nav_button_theme
+            icon: 'theme-light-dark'
+            md_bg_color: app.theme_cls.primary_light
+            pos_hint: {'center_x': 0.7, 'center_y': 0.27}
+            size_hint: (1.2, 0.0875)
+            on_release: app.switchTheme()
+
+        MDIconButton:
+            id: nav_button_settings
+            icon: 'tune-vertical'
+            md_bg_color: app.theme_cls.primary_light
+            pos_hint: {'center_x': 0.7, 'center_y': 0.17}
+            size_hint: (1.2, 0.0875)
+            on_release: app.navButtonRouter('nav_button_settings')
+
+        MDIconButton:
+            id: nav_button_power
+            icon: 'power'
+            md_bg_color: app.theme_cls.primary_light
+            pos_hint: {'center_x': 0.7, 'center_y': 0.07}
+            size_hint: (1.2, 0.0875)
+            on_release: app.navButtonRouter('nav_button_power')
+
