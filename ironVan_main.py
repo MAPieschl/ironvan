@@ -99,7 +99,7 @@ class WSPumpToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 				self.app.bus.send(
 					'command',
 					self.app.bus.activeDevices['utilities'].address,
-					self.value
+					self.app.bus.activeDevices['utilities'].command[self.value]
 				)
 
 	def set_disabled(self, disabled):
