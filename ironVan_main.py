@@ -4,6 +4,7 @@ from kivy.animation import Animation
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.behaviors import ToggleButtonBehavior
 from kivy.properties import StringProperty
+from kivy.config import Config
 
 from kivymd.app import MDApp
 from kivymd.uix.button import MDFillRoundFlatButton
@@ -159,7 +160,9 @@ class ironVanApp(MDApp):
 	def build(self):
 
 		# ---- Build Window ----
-		Window.size = (700, 480)
+		Config.set('graphics', 'resizable', True)
+		#Window.size = (700, 480)
+		Window.fullscreen = True
 		
 		# ---- Build App Theme ----
 
