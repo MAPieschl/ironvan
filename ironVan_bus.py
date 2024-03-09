@@ -22,6 +22,8 @@ class Device():
 		self.name = deviceName
 		self.type = deviceType
 		self.address = deviceAddr
+		self.command = None
+		self.request = None
 
 		# Choose type of device
 		
@@ -36,7 +38,7 @@ class Device():
 					# Define available commands
 					
 					self.command = {
-						'water_pump_on': 0x00,
+						'water_pump_auto': 0x00,
 						'water_pump_off': 0x01,
 						'fan_auto': 0x02,
 						'fan_off': 0x03,
@@ -58,27 +60,27 @@ class Device():
 			if('ltsy' in deviceType):
 			# Choose PCB version
 			
-			if("b100" in deviceType):
-				# Choose firmware major version
+				if("b100" in deviceType):
+					# Choose firmware major version
 
-				if("v0" in deviceType):
-					# Define available commands
+					if("v0" in deviceType):
+						# Define available commands
 
-					self.command = {
-						'ls_1_toggle': 0x00,
-						'ls_2_toggle': 0x01,
-						'ls_3_toggle': 0x02,
-						'ls_4_toggle': 0x03
-					}
+						self.command = {
+							'ls_1_toggle': 0x00,
+							'ls_2_toggle': 0x01,
+							'ls_3_toggle': 0x02,
+							'ls_4_toggle': 0x03
+						}
 
-					# Define available requests
-					
-					self.request = {
-						'device_type':	[0x20, 14]
-					}
+						# Define available requests
+						
+						self.request = {
+							'device_type':	[0x20, 14]
+						}
 
 class Bus():
-	def __init__(self, screenManager, log):
+	def __init__(self, log):
 		# Initialize bus from location -1 on RPi
 		try:
 			self.bus = SMBus(1)
@@ -113,11 +115,8 @@ class Bus():
 		self.value = []
 
 		for deviceType in self.deviceAddress:
-			deviceName = input(f"A device of type {deviceType} was found at address {self.deviceAddress[deviceType]}. What would you like to name this device? ... ")
-
-			self.activeDevices[deviceName] = Device(deviceName, deviceType, self.deviceAddress[deviceType])
-		
-		print(self.activeDevices['Utilities'].command)
+			if 'util' in deviceType:
+				self.activeDevices['utilities'] = Device('utilities', deviceType, deviceAddress[deviceType])
 				
 	def sendCommandCLI(self):
 		while(True):

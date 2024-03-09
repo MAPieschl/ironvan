@@ -1,3 +1,3 @@
 class Log():
-    def __init__(self, screenManager):
+    def __init__(self):
         return
