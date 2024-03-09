@@ -114,7 +114,7 @@ class Bus():
 		self.activeDevices = {}
 		self.value = []
 
-		for deviceType in self.deviceAddress:
+		for deviceType in deviceAddress:
 			if 'util' in deviceType:
 				self.activeDevices['utilities'] = Device('utilities', deviceType, deviceAddress[deviceType])
 				
