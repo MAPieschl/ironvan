@@ -133,11 +133,11 @@ class Bus():
 		# - message - Device().command['x_command'] or Device().request('')
 
 		if('command' in msgType):
-			self.write_byte_data(addr, 0, message)
+			self.bus.write_byte_data(addr, 0, message)
 			return 'command sent'
 		
 		elif('request' in msgType):
-			msg = self.rawMsg2Str(self.read_i2c_block_data(addr, message[0], message[1]))
+			msg = self.rawMsg2Str(self.bus.read_i2c_block_data(addr, message[0], message[1]))
 			return msg
 	
 	def rawMsg2Str(self, msg):
