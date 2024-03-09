@@ -86,7 +86,7 @@ class WSPumpToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 	def on_state(self, instance, value):
 		if value == 'normal':
 			if self.value == 'water_pump_off':
-				self.value = 'water_pump_on'
+				self.value = 'water_pump_auto'
 				self.md_bg_color = self.app.toggleOn
 				self.app.bus.send(
 					'command',
