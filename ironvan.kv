@@ -268,7 +268,50 @@ MDFloatLayout:
                     md_bg_color: app.theme_cls.bg_darkest
                     size_hint: (0.4, 0.15)
                     pos_hint: {'center_x': 0.725, 'center_y': 0.125}
-                    on_release: app.navButtonRouter('nav_button_ls')
+                    #on_release: app.navButtonRouter('nav_button_ls')
+
+                    MDFloatLayout:
+
+                        DiningLightToggleButton:
+                            id: ls_1_switch
+                            icon: 'table-furniture'
+                            md_bg_color: app.theme_cls.accent_light
+                            ripple_scale: 0
+                            theme_text_color: 'Custom'
+                            text_color: app.theme_cls.accent_dark
+                            pos_hint: {'center_x': 0.15, 'center_y': 0.5}
+                            on_release: self.state = 'down' if self.state == 'normal' else 'normal'
+
+                        BedroomLightToggleButton:
+                            id: ls_2_switch
+                            icon: 'bed'
+                            md_bg_color: app.theme_cls.accent_light
+                            ripple_scale: 0
+                            theme_text_color: 'Custom'
+                            text_color: app.theme_cls.accent_dark
+                            pos_hint: {'center_x': 0.38, 'center_y': 0.5}
+                            on_release: self.state = 'down' if self.state == 'normal' else 'normal'
+
+                        KitchenLightToggleButton:
+                            id: ls_3_switch
+                            icon: 'countertop'
+                            md_bg_color: app.theme_cls.accent_light
+                            ripple_scale: 0
+                            theme_text_color: 'Custom'
+                            text_color: app.theme_cls.accent_dark
+                            pos_hint: {'center_x': 0.62, 'center_y': 0.5}
+                            on_release: self.state = 'down' if self.state == 'normal' else 'normal'
+
+                        BathroomLightToggleButton:
+                            id: ls_4_switch
+                            icon: 'shower-head'
+                            md_bg_color: app.theme_cls.accent_light
+                            ripple_scale: 0
+                            theme_text_color: 'Custom'
+                            text_color: app.theme_cls.accent_dark
+                            pos_hint: {'center_x': 0.85, 'center_y': 0.5}
+                            on_release: self.state = 'down' if self.state == 'normal' else 'normal'
+
 
         BEMUHomeScreen:
             name: 'bemu_home_page'

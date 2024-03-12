@@ -7,7 +7,7 @@ from kivy.properties import StringProperty
 from kivy.config import Config
 
 from kivymd.app import MDApp
-from kivymd.uix.button import MDFillRoundFlatButton
+from kivymd.uix.button import MDFillRoundFlatButton, MDIconButton
 
 import ironVan_log as ivLog
 import ironVan_bus as ivBus
@@ -37,7 +37,11 @@ class appElementIDs():
 		]
 		self.toggles = [
 			'ws_pump_switch',
-			'ws_heater_switch'
+			'ws_heater_switch',
+			'ls_1_switch',
+			'ls_2_switch',
+			'ls_3_switch',
+			'ls_4_switch'
 		]
 		self.cards = [
 			'weather_quick_card',
@@ -71,7 +75,11 @@ class appElementIDs():
 			'grey_water_icon_75',
 			'grey_water_icon_50',
 			'grey_water_icon_25',
-			'grey_water_icon_0'
+			'grey_water_icon_0',
+			'ls_1_switch',
+			'ls_2_switch',
+			'ls_3_switch',
+			'ls_4_switch'
 		]
 
 class WSPumpToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
@@ -89,19 +97,19 @@ class WSPumpToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 			if self.value == 'water_pump_off':
 				self.value = 'water_pump_auto'
 				self.md_bg_color = self.app.toggleOn
-				self.app.bus.send(
-					'command',
-					self.app.bus.activeDevices['utilities'].address,
-					self.app.bus.activeDevices['utilities'].command[self.value]
-				)
+				# self.app.bus.send(
+				# 	'command',
+				# 	self.app.bus.activeDevices['utilities'].address,
+				# 	self.app.bus.activeDevices['utilities'].command[self.value]
+				# )
 			else:
 				self.value = 'water_pump_off'
 				self.md_bg_color = self.app.toggleOff
-				self.app.bus.send(
-					'command',
-					self.app.bus.activeDevices['utilities'].address,
-					self.app.bus.activeDevices['utilities'].command[self.value]
-				)
+				# self.app.bus.send(
+				# 	'command',
+				# 	self.app.bus.activeDevices['utilities'].address,
+				# 	self.app.bus.activeDevices['utilities'].command[self.value]
+				# )
 
 	def set_disabled(self, disabled):
 		self.disabled = disabled
@@ -123,6 +131,86 @@ class WSHeaterToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 				self.md_bg_color = self.app.toggleOn
 			else:
 				self.value = 'water_heater_off'
+				self.md_bg_color = self.app.toggleOff
+
+	def set_disabled(self, disabled):
+		self.disabled = disabled
+
+class DiningLightToggleButton(ToggleButtonBehavior, MDIconButton):
+
+	def __init__(self, **kwargs):
+		super().__init__(**kwargs)
+		self.app = ironVanApp.get_running_app()
+		self.value = 'ls_1_off'
+		#self.set_disabled(True)
+
+	def on_state(self, instance, value):
+		if value == 'normal':
+			if self.value == 'ls_1_off':
+				self.value = 'ls_1_on'
+				self.md_bg_color = self.app.toggleOn
+			else:
+				self.value = 'ls_1_off'
+				self.md_bg_color = self.app.toggleOff
+
+	def set_disabled(self, disabled):
+		self.disabled = disabled
+
+class BedroomLightToggleButton(ToggleButtonBehavior, MDIconButton):
+
+	def __init__(self, **kwargs):
+		super().__init__(**kwargs)
+		self.app = ironVanApp.get_running_app()
+		self.value = 'ls_2_off'
+		#self.set_disabled(True)
+
+	def on_state(self, instance, value):
+		if value == 'normal':
+			if self.value == 'ls_2_off':
+				self.value = 'ls_2_on'
+				self.md_bg_color = self.app.toggleOn
+			else:
+				self.value = 'ls_2_off'
+				self.md_bg_color = self.app.toggleOff
+
+	def set_disabled(self, disabled):
+		self.disabled = disabled
+
+class KitchenLightToggleButton(ToggleButtonBehavior, MDIconButton):
+
+	def __init__(self, **kwargs):
+		super().__init__(**kwargs)
+		self.app = ironVanApp.get_running_app()
+		self.value = 'ls_3_off'
+		#self.set_disabled(True)
+
+	def on_state(self, instance, value):
+		if value == 'normal':
+			if self.value == 'ls_3_off':
+				self.value = 'ls_3_on'
+				self.md_bg_color = self.app.toggleOn
+			else:
+				self.value = 'ls_3_off'
+				self.md_bg_color = self.app.toggleOff
+
+	def set_disabled(self, disabled):
+		self.disabled = disabled
+
+class BathroomLightToggleButton(ToggleButtonBehavior, MDIconButton):
+
+	def __init__(self, **kwargs):
+		super().__init__(**kwargs)
+		self.app = ironVanApp.get_running_app()
+		self.value = 'ls_4_off'
+		#self.set_disabled(True)
+
+	def on_state(self, instance, value):
+		if value == 'normal':
+			if self.value == 'ls_4_off':
+				self.value = 'ls_4_on'
+				self.md_bg_color = self.app.toggleOn
+			else:
+				self.value = 'ls_4_off'
 				self.md_bg_color = self.app.toggleOff
 
 	def set_disabled(self, disabled):
@@ -161,8 +249,8 @@ class ironVanApp(MDApp):
 
 		# ---- Build Window ----
 		Config.set('graphics', 'resizable', True)
-		#Window.size = (700, 480)
-		Window.fullscreen = 'auto'
+		Window.size = (700, 480)
+		#Window.fullscreen = 'auto'
 		
 		# ---- Build App Theme ----
 
