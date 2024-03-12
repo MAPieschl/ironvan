@@ -96,9 +96,8 @@ class WSPumpToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 		#self.set_disabled(True)
 
 	def on_state(self, instance, value):
-		print(value)
 		if value == 'normal' and time.time() >= (self.lastToggle + 1):
-			print(time.time() - self.lastToggle)
+			self.lastToggle = time.time()
 			if self.value == 'water_pump_off':
 				self.value = 'water_pump_auto'
 				self.md_bg_color = self.app.toggleOn
