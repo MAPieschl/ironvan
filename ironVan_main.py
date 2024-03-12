@@ -280,7 +280,7 @@ class ironVanApp(MDApp):
 		# Note:  every button that uses buttonReset MUST reset self.buttonReset after use
 
 		# Button delay is the standard delay used globally for all button debouncing
-		self.buttonDelay = 1
+		self.buttonDelay = 0.25
 		self.buttonReset = time.time() + self.buttonDelay
 
 		self.toggleOn = self.theme_cls.primary_light
