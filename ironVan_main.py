@@ -282,7 +282,7 @@ class ironVanApp(MDApp):
 		print('Theme switch at: ', time.time())
 		print('Last switch at: ', self.lastSwitch, '\n')
 		if time.time() < self.lastSwitch + 1: return
-
+		self.lastSwitch = time.time()
 		self.theme_cls.theme_style = (
 			'Dark' if self.theme_cls.theme_style == 'Light' else 'Light'
 		)
