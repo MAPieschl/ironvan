@@ -249,8 +249,8 @@ class ironVanApp(MDApp):
 
 		# ---- Build Window ----
 		Config.set('graphics', 'resizable', True)
-		Window.size = (700, 480)
-		#Window.fullscreen = 'auto'
+		#Window.size = (700, 480)
+		Window.fullscreen = 'auto'
 		
 		# ---- Build App Theme ----
 
