@@ -13,6 +13,8 @@ import ironVan_log as ivLog
 import ironVan_bus as ivBus
 import ironVan_status as ivStatus
 
+import time
+
 class appElementIDs():
 	"""
 	appElementIDs groups together all elements from the app into common lists. These lists can then be iterated through to set new colors when changing themes.
@@ -90,11 +92,12 @@ class WSPumpToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 		super().__init__(**kwargs)
 		self.app = ironVanApp.get_running_app()
 		self.value = 'water_pump_off'
+		self.lastToggle = time.time()
 		#self.set_disabled(True)
 
 	def on_state(self, instance, value):
 		print(value)
-		if value == 'normal':
+		if value == 'normal' and time.time() >= (self.lastToggle + 1):
 			if self.value == 'water_pump_off':
 				self.value = 'water_pump_auto'
 				self.md_bg_color = self.app.toggleOn
