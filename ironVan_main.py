@@ -93,6 +93,7 @@ class WSPumpToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 		#self.set_disabled(True)
 
 	def on_state(self, instance, value):
+		print(value)
 		if value == 'normal':
 			if self.value == 'water_pump_off':
 				self.value = 'water_pump_auto'
@@ -249,8 +250,8 @@ class ironVanApp(MDApp):
 
 		# ---- Build Window ----
 		Config.set('graphics', 'resizable', True)
-		#Window.size = (700, 480)
-		Window.fullscreen = 'auto'
+		Window.size = (700, 480)
+		#Window.fullscreen = 'auto'
 		
 		# ---- Build App Theme ----
 
