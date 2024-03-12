@@ -271,6 +271,7 @@ class ironVanApp(MDApp):
 		self.theme_cls.accent_palette = self.lightAccent
 		self.theme_cls.accent_light_hue = '300'
 		self.theme_cls.accent_dark_hue = '800'
+		self.lastSwitch = time.time()
 
 		self.toggleOn = self.theme_cls.primary_light
 		self.toggleOff = self.theme_cls.accent_light
@@ -278,6 +279,9 @@ class ironVanApp(MDApp):
 		return Builder.load_file('ironvan.kv')
 	
 	def switchTheme(self):
+		print('Theme switch at: ', time.time())
+		print('Last switch at: ', self.lastSwitch, '\n')
+		if time.time() < self.lastSwitch + 1: return
 
 		self.theme_cls.theme_style = (
 			'Dark' if self.theme_cls.theme_style == 'Light' else 'Light'
