@@ -92,28 +92,27 @@ class WSPumpToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 		super().__init__(**kwargs)
 		self.app = ironVanApp.get_running_app()
 		self.value = 'water_pump_off'
-		self.lastToggle = time.time()
 		#self.set_disabled(True)
 
 	def on_state(self, instance, value):
-		if value == 'normal' and time.time() >= (self.lastToggle + 1):
-			self.lastToggle = time.time()
+		if value == 'normal' and time.time() >= self.app.buttonReset:
+			self.app.buttonReset = time.time() + self.app.buttonDelay
 			if self.value == 'water_pump_off':
 				self.value = 'water_pump_auto'
 				self.md_bg_color = self.app.toggleOn
-				self.app.bus.send(
-					'command',
-					self.app.bus.activeDevices['utilities'].address,
-					self.app.bus.activeDevices['utilities'].command[self.value]
-				)
+				# self.app.bus.send(
+				# 	'command',
+				# 	self.app.bus.activeDevices['utilities'].address,
+				# 	self.app.bus.activeDevices['utilities'].command[self.value]
+				# )
 			else:
 				self.value = 'water_pump_off'
 				self.md_bg_color = self.app.toggleOff
-				self.app.bus.send(
-					'command',
-					self.app.bus.activeDevices['utilities'].address,
-					self.app.bus.activeDevices['utilities'].command[self.value]
-				)
+				# self.app.bus.send(
+				# 	'command',
+				# 	self.app.bus.activeDevices['utilities'].address,
+				# 	self.app.bus.activeDevices['utilities'].command[self.value]
+				# )
 
 	def set_disabled(self, disabled):
 		self.disabled = disabled
@@ -129,7 +128,8 @@ class WSHeaterToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 		self.set_disabled(True)
 
 	def on_state(self, instance, value):
-		if value == 'normal':
+		if value == 'normal' and time.time() >= self.app.buttonReset:
+			self.app.buttonReset = time.time() + self.app.buttonDelay
 			if self.value == 'water_heater_off':
 				self.value = 'water_heater_on'
 				self.md_bg_color = self.app.toggleOn
@@ -149,7 +149,8 @@ class DiningLightToggleButton(ToggleButtonBehavior, MDIconButton):
 		#self.set_disabled(True)
 
 	def on_state(self, instance, value):
-		if value == 'normal':
+		if value == 'normal' and time.time() >= self.app.buttonReset:
+			self.app.buttonReset = time.time() + self.app.buttonDelay
 			if self.value == 'ls_1_off':
 				self.value = 'ls_1_on'
 				self.md_bg_color = self.app.toggleOn
@@ -169,7 +170,8 @@ class BedroomLightToggleButton(ToggleButtonBehavior, MDIconButton):
 		#self.set_disabled(True)
 
 	def on_state(self, instance, value):
-		if value == 'normal':
+		if value == 'normal' and time.time() >= self.app.buttonReset:
+			self.app.buttonReset = time.time() + self.app.buttonDelay
 			if self.value == 'ls_2_off':
 				self.value = 'ls_2_on'
 				self.md_bg_color = self.app.toggleOn
@@ -189,7 +191,8 @@ class KitchenLightToggleButton(ToggleButtonBehavior, MDIconButton):
 		#self.set_disabled(True)
 
 	def on_state(self, instance, value):
-		if value == 'normal':
+		if value == 'normal' and time.time() >= self.app.buttonReset:
+			self.app.buttonReset = time.time() + self.app.buttonDelay
 			if self.value == 'ls_3_off':
 				self.value = 'ls_3_on'
 				self.md_bg_color = self.app.toggleOn
@@ -209,7 +212,8 @@ class BathroomLightToggleButton(ToggleButtonBehavior, MDIconButton):
 		#self.set_disabled(True)
 
 	def on_state(self, instance, value):
-		if value == 'normal':
+		if value == 'normal' and time.time() >= self.app.buttonReset:
+			self.app.buttonReset = time.time() + self.app.buttonDelay
 			if self.value == 'ls_4_off':
 				self.value = 'ls_4_on'
 				self.md_bg_color = self.app.toggleOn
@@ -271,7 +275,13 @@ class ironVanApp(MDApp):
 		self.theme_cls.accent_palette = self.lightAccent
 		self.theme_cls.accent_light_hue = '300'
 		self.theme_cls.accent_dark_hue = '800'
-		self.lastSwitch = time.time()
+
+		# Master reset for allowing button presses - used globally for debouncing
+		# Note:  every button that uses buttonReset MUST reset self.buttonReset after use
+
+		# Button delay is the standard delay used globally for all button debouncing
+		self.buttonDelay = 1
+		self.buttonReset = time.time() + self.buttonDelay
 
 		self.toggleOn = self.theme_cls.primary_light
 		self.toggleOff = self.theme_cls.accent_light
@@ -279,10 +289,9 @@ class ironVanApp(MDApp):
 		return Builder.load_file('ironvan.kv')
 	
 	def switchTheme(self):
-		print('Theme switch at: ', time.time())
-		print('Last switch at: ', self.lastSwitch, '\n')
-		if time.time() < self.lastSwitch + 1: return
-		self.lastSwitch = time.time()
+		if time.time() < self.buttonReset: return
+		self.buttonReset = time.time() + self.buttonDelay
+
 		self.theme_cls.theme_style = (
 			'Dark' if self.theme_cls.theme_style == 'Light' else 'Light'
 		)
