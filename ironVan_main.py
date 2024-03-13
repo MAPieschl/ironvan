@@ -100,19 +100,19 @@ class WSPumpToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 			if self.value == 'water_pump_off':
 				self.value = 'water_pump_auto'
 				self.md_bg_color = self.app.toggleOn
-				# self.app.bus.send(
-				# 	'command',
-				# 	self.app.bus.activeDevices['utilities'].address,
-				# 	self.app.bus.activeDevices['utilities'].command[self.value]
-				# )
+				self.app.bus.send(
+					'command',
+					self.app.bus.activeDevices['utilities'].address,
+					self.app.bus.activeDevices['utilities'].command[self.value]
+				)
 			else:
 				self.value = 'water_pump_off'
 				self.md_bg_color = self.app.toggleOff
-				# self.app.bus.send(
-				# 	'command',
-				# 	self.app.bus.activeDevices['utilities'].address,
-				# 	self.app.bus.activeDevices['utilities'].command[self.value]
-				# )
+				self.app.bus.send(
+					'command',
+					self.app.bus.activeDevices['utilities'].address,
+					self.app.bus.activeDevices['utilities'].command[self.value]
+				)
 
 	def set_disabled(self, disabled):
 		self.disabled = disabled
