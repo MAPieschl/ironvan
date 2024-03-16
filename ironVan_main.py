@@ -263,6 +263,7 @@ class DiningLightToggleButton(ToggleButtonBehavior, MDIconButton):
 				self.value = 'ls_1_toggle'
 				self.app.root.ids['ls_1_switch'].md_bg_color = self.app.toggleOn
 				self.app.root.ids['ls_1_quick_switch'].md_bg_color = self.app.toggleOn
+				print(self.app.bus.activeDevices['lighting'].command)
 				self.app.bus.send(
 					'command',
 					self.app.bus.activeDevices['lighting'].address,
