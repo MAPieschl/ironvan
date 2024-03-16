@@ -76,11 +76,16 @@ class Device():
 						# Define available requests
 						
 						self.request = {
-							'device_type':	[0x20, 14]
+							'device_type':	[0x20, 14],
+							'device_status': [0x21, 4]
 						}
 
 class Bus():
 	def __init__(self, log):
+
+		# Dictionary -> {'deviceName': Device()}
+		self.activeDevices = {}
+
 		# Initialize bus from location -1 on RPi
 		try:
 			self.bus = SMBus(1)
@@ -111,12 +116,13 @@ class Bus():
 		print("Initializing devices...")
 
 		# Temp code -- should be replaced with subroutine that checks a log document to see if device has previously been stored, then either automatically runs the Device() setup or sends user to a GUI setup page
-		self.activeDevices = {}
 		self.value = []
 
 		for deviceType in deviceAddress:
 			if 'util' in deviceType:
 				self.activeDevices['utilities'] = Device('utilities', deviceType, deviceAddress[deviceType])
+			elif 'ltsy' in deviceType:
+				self.activeDevices['lighting'] = Device('lighting', deviceType, deviceAddress[deviceType])
 				
 	def sendCommandCLI(self):
 		while(True):
@@ -131,7 +137,6 @@ class Bus():
 		# - msgType - 'request' or 'command'
 		# - addr - Device().address
 		# - message - Device().command['x_command'] or Device().request('')
-
 		if('command' in msgType):
 			self.bus.write_byte_data(addr, 0, message)
 			return 'command sent'

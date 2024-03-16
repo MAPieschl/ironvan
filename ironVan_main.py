@@ -7,7 +7,8 @@ from kivy.properties import StringProperty
 from kivy.config import Config
 
 from kivymd.app import MDApp
-from kivymd.uix.button import MDFillRoundFlatButton, MDIconButton
+from kivymd.uix.button import MDFillRoundFlatButton, MDIconButton, MDRoundFlatButton
+from kivymd.uix.dialog import MDDialog
 
 import ironVan_log as ivLog
 import ironVan_bus as ivBus
@@ -38,8 +39,15 @@ class appElementIDs():
 			'nav_button_ls'
 		]
 		self.toggles = [
+			'env_fan_quick_switch',
+			'env_cool_quick_switch',
+			'env_heat_quick_switch',
 			'ws_pump_switch',
 			'ws_heater_switch',
+			'ls_1_quick_switch',
+			'ls_2_quick_switch',
+			'ls_3_quick_switch',
+			'ls_4_quick_switch',
 			'ls_1_switch',
 			'ls_2_switch',
 			'ls_3_switch',
@@ -47,7 +55,7 @@ class appElementIDs():
 		]
 		self.cards = [
 			'weather_quick_card',
-			'env_quick_card',
+			'time_quick_card',
 			'bemu_quick_card',
 			'ws_quick_card',
 			'ls_quick_card',
@@ -66,6 +74,9 @@ class appElementIDs():
 			'nav_button_env',
 			'nav_button_ws',
 			'nav_button_ls',
+			'env_fan_quick_switch',
+			'env_cool_quick_switch',
+			'env_heat_quick_switch',
 			'fresh_water_icon_75',
 			'fresh_water_icon_50',
 			'fresh_water_icon_25',
@@ -78,11 +89,105 @@ class appElementIDs():
 			'grey_water_icon_50',
 			'grey_water_icon_25',
 			'grey_water_icon_0',
+			'ls_1_quick_switch',
+			'ls_2_quick_switch',
+			'ls_3_quick_switch',
+			'ls_4_quick_switch',
 			'ls_1_switch',
 			'ls_2_switch',
 			'ls_3_switch',
-			'ls_4_switch'
+			'ls_4_switch',
 		]
+
+class EnvFanToggleButton(ToggleButtonBehavior, MDIconButton):
+
+	def __init__(self, **kwargs):
+		super().__init__(**kwargs)
+		self.app = ironVanApp.get_running_app()
+		self.value = 'env_fan_off'
+		#self.set_disabled(True)
+
+	def on_state(self, instance, value):
+		if value == 'normal' and time.time() >= self.app.buttonReset:
+			self.app.buttonReset = time.time() + self.app.buttonDelay
+			if self.value == 'env_fan_off':
+				self.value = 'env_fan_on'
+				#self.app.root.ids['env_fan_switch'].md_bg_color = self.app.toggleOn
+				self.app.root.ids['env_fan_quick_switch'].md_bg_color = self.app.toggleOn
+				# self.app.bus.send(
+				# 	'command',
+				# 	self.app.bus.activeDevices['lighting'].address,
+				# 	self.app.bus.activeDevices['lighting'].command[self.value]
+				# )
+			else:
+				self.value = 'env_fan_off'
+				#self.app.root.ids['env_fan_switch'].md_bg_color = self.app.toggleOff
+				self.app.root.ids['env_fan_quick_switch'].md_bg_color = self.app.toggleOff
+				# self.app.bus.send(
+				# 	'command',
+				# 	self.app.bus.activeDevices['lighting'].address,
+				# 	self.app.bus.activeDevices['lighting'].command[self.value]
+				# )
+
+class EnvCoolToggleButton(ToggleButtonBehavior, MDIconButton):
+
+	def __init__(self, **kwargs):
+		super().__init__(**kwargs)
+		self.app = ironVanApp.get_running_app()
+		self.value = 'env_cool_off'
+		#self.set_disabled(True)
+
+	def on_state(self, instance, value):
+		if value == 'normal' and time.time() >= self.app.buttonReset:
+			self.app.buttonReset = time.time() + self.app.buttonDelay
+			if self.value == 'env_cool_off':
+				self.value = 'env_cool_on'
+				#self.app.root.ids['env_cool_switch'].md_bg_color = self.app.toggleOn
+				self.app.root.ids['env_cool_quick_switch'].md_bg_color = self.app.toggleOn
+				# self.app.bus.send(
+				# 	'command',
+				# 	self.app.bus.activeDevices['lighting'].address,
+				# 	self.app.bus.activeDevices['lighting'].command[self.value]
+				# )
+			else:
+				self.value = 'env_cool_off'
+				#self.app.root.ids['env_cool_switch'].md_bg_color = self.app.toggleOff
+				self.app.root.ids['env_cool_quick_switch'].md_bg_color = self.app.toggleOff
+				# self.app.bus.send(
+				# 	'command',
+				# 	self.app.bus.activeDevices['lighting'].address,
+				# 	self.app.bus.activeDevices['lighting'].command[self.value]
+				# )
+
+class EnvHeatToggleButton(ToggleButtonBehavior, MDIconButton):
+
+	def __init__(self, **kwargs):
+		super().__init__(**kwargs)
+		self.app = ironVanApp.get_running_app()
+		self.value = 'env_heat_off'
+		#self.set_disabled(True)
+
+	def on_state(self, instance, value):
+		if value == 'normal' and time.time() >= self.app.buttonReset:
+			self.app.buttonReset = time.time() + self.app.buttonDelay
+			if self.value == 'env_heat_off':
+				self.value = 'env_heat_on'
+				#self.app.root.ids['env_heat_switch'].md_bg_color = self.app.toggleOn
+				self.app.root.ids['env_heat_quick_switch'].md_bg_color = self.app.toggleOn
+				# self.app.bus.send(
+				# 	'command',
+				# 	self.app.bus.activeDevices['lighting'].address,
+				# 	self.app.bus.activeDevices['lighting'].command[self.value]
+				# )
+			else:
+				self.value = 'env_heat_off'
+				#self.app.root.ids['env_heat_switch'].md_bg_color = self.app.toggleOff
+				self.app.root.ids['env_heat_quick_switch'].md_bg_color = self.app.toggleOff
+				# self.app.bus.send(
+				# 	'command',
+				# 	self.app.bus.activeDevices['lighting'].address,
+				# 	self.app.bus.activeDevices['lighting'].command[self.value]
+				# )
 
 class WSPumpToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 	off = StringProperty('water_pump_off')
@@ -97,22 +202,25 @@ class WSPumpToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 	def on_state(self, instance, value):
 		if value == 'normal' and time.time() >= self.app.buttonReset:
 			self.app.buttonReset = time.time() + self.app.buttonDelay
-			if self.value == 'water_pump_off':
-				self.value = 'water_pump_auto'
-				self.md_bg_color = self.app.toggleOn
-				self.app.bus.send(
-					'command',
-					self.app.bus.activeDevices['utilities'].address,
-					self.app.bus.activeDevices['utilities'].command[self.value]
-				)
-			else:
-				self.value = 'water_pump_off'
-				self.md_bg_color = self.app.toggleOff
-				self.app.bus.send(
-					'command',
-					self.app.bus.activeDevices['utilities'].address,
-					self.app.bus.activeDevices['utilities'].command[self.value]
-				)
+			try:
+				if self.value == 'water_pump_off':
+					self.value = 'water_pump_auto'
+					self.app.bus.send(
+						'command',
+						self.app.bus.activeDevices['utilities'].address,
+						self.app.bus.activeDevices['utilities'].command[self.value]
+					)
+					self.md_bg_color = self.app.toggleOn
+				else:
+					self.value = 'water_pump_off'
+					self.app.bus.send(
+						'command',
+						self.app.bus.activeDevices['utilities'].address,
+						self.app.bus.activeDevices['utilities'].command[self.value]
+					)
+					self.md_bg_color = self.app.toggleOff
+			except KeyError:
+					self.app.noDeviceFound_dialog('Water pump')
 
 	def set_disabled(self, disabled):
 		self.disabled = disabled
@@ -153,10 +261,22 @@ class DiningLightToggleButton(ToggleButtonBehavior, MDIconButton):
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			if self.value == 'ls_1_off':
 				self.value = 'ls_1_on'
-				self.md_bg_color = self.app.toggleOn
+				self.app.root.ids['ls_1_switch'].md_bg_color = self.app.toggleOn
+				self.app.root.ids['ls_1_quick_switch'].md_bg_color = self.app.toggleOn
+				# self.app.bus.send(
+				# 	'command',
+				# 	self.app.bus.activeDevices['lighting'].address,
+				# 	self.app.bus.activeDevices['lighting'].command[self.value]
+				# )
 			else:
 				self.value = 'ls_1_off'
-				self.md_bg_color = self.app.toggleOff
+				self.app.root.ids['ls_1_switch'].md_bg_color = self.app.toggleOff
+				self.app.root.ids['ls_1_quick_switch'].md_bg_color = self.app.toggleOff
+				# self.app.bus.send(
+				# 	'command',
+				# 	self.app.bus.activeDevices['lighting'].address,
+				# 	self.app.bus.activeDevices['lighting'].command[self.value]
+				# )
 
 	def set_disabled(self, disabled):
 		self.disabled = disabled
@@ -174,10 +294,22 @@ class BedroomLightToggleButton(ToggleButtonBehavior, MDIconButton):
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			if self.value == 'ls_2_off':
 				self.value = 'ls_2_on'
-				self.md_bg_color = self.app.toggleOn
+				self.app.root.ids['ls_2_switch'].md_bg_color = self.app.toggleOn
+				self.app.root.ids['ls_2_quick_switch'].md_bg_color = self.app.toggleOn
+				# self.app.bus.send(
+				# 	'command',
+				# 	self.app.bus.activeDevices['lighting'].address,
+				# 	self.app.bus.activeDevices['lighting'].command[self.value]
+				# )
 			else:
 				self.value = 'ls_2_off'
-				self.md_bg_color = self.app.toggleOff
+				self.app.root.ids['ls_2_switch'].md_bg_color = self.app.toggleOff
+				self.app.root.ids['ls_2_quick_switch'].md_bg_color = self.app.toggleOff
+				# self.app.bus.send(
+				# 	'command',
+				# 	self.app.bus.activeDevices['lighting'].address,
+				# 	self.app.bus.activeDevices['lighting'].command[self.value]
+				# )
 
 	def set_disabled(self, disabled):
 		self.disabled = disabled
@@ -195,10 +327,22 @@ class KitchenLightToggleButton(ToggleButtonBehavior, MDIconButton):
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			if self.value == 'ls_3_off':
 				self.value = 'ls_3_on'
-				self.md_bg_color = self.app.toggleOn
+				self.app.root.ids['ls_3_switch'].md_bg_color = self.app.toggleOn
+				self.app.root.ids['ls_3_quick_switch'].md_bg_color = self.app.toggleOn
+				# self.app.bus.send(
+				# 	'command',
+				# 	self.app.bus.activeDevices['lighting'].address,
+				# 	self.app.bus.activeDevices['lighting'].command[self.value]
+				# )
 			else:
 				self.value = 'ls_3_off'
-				self.md_bg_color = self.app.toggleOff
+				self.app.root.ids['ls_3_switch'].md_bg_color = self.app.toggleOff
+				self.app.root.ids['ls_3_quick_switch'].md_bg_color = self.app.toggleOff
+				# self.app.bus.send(
+				# 	'command',
+				# 	self.app.bus.activeDevices['lighting'].address,
+				# 	self.app.bus.activeDevices['lighting'].command[self.value]
+				# )
 
 	def set_disabled(self, disabled):
 		self.disabled = disabled
@@ -216,10 +360,22 @@ class BathroomLightToggleButton(ToggleButtonBehavior, MDIconButton):
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			if self.value == 'ls_4_off':
 				self.value = 'ls_4_on'
-				self.md_bg_color = self.app.toggleOn
+				self.app.root.ids['ls_4_switch'].md_bg_color = self.app.toggleOn
+				self.app.root.ids['ls_4_quick_switch'].md_bg_color = self.app.toggleOn
+				# self.app.bus.send(
+				# 	'command',
+				# 	self.app.bus.activeDevices['lighting'].address,
+				# 	self.app.bus.activeDevices['lighting'].command[self.value]
+				# )
 			else:
 				self.value = 'ls_4_off'
-				self.md_bg_color = self.app.toggleOff
+				self.app.root.ids['ls_4_switch'].md_bg_color = self.app.toggleOff
+				self.app.root.ids['ls_4_quick_switch'].md_bg_color = self.app.toggleOff
+				# self.app.bus.send(
+				# 	'command',
+				# 	self.app.bus.activeDevices['lighting'].address,
+				# 	self.app.bus.activeDevices['lighting'].command[self.value]
+				# )
 
 	def set_disabled(self, disabled):
 		self.disabled = disabled
@@ -257,8 +413,8 @@ class ironVanApp(MDApp):
 
 		# ---- Build Window ----
 		Config.set('graphics', 'resizable', True)
-		#Window.size = (700, 480)
-		Window.fullscreen = 'auto'
+		Window.size = (700, 480)
+		#Window.fullscreen = 'auto'
 		
 		# ---- Build App Theme ----
 
@@ -425,6 +581,31 @@ class ironVanApp(MDApp):
 			
 			case 'nav_button_settings':
 				self.root.ids.page_manager.current = 'settings_home_page'
+
+	def lightingAdjust(self, *args):
+		value = args[1]
+		sliderID = args[2]
+		
+		return
+	
+	# ---- Dialob Boxes ----
+
+	def noDeviceFound_dialog(self, deviceName):
+		self.dialogBox = MDDialog(
+			text = f'{deviceName} is not responding.',
+			buttons = [
+				MDRoundFlatButton(
+					text = 'Dismiss',
+					on_release = self.closeDialogBox
+				),
+				MDFillRoundFlatButton(
+					text = 'Troubleshoot',
+				)],
+		)
+		self.dialogBox.open()
+
+	def closeDialogBox(self, obj):
+		self.dialogBox.dismiss()
 		
 
 ironVanApp().run()

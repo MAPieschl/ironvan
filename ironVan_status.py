@@ -28,8 +28,14 @@ API:
 
 class WaterSystem():
     def __init__(self, bus, log):
+        '''
+        To fully utilize the WaterSystem class, the following LRUs are required:
+        - Utilities - incl. fresh water pump, greay water valve, and grey water heat control and monitoring
+        - MeterSW120V - for the water heater
+        - WaterLevel - for each fresh water tank and grey water tank
 
-        # ---- State variables ----
+        The values stored in this class are read directly from the LRUs and are a means to detect faults in the system (comparing the values stored here with switch positions in the UI)
+        '''
 
         # Fresh Water Level (left / driver-side tank):  (0 - 100) (%)
         self.freshLevelLeft = None

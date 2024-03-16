@@ -31,19 +31,19 @@ int pin_ADC0_LS_4 = A0;
 
 //   LS_1
 int pin_LS_1 = 11;
-byte dutyCycle_LS_1 = 0; // Current duty cycle -> 0 = 0% & 255 = 100%
+byte dutyCycle_LS_1 = 191; // Current duty cycle -> 0 = 0% & 255 = 100%
 
 //   LS_2
 int pin_LS_2 = 10;
-byte dutyCycle_LS_3 = 0; // Current duty cycle -> 0 = 0% & 255 = 100%
+byte dutyCycle_LS_2 = 191; // Current duty cycle -> 0 = 0% & 255 = 100%
 
 //   LS_3
 int pin_LS_3 = 9;
-byte dutyCycle_LS_3 = 0; // Current duty cycle -> 0 = 0% & 255 = 100%
+byte dutyCycle_LS_3 = 191; // Current duty cycle -> 0 = 0% & 255 = 100%
 
 //   LS_4
 int pin_LS_4 = 3;
-byte dutyCycle_LS_4 = 0; // Current duty cycle -> 0 = 0% & 255 = 100%
+byte dutyCycle_LS_4 = 191; // Current duty cycle -> 0 = 0% & 255 = 100%
 
 void setup()
 {
@@ -126,7 +126,7 @@ void receiveEvent(int howMany)
             }
             else
             {
-                analogWrite(pin_LS_1, 255);
+                analogWrite(pin_LS_1, dutyCycle_LS_1);
             }
             break;
 
@@ -142,7 +142,7 @@ void receiveEvent(int howMany)
             }
             else
             {
-                analogWrite(pin_LS_2, 255);
+                analogWrite(pin_LS_2, dutyCycle_LS_2);
             }
             break;
 
@@ -158,7 +158,7 @@ void receiveEvent(int howMany)
             }
             else
             {
-                analogWrite(pin_LS_3, 255);
+                analogWrite(pin_LS_3, dutyCycle_LS_3);
             }
             break;
 
@@ -174,7 +174,7 @@ void receiveEvent(int howMany)
             }
             else
             {
-                analogWrite(pin_LS_4, 255);
+                analogWrite(pin_LS_4, dutyCycle_LS_4);
             }
             break;
 
@@ -192,4 +192,8 @@ void requestEvent()
     case 0x20:
         Wire.write(DEVICE_TYPE);
         break;
+    case 0x21:
+        Wire.write({pin_ADC3_LS_1, pin_ADC2_LS_2, pin_ADC1_LS_3, pin_ADC0_LS_4});
+        break;
     }
+}
