@@ -24,7 +24,7 @@ class Device():
 		self.address = deviceAddr
 		self.command = None
 		self.request = None
-
+		
 		# Choose type of device
 		
 		# --- UTILITIES ---
@@ -38,14 +38,14 @@ class Device():
 					# Define available commands
 					
 					self.command = {
-						'water_pump_auto': 0x00,
-						'water_pump_off': 0x01,
-						'fan_auto': 0x02,
-						'fan_off': 0x03,
-						'grey_tank_heater_auto': 0x04,
-						'grey_tank_heater_off': 0x05,
-						'grey_tank_valve_close': 0x06,
-						'grey_tank_valve_open': 0x07
+						'water_pump_auto': [0x00],
+						'water_pump_off': [0x01],
+						'fan_auto': [0x02],
+						'fan_off': [0x03],
+						'grey_tank_heater_auto': [0x04],
+						'grey_tank_heater_off': [0x05],
+						'grey_tank_valve_close': [0x06],
+						'grey_tank_valve_open': [0x07]
 					}
 
 					# Define available requests
@@ -55,30 +55,30 @@ class Device():
 						'status':  [0x21, 1]
 					}
 					
-			# --- LIGHTING ---
-			# Note:  Light system is currently set up for "on/off" functionality sending one byte in the command sequence. For full functionality, send two bytes -> one stating which light to affect (0x00 - 0x03) and the send stating the value of the PWM signal (0 - 255)
-			if('ltsy' in deviceType):
-			# Choose PCB version
-			
-				if("b100" in deviceType):
-					# Choose firmware major version
+		# --- LIGHTING ---
+		# Note:  Light system is currently set up for "on/off" functionality sending one byte in the command sequence. For full functionality, send two bytes -> one stating which light to affect (0x00 - 0x03) and the send stating the value of the PWM signal (0 - 255)
+		if('ltsy' in deviceType):
+		# Choose PCB version
+		
+			if("b100" in deviceType):
+				# Choose firmware major version
 
-					if("v0" in deviceType):
-						# Define available commands
+				if("v0" in deviceType):
+					# Define available commands
 
-						self.command = {
-							'ls_1_toggle': 0x00,
-							'ls_2_toggle': 0x01,
-							'ls_3_toggle': 0x02,
-							'ls_4_toggle': 0x03
-						}
+					self.command = {
+						'ls_1_toggle': [0x00],
+						'ls_2_toggle': [0x01],
+						'ls_3_toggle': [0x02],
+						'ls_4_toggle': [0x03]
+					}
 
-						# Define available requests
-						
-						self.request = {
-							'device_type':	[0x20, 14],
-							'device_status': [0x21, 4]
-						}
+					# Define available requests
+					
+					self.request = {
+						'device_type':	[0x20, 14],
+						'device_status': [0x21, 4]
+					}
 
 class Bus():
 	def __init__(self, log):
@@ -138,7 +138,8 @@ class Bus():
 		# - addr - Device().address
 		# - message - Device().command['x_command'] or Device().request('')
 		if('command' in msgType):
-			self.bus.write_byte_data(addr, 0, message)
+			#self.bus.write_byte_data(addr, 0, message)
+			self.bus.write_i2c_block_data(addr, 0, message)
 			return 'command sent'
 		
 		elif('request' in msgType):

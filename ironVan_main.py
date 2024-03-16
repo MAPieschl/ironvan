@@ -253,30 +253,34 @@ class DiningLightToggleButton(ToggleButtonBehavior, MDIconButton):
 	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
 		self.app = ironVanApp.get_running_app()
-		self.value = 'ls_1_toggle'
+		self.value = 'ls_1_off'
 		#self.set_disabled(True)
 
 	def on_state(self, instance, value):
 		if value == 'normal' and time.time() >= self.app.buttonReset:
 			self.app.buttonReset = time.time() + self.app.buttonDelay
-			if self.value == 'ls_1_toggle':
-				self.value = 'ls_1_toggle'
+			if self.value == 'ls_1_off':
+				self.value = 'ls_1_on'
 				self.app.root.ids['ls_1_switch'].md_bg_color = self.app.toggleOn
 				self.app.root.ids['ls_1_quick_switch'].md_bg_color = self.app.toggleOn
-				print(self.app.bus.activeDevices['lighting'].command)
+				command = self.app.bus.activeDevices['lighting'].command['ls_1_toggle'][:]
+				command.append(int(self.app.root.ids['ls_1_slider'].value))
+				#command.append(191)
 				self.app.bus.send(
 					'command',
 					self.app.bus.activeDevices['lighting'].address,
-					self.app.bus.activeDevices['lighting'].command['ls_1_toggle']
+					command
 				)
 			else:
-				self.value = 'ls_1_toggle'
+				self.value = 'ls_1_off'
 				self.app.root.ids['ls_1_switch'].md_bg_color = self.app.toggleOff
 				self.app.root.ids['ls_1_quick_switch'].md_bg_color = self.app.toggleOff
+				command = self.app.bus.activeDevices['lighting'].command['ls_1_toggle'][:]
+				command.append(0)
 				self.app.bus.send(
 					'command',
 					self.app.bus.activeDevices['lighting'].address,
-					self.app.bus.activeDevices['lighting'].command[self.value]
+					command
 				)
 
 	def set_disabled(self, disabled):
