@@ -67,10 +67,10 @@ class Device():
 					# Define available commands
 
 					self.command = {
-						'ls_1_toggle': [0x00],
-						'ls_2_toggle': [0x01],
-						'ls_3_toggle': [0x02],
-						'ls_4_toggle': [0x03]
+						'ls_1_toggle': [0x01],
+						'ls_2_toggle': [0x02],
+						'ls_3_toggle': [0x03],
+						'ls_4_toggle': [0x04]
 					}
 
 					# Define available requests

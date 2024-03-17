@@ -22,30 +22,31 @@ byte requestNumber;
 // FEEDBACK VARIABLES
 
 //  ADC3 (LS_1)
-int pin_ADC3_LS_1 = A3;
-int pin_ADC2_LS_2 = A2;
-int pin_ADC1_LS_3 = A1;
-int pin_ADC0_LS_4 = A0;
+const int pin_ADC3_LS_1 = A3;
+const int pin_ADC2_LS_2 = A2;
+const int pin_ADC1_LS_3 = A1;
+const int pin_ADC0_LS_4 = A0;
 
 // OUTPUT VARIABLES
 
 //   LS_1
-int pin_LS_1 = 11;
+const int pin_LS_1 = 11;
 byte dutyCycle_LS_1 = 191; // Current duty cycle -> 0 = 0% & 255 = 100%
 
 //   LS_2
-int pin_LS_2 = 10;
+const int pin_LS_2 = 10;
 byte dutyCycle_LS_2 = 191; // Current duty cycle -> 0 = 0% & 255 = 100%
 
 //   LS_3
-int pin_LS_3 = 9;
+const int pin_LS_3 = 9;
 byte dutyCycle_LS_3 = 191; // Current duty cycle -> 0 = 0% & 255 = 100%
 
 //   LS_4
-int pin_LS_4 = 3;
+const int pin_LS_4 = 3;
 byte dutyCycle_LS_4 = 191; // Current duty cycle -> 0 = 0% & 255 = 100%
 
-byte activeLight = 5;
+//   pin_LS_n currently selected by I2C command
+int active_LS_pin = 0;
 
 void setup()
 {
@@ -105,98 +106,69 @@ void receiveEvent(int howMany)
     {
         byte msg = Wire.read();
 
-        if(activeLight < 4){
-          switch (activeLight)
-          {
-            case 0:
-              analogWrite(pin_LS_1, msg);
-              activeLight = 5;
-              break;
-          }
-        }
-
-        else{
-          switch (msg)
-          {
+        switch (msg)
+        {
   
               // COMMAND STRUCTURE
-              // 0x00 - 0x03:  Write commands directly to the controller to change light PWM signals
-              // Default:  Store value written by master to the global variable requestNumber. This when sending SMBus commands from the Python master script, a value is written to the slave prior to requesting a value. For example:
+              // 0x01 - 0x04:  Signal the light targeted by the PWM value (10 - 255) in the second byte of the command.
+              // Default:  
+              //  1. If a light has been signaled for command, the default case will assign the second byte as the PWM value to the pin.
+              //  2. If note, it will store value written by master to the global variable requestNumber. This when sending SMBus commands from the Python master script, a value is written to the slave prior to requesting a value. For example:
               //
               //  bus.read_i2c_block_data(8, 10, 14)
               //
               // This command will first write the value 10 to the slave at address 8, then request a block of data containing 14 bytes. The specific requestNumber values are broken out in requestEvent().
-  
-          case 0x00:
-              // Determine how I2C block data is sent - assign PWM value to pin between 0 & 255
-  
-              // Temp code -> toggle light on and off using edge values 0 & 255 using the ADC variables (incorrectly)
-  
-  //            pin_ADC3_LS_1 = analogRead(pin_LS_1);
-  //            if (pin_ADC3_LS_1 >= 512)
-  //            {
-  //                analogWrite(pin_LS_1, 0);
-  //            }
-  //            else
-  //            {
-  //                analogWrite(pin_LS_1, dutyCycle_LS_1);
-  //            }
-  
-              activeLight = 0;
-              break;
+              //
+              // NOTE:  The light commands (currently 0x01 - 0x04) MUST fall between the off value (0x00) and the minimum value set by the user (normally 0x0A). Otherwise, the PWM signal will not fall to the default case.
   
           case 0x01:
-              // Determine how I2C block data is sent - assign PWM value to pin between 0 & 255
-  
-              // Temp code -> toggle light on and off using edge values 0 & 255 using the ADC variables (incorrectly)
-  
-              pin_ADC2_LS_2 = analogRead(pin_LS_2);
-              if (pin_ADC2_LS_2 >= 512)
-              {
-                  analogWrite(pin_LS_2, 0);
-              }
-              else
-              {
-                  analogWrite(pin_LS_2, dutyCycle_LS_2);
-              }
+              active_LS_pin = pin_LS_1;
               break;
   
           case 0x02:
-              // Determine how I2C block data is sent - assign PWM value to pin between 0 & 255
-  
-              // Temp code -> toggle light on and off using edge values 0 & 255 using the ADC variables (incorrectly)
-  
-              pin_ADC1_LS_3 = analogRead(pin_LS_3);
-              if (pin_ADC1_LS_3 >= 512)
-              {
-                  analogWrite(pin_LS_3, 0);
-              }
-              else
-              {
-                  analogWrite(pin_LS_3, dutyCycle_LS_3);
-              }
+              active_LS_pin = pin_LS_2;
               break;
   
           case 0x03:
-              // Determine how I2C block data is sent - assign PWM value to pin between 0 & 255
+              active_LS_pin = pin_LS_3;
+              break;
   
-              // Temp code -> toggle light on and off using edge values 0 & 255 using the ADC variables (incorrectly)
-  
-              pin_ADC0_LS_4 = analogRead(pin_LS_4);
-              if (pin_ADC0_LS_4 >= 512)
-              {
-                  analogWrite(pin_LS_4, 0);
-              }
-              else
-              {
-                  analogWrite(pin_LS_4, dutyCycle_LS_4);
-              }
+          case 0x04:
+              active_LS_pin = pin_LS_4;
               break;
   
           default:
-              requestNumber = msg;
+              if(active_LS_pin != 0){
+                
+                switch(active_LS_pin)
+                {
+                  case pin_LS_1:
+                    dutyCycle_LS_1 = msg;
+                    break;
+                    
+                  case pin_LS_2:
+                    dutyCycle_LS_2 = msg;
+                    break;
+                    
+                  case pin_LS_3:
+                    dutyCycle_LS_3 = msg;
+                    break;
+                    
+                  case pin_LS_4:
+                    dutyCycle_LS_4 = msg;
+                    break;
+                }
+                
+                analogWrite(active_LS_pin, msg);
+
+                active_LS_pin = 0;
+              }
+
+              else{
+                requestNumber = msg;
+              }
+              
               break;
-          }
         }
     }
 }

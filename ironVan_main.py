@@ -265,7 +265,6 @@ class DiningLightToggleButton(ToggleButtonBehavior, MDIconButton):
 				self.app.root.ids['ls_1_quick_switch'].md_bg_color = self.app.toggleOn
 				command = self.app.bus.activeDevices['lighting'].command['ls_1_toggle'][:]
 				command.append(int(self.app.root.ids['ls_1_slider'].value))
-				#command.append(191)
 				self.app.bus.send(
 					'command',
 					self.app.bus.activeDevices['lighting'].address,
@@ -301,20 +300,24 @@ class BedroomLightToggleButton(ToggleButtonBehavior, MDIconButton):
 				self.value = 'ls_2_on'
 				self.app.root.ids['ls_2_switch'].md_bg_color = self.app.toggleOn
 				self.app.root.ids['ls_2_quick_switch'].md_bg_color = self.app.toggleOn
-				# self.app.bus.send(
-				# 	'command',
-				# 	self.app.bus.activeDevices['lighting'].address,
-				# 	self.app.bus.activeDevices['lighting'].command[self.value]
-				# )
+				command = self.app.bus.activeDevices['lighting'].command['ls_2_toggle'][:]
+				command.append(int(self.app.root.ids['ls_2_slider'].value))
+				self.app.bus.send(
+					'command',
+					self.app.bus.activeDevices['lighting'].address,
+					command
+				)
 			else:
 				self.value = 'ls_2_off'
 				self.app.root.ids['ls_2_switch'].md_bg_color = self.app.toggleOff
 				self.app.root.ids['ls_2_quick_switch'].md_bg_color = self.app.toggleOff
-				# self.app.bus.send(
-				# 	'command',
-				# 	self.app.bus.activeDevices['lighting'].address,
-				# 	self.app.bus.activeDevices['lighting'].command[self.value]
-				# )
+				command = self.app.bus.activeDevices['lighting'].command['ls_2_toggle'][:]
+				command.append(0)
+				self.app.bus.send(
+					'command',
+					self.app.bus.activeDevices['lighting'].address,
+					command
+				)
 
 	def set_disabled(self, disabled):
 		self.disabled = disabled
@@ -334,20 +337,24 @@ class KitchenLightToggleButton(ToggleButtonBehavior, MDIconButton):
 				self.value = 'ls_3_on'
 				self.app.root.ids['ls_3_switch'].md_bg_color = self.app.toggleOn
 				self.app.root.ids['ls_3_quick_switch'].md_bg_color = self.app.toggleOn
-				# self.app.bus.send(
-				# 	'command',
-				# 	self.app.bus.activeDevices['lighting'].address,
-				# 	self.app.bus.activeDevices['lighting'].command[self.value]
-				# )
+				command = self.app.bus.activeDevices['lighting'].command['ls_3_toggle'][:]
+				command.append(int(self.app.root.ids['ls_3_slider'].value))
+				self.app.bus.send(
+					'command',
+					self.app.bus.activeDevices['lighting'].address,
+					command
+				)
 			else:
 				self.value = 'ls_3_off'
 				self.app.root.ids['ls_3_switch'].md_bg_color = self.app.toggleOff
 				self.app.root.ids['ls_3_quick_switch'].md_bg_color = self.app.toggleOff
-				# self.app.bus.send(
-				# 	'command',
-				# 	self.app.bus.activeDevices['lighting'].address,
-				# 	self.app.bus.activeDevices['lighting'].command[self.value]
-				# )
+				command = self.app.bus.activeDevices['lighting'].command['ls_3_toggle'][:]
+				command.append(0)
+				self.app.bus.send(
+					'command',
+					self.app.bus.activeDevices['lighting'].address,
+					command
+				)
 
 	def set_disabled(self, disabled):
 		self.disabled = disabled
@@ -367,20 +374,24 @@ class BathroomLightToggleButton(ToggleButtonBehavior, MDIconButton):
 				self.value = 'ls_4_on'
 				self.app.root.ids['ls_4_switch'].md_bg_color = self.app.toggleOn
 				self.app.root.ids['ls_4_quick_switch'].md_bg_color = self.app.toggleOn
-				# self.app.bus.send(
-				# 	'command',
-				# 	self.app.bus.activeDevices['lighting'].address,
-				# 	self.app.bus.activeDevices['lighting'].command[self.value]
-				# )
+				command = self.app.bus.activeDevices['lighting'].command['ls_4_toggle'][:]
+				command.append(int(self.app.root.ids['ls_4_slider'].value))
+				self.app.bus.send(
+					'command',
+					self.app.bus.activeDevices['lighting'].address,
+					command
+				)
 			else:
 				self.value = 'ls_4_off'
 				self.app.root.ids['ls_4_switch'].md_bg_color = self.app.toggleOff
 				self.app.root.ids['ls_4_quick_switch'].md_bg_color = self.app.toggleOff
-				# self.app.bus.send(
-				# 	'command',
-				# 	self.app.bus.activeDevices['lighting'].address,
-				# 	self.app.bus.activeDevices['lighting'].command[self.value]
-				# )
+				command = self.app.bus.activeDevices['lighting'].command['ls_4_toggle'][:]
+				command.append(0)
+				self.app.bus.send(
+					'command',
+					self.app.bus.activeDevices['lighting'].address,
+					command
+				)
 
 	def set_disabled(self, disabled):
 		self.disabled = disabled
@@ -591,7 +602,25 @@ class ironVanApp(MDApp):
 		value = args[1]
 		sliderID = args[2]
 		
-		return
+		match sliderID:
+			case 'ls_1_slider':
+				command = self.bus.activeDevices['lighting'].command['ls_1_toggle'][:]
+			case 'ls_2_slider':
+				command = self.bus.activeDevices['lighting'].command['ls_2_toggle'][:]
+			case 'ls_3_slider':
+				command = self.bus.activeDevices['lighting'].command['ls_3_toggle'][:]
+			case 'ls_4_slider':
+				command = self.bus.activeDevices['lighting'].command['ls_4_toggle'][:]
+			case _:
+				print('Error processing lightingAdjust()')
+				return
+				
+		command.append(int(self.root.ids[sliderID].value))
+		self.bus.send(
+			'command',
+			self.bus.activeDevices['lighting'].address,
+			command
+		)
 	
 	# ---- Dialob Boxes ----
 
