@@ -1,14 +1,14 @@
 #include <Wire.h>
 
 // Constant device address set
-const byte DEVICE_ADDR = 0x08;
+const byte DEVICE_ADDR = 0x28;
 
 // Device type is a device signature to signify to the control center the commands that the board will accept:
-//    util - board type "utilities"
+//    temp - board type "thermostat"
 //    b100 - PCB version 1.0.0
 //    v010 - firmware version 0.1.0
 // NOTE:  All DEVICE_TYPE strings will be 14 bytes (ASCII)
-const char DEVICE_TYPE[] = "util_b100_v010";
+const char DEVICE_TYPE[] = "temp_b100_v010";
 
 // Request number used to determine what value to return to the master. Value is set in receiveEvent() and used in requestEvent(). DEFAULT:  Send DEVICE_TYPE
 byte requestNumber;
@@ -72,43 +72,47 @@ void receiveEvent(int howMany)
       // This command will first write the value 10 to the slave at address 8, then request a block of data containing 14 bytes. The specific requestNumber values are broken out in requestEvent().
 
     case 0x00:
-      // Turns water pump ON (PUMP_OV must be shorted)
+      // Fan-low on
       digitalWrite(12, HIGH);
       break;
 
     case 0x01:
-      // Turns water pump OFF (regardless of state of PUMP_OV)
+      // Fan-low off
       digitalWrite(12, LOW);
       break;
 
     case 0x02:
-      // Turns shower fan to AUTO, toilet fan ON
-      digitalWrite(11, LOW);
-      break;
-
-    case 0x03:
-      // Turns shower and toilet fans OFF
+      // Fan-high on
       digitalWrite(11, HIGH);
       break;
 
-    case 0x04:
-      // Turns grey water tank heater to AUTO
-      digitalWrite(10, LOW);
+    case 0x03:
+      // Fan-high off
+      digitalWrite(11, LOW);
       break;
 
-    case 0x05:
-      // Turns grey water tank heater to OFF
+    case 0x04:
+      // AC on (& fan-high on)
+      digitalWrite(11, HIGH);
       digitalWrite(10, HIGH);
       break;
 
+    case 0x05:
+      // AC off (& fan-high off)
+      digitalWrite(10, LOW);
+      digitalWrite(11, LOW);
+      break;
+
     case 0x06:
-      // Opens grey water tank dump valve
+      // Heat pump on (& fan-high on)
+      digitalWrite(11, HIGH);
       digitalWrite(9, HIGH);
       break;
 
     case 0x07:
-      // Closes grey water tank valve
+      // Heat pump off (& fan-high off)
       digitalWrite(9, LOW);
+      digitalWrite(11, LOW);
       break;
 
     default:

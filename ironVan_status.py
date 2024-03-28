@@ -27,7 +27,7 @@ API:
 '''
 
 class WaterSystem():
-    def __init__(self, bus, log):
+    def __init__(self):
         '''
         To fully utilize the WaterSystem class, the following LRUs are required:
         - Utilities - incl. fresh water pump, greay water valve, and grey water heat control and monitoring
@@ -39,8 +39,6 @@ class WaterSystem():
 
         # Fresh Water Level (left / driver-side tank):  (0 - 100) (%)
         self.freshLevelLeft = None
-
-        # Fresh Water Level 
 
         # Fresh Water Level (right / passenger-side tank):  (0 - 100) (%)
         self.freshLevelRight = None
@@ -68,3 +66,11 @@ class WaterSystem():
 
         # Water Pump Power Consumption: float
         self.waterPumpPower = None
+
+class BEMUSystem():
+    def __init__(self):
+        return
+
+class LightingSystem():
+    def __init__(self):
+        return

@@ -1,3 +1,3 @@
 class Log():
-    def __init__(self):
+    def __init__(selfs):
         return
