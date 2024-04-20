@@ -79,7 +79,6 @@ class Weather():
         try:
             for forecast in forecastResponse.get('list'):
                 systemDate = datetime.fromtimestamp(forecast.get('dt')).strftime('%m/%d')
-                print(systemDate)
 
                 if systemDate in forecastList:
                     forecastList[systemDate].addData(forecast)

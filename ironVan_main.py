@@ -110,23 +110,29 @@ class EnvFanToggleButton(ToggleButtonBehavior, MDIconButton):
 		#self.set_disabled(True)
 
 	def on_state(self, instance, value):
+		print(value)
 		if value == 'normal' and time.time() >= self.app.buttonReset:
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
+				print(self.value)
 				if self.value == 'fan_low_off':
+					print('Turning on...')
 					self.app.bus.send(
 						'command',
 						self.app.bus.activeDevices['thermostat'].address,
 						self.app.bus.activeDevices['thermostat'].command[self.value]
 					)
+					print('Command sent...')
 					self.value = 'fan_low_auto'
 					self.md_bg_color = self.app.toggleOn
 				else:
+					print('Turning off...')
 					self.app.bus.send(
 						'command',
 						self.app.bus.activeDevices['thermostat'].address,
 						self.app.bus.activeDevices['thermostat'].command[self.value]
 					)
+					print('Command sent...')
 					self.value = 'fan_low_off'
 					self.md_bg_color = self.app.toggleOff
 			except KeyError:
