@@ -123,7 +123,7 @@ class EnvFanToggleButton(ToggleButtonBehavior, MDIconButton):
 						self.app.bus.activeDevices['thermostat'].command[self.value]
 					)
 					print('Command sent...')
-					self.value = 'fan_low_auto'
+					self.value = 'fan_low_on'
 					self.md_bg_color = self.app.toggleOn
 					print('Success!')
 				else:
