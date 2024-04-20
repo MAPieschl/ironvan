@@ -125,6 +125,7 @@ class EnvFanToggleButton(ToggleButtonBehavior, MDIconButton):
 					print('Command sent...')
 					self.value = 'fan_low_auto'
 					self.md_bg_color = self.app.toggleOn
+					print('Success!')
 				else:
 					print('Turning off...')
 					self.app.bus.send(
@@ -135,6 +136,7 @@ class EnvFanToggleButton(ToggleButtonBehavior, MDIconButton):
 					print('Command sent...')
 					self.value = 'fan_low_off'
 					self.md_bg_color = self.app.toggleOff
+					print('Success!')
 			except KeyError:
 					self.app.noDeviceFound_dialog('Fan')
 
