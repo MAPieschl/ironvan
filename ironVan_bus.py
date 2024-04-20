@@ -251,6 +251,8 @@ class Bus():
 			elif 'temp' in deviceType:
 				self.activeDevices['thermostat'] = Device('thermostat', deviceType, deviceAddress[deviceType])
 
+		print(self.activeDevices)
+
 	def send(self, msgType: str, addr: int, message: int):
 		# Channel through which all commands and requests should be sent outside of the initial scan for active devicess
 		#
@@ -258,6 +260,7 @@ class Bus():
 		# - msgType - 'request' or 'command'
 		# - addr - Device().address
 		# - message - Device().command['x_command'] or Device().request('')
+		print(f'Command sent: {addr} // {message}')
 		if('command' in msgType):
 			#self.bus.write_byte_data(addr, 0, message)
 			self.bus.write_i2c_block_data(addr, 0, message)
