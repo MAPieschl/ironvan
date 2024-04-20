@@ -1,7 +1,7 @@
 #include <Wire.h>
 
 // Constant device address set
-const byte DEVICE_ADDR = 0x28;
+const byte DEVICE_ADDR = 0x0A;
 
 // Device type is a device signature to signify to the control center the commands that the board will accept:
 //    temp - board type "thermostat"

@@ -14,7 +14,7 @@ from kivymd.uix.dialog import MDDialog
 
 import ironVan_log as ivLog
 import ironVan_bus as ivBus
-import ironVan_status as ivStatus
+import ironVan_weather as weather
 
 import time
 
@@ -438,12 +438,15 @@ class ironVanApp(MDApp):
 	log = ivLog.Log()
 	bus = ivBus.Bus(log)
 
+	location = weather.Location()
+	weather = weather.Weather()
+
 	def build(self):
 
 		# ---- Build Window ----
 		Config.set('graphics', 'resizable', True)
 		# Note:  When uncommenting Window.fullscreen, ensure to delete comment out `size: (700, 480)` in the .kv file.
-		#Window.fullscreen = 'auto'
+		Window.fullscreen = 'auto'
 		
 		# ---- Build App Theme ----
 
@@ -474,10 +477,13 @@ class ironVanApp(MDApp):
 		# All pop-up windows must be instantiated under the self.dialogBox object to ensure that dialog boxes do not stack
 		self.dialogBox = None
 
+		self.location.getLocation(self)
+		Clock.schedule_interval(partial(self.weather.getWeather, self), 10)
+
 		# Initialize bus scan
-		if(len(self.bus.activeDevices) != 0):
-			Clock.schedule_interval(self.bus.regularScan, 1)
-			Clock.schedule_interval(self.bus.parseResponses, 1)
+		# if(len(self.bus.activeDevices) != 0):
+		# 	Clock.schedule_interval(self.bus.regularScan, 1)
+		# 	Clock.schedule_interval(self.bus.parseResponses, 1)
 
 		return Builder.load_file('ironvan.kv')
 	

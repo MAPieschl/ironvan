@@ -7,7 +7,7 @@
 // I2C VARIABLES
 
 // Constant device address set
-const byte DEVICE_ADDR = 0x18;
+const byte DEVICE_ADDR = 0x09;
 
 // Device type is a device signature to signify to the control center the commands that the board will accept:
 //    ltsy - board type "lighting systems"

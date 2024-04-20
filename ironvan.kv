@@ -2,8 +2,7 @@
 #:import SwapTransition kivy.uix.screenmanager.SwapTransition
 
 MDFloatLayout:
-    #size_hint: (None, None)
-    size: (700, 480)
+    # size: (700, 480)
 
     # ---- Build Side Navigation ----
 
@@ -134,17 +133,27 @@ MDFloatLayout:
 
                         MDLabel:
                             id: outside_temp_quick_label
-                            text: u'69\N{DEGREE SIGN}'
+                            text: u'--\N{DEGREE SIGN}'
                             font_style: 'H2'
                             theme_text_color: 'Primary'
                             pos_hint: {'center_x': 0.64, 'center_y': 0.87}
 
-                        MDIcon:
-                            id: weather_icon
-                            icon: 'cloud-question-outline'
-                            theme_text_color: 'Hint'
-                            font_size: 128
-                            pos_hint: {'center_x': 0.72, 'center_y': 0.87}
+                        # MDIcon:
+                        #     id: weather_icon
+                        #     icon: 'cloud-question-outline'
+                        #     theme_text_color: 'Hint'
+                        #     font_size: 128
+                        #     pos_hint: {'center_x': 0.72, 'center_y': 0.87}
+
+                        MDFloatLayout:
+                            size_hint: (0.3, 0.3)
+                            pos_hint: {'center_x': 0.7, 'center_y': 0.85}
+                            AsyncImage:
+                                id: weather_icon
+                                source: 'https://openweathermap.org/img/wn/50d@2x.png'
+                                fit_mode: 'fill'
+                                allow_stretch: 'false'
+                                pos_hint: {'center_x': 0.5, 'center_y': 0.5}
 
                         MDLabel:
                             text: 'Today'
@@ -160,7 +169,7 @@ MDFloatLayout:
 
                         MDLabel:
                             id: high_temp_quick_label
-                            text: u'69\N{DEGREE SIGN}'
+                            text: u'--\N{DEGREE SIGN}'
                             font_style: 'H4'
                             theme_text_color: 'Primary'
                             pos_hint: {'center_x': 0.95, 'center_y': 0.68}
@@ -173,7 +182,7 @@ MDFloatLayout:
 
                         MDLabel:
                             id: low_temp_quick_label
-                            text: u'37\N{DEGREE SIGN}'
+                            text: u'--\N{DEGREE SIGN}'
                             font_style: 'H5'
                             theme_text_color: 'Primary'
                             pos_hint: {'center_x': 1.22, 'center_y': 0.68}

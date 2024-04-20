@@ -14,7 +14,8 @@ try:
 	from smbus2 import SMBus, i2c_msg
 
 except:
-		pass
+	print('No bus detected...')
+	pass
 
 import ironVan_log as log
 
