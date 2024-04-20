@@ -248,6 +248,8 @@ class Bus():
 				self.activeDevices['utilities'] = Device('utilities', deviceType, deviceAddress[deviceType])
 			elif 'ltsy' in deviceType:
 				self.activeDevices['lighting'] = Device('lighting', deviceType, deviceAddress[deviceType])
+			elif 'temp' in deviceType:
+				self.activeDevices['thermostat'] = Device('thermostat', deviceType, deviceAddress[deviceType])
 
 	def send(self, msgType: str, addr: int, message: int):
 		# Channel through which all commands and requests should be sent outside of the initial scan for active devicess
