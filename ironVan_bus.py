@@ -71,6 +71,7 @@ class Device():
 
 				if("v0" in deviceType):
 					# Define available commands
+	 				# Note:  The 'ls_n_toggle' commands are appended with a 1 byte value from either -- the toggle button (0 or current slider value) -- or -- app.lightingAdjust() (slider value)
 
 					self.command = {
 						'ls_1_toggle': [0x01],
@@ -84,6 +85,27 @@ class Device():
 					self.request = {
 						'device_type':	[0x20, 14],
 						'device_status': [0x21, 4]
+					}
+
+		# --- LIGHT SWITCH & THERMOMETER ---
+		if('ltsw' in deviceType):
+		# Choose PCB version
+		
+			if("b100" in deviceType):
+				# Choose firmware major version
+
+				if("v0" in deviceType):
+					# Define available commands
+
+					self.command = {
+					}
+
+					# Define available requests
+					
+					self.request = {
+						'device_type':	[0x20, 14],
+						'current_temperature': [0x21, 2],
+						'light_switch_status': [0x22, 2]
 					}
 
 		# --- THERMOSTAT ---

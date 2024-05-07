@@ -3,18 +3,26 @@ from kivy.core.window import Window
 from kivy.animation import Animation
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.behaviors import ToggleButtonBehavior
-from kivy.properties import StringProperty
+from kivy.properties import StringProperty, ObjectProperty
 from kivy.config import Config
 from kivy.clock import Clock
 from functools import partial
 
 from kivymd.app import MDApp
-from kivymd.uix.button import MDFillRoundFlatButton, MDIconButton, MDRoundFlatButton
+from kivymd.uix.button import MDFillRoundFlatButton, MDIconButton, MDRoundFlatButton, MDFlatButton
 from kivymd.uix.dialog import MDDialog
+from kivymd.uix.list import OneLineIconListItem, IconLeftWidget
+from kivymd.uix.textfield import MDTextField
+from kivymd.uix.floatlayout import MDFloatLayout
+from kivymd.uix.relativelayout import MDRelativeLayout
+from kivymd.uix.boxlayout import MDBoxLayout
+from kivymd.uix.behaviors.toggle_behavior import MDToggleButton
 
 import ironVan_log as ivLog
 import ironVan_bus as ivBus
 import ironVan_weather as weather
+import ironVan_wifi as network
+import ironVan_settings as settings
 
 import time
 
@@ -28,9 +36,13 @@ class appElementIDs():
 		]
 		self.labels = [
 			'fresh_water_label',
-			'grey_water_label'
+			'grey_water_label',
+			'settings_user_settings_title_icon',
+			'settings_user_settings_title',
+			'settings_user_settings_temp_select_label',
+			'settings_user_settings_time_select_label'
 		]
-		self.buttons = [
+		self.navButtons = [
 			'nav_button_home',
 			'nav_button_bemu',
 			'nav_button_theme',
@@ -40,10 +52,16 @@ class appElementIDs():
 			'nav_button_ws',
 			'nav_button_ls'
 		]
-		self.toggles = [
+		self.buttons = [
+			'settings_user_settings_button_back',
+			'user_settings_button'
+		]
+		self.switches = [
 			'env_fan_quick_switch',
 			'env_cool_quick_switch',
 			'env_heat_quick_switch',
+			'wifi_quick_switch',
+			'ble_quick_switch',
 			'ws_pump_switch',
 			'ws_heater_switch',
 			'ls_1_quick_switch',
@@ -55,6 +73,12 @@ class appElementIDs():
 			'ls_3_switch',
 			'ls_4_switch'
 		]
+		self.toggles = [
+			'celsius_toggle',
+			'fahrenheit_toggle',
+			'hour12_toggle',
+			'hour24_toggle'
+		]
 		self.cards = [
 			'weather_quick_card',
 			'time_quick_card',
@@ -65,7 +89,8 @@ class appElementIDs():
 			'env_home_card',
 			'ws_home_card',
 			'ls_home_card',
-			'settings_home_card'
+			'settings_home_card',
+			'settings_user_settings_card'
 		]
 		self.icons = [
 			'nav_button_home',
@@ -79,6 +104,7 @@ class appElementIDs():
 			'env_fan_quick_switch',
 			'env_cool_quick_switch',
 			'env_heat_quick_switch',
+			'wifi_quick_switch',
 			'fresh_water_icon_75',
 			'fresh_water_icon_50',
 			'fresh_water_icon_25',
@@ -100,6 +126,49 @@ class appElementIDs():
 			'ls_3_switch',
 			'ls_4_switch',
 		]
+		self.keys = [
+			'one_key',
+			'two_key',
+			'three_key',
+			'four_key',
+			'five_key',
+			'six_key',
+			'seven_key',
+			'eight_key',
+			'nine_key',
+			'zero_key',
+			'q_key',
+			'w_key',
+			'e_key',
+			'r_key',
+			't_key',
+			'y_key',
+			'u_key',
+			'i_key',
+			'o_key',
+			'p_key',
+			'a_key',
+			's_key',
+			'd_key',
+			'f_key',
+			'g_key',
+			'h_key',
+			'j_key',
+			'k_key',
+			'l_key',
+			'z_key',
+			'x_key',
+			'c_key',
+			'v_key',
+			'b_key',
+			'n_key',
+			'm_key',
+			'shift_key',
+			'back_key',
+			'symbol_key',
+			'space_key',
+			'done_key'
+		]
 
 class EnvFanToggleButton(ToggleButtonBehavior, MDIconButton):
 
@@ -110,11 +179,9 @@ class EnvFanToggleButton(ToggleButtonBehavior, MDIconButton):
 		#self.set_disabled(True)
 
 	def on_state(self, instance, value):
-		print(value)
 		if value == 'normal' and time.time() >= self.app.buttonReset:
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
-				print(self.value)
 				if self.value == 'fan_low_off':
 					print(f'Turning on...{self.value}')
 					self.app.bus.send(
@@ -122,21 +189,16 @@ class EnvFanToggleButton(ToggleButtonBehavior, MDIconButton):
 						self.app.bus.activeDevices['thermostat'].address,
 						self.app.bus.activeDevices['thermostat'].command[self.value]
 					)
-					print('Command sent...')
 					self.value = 'fan_low_on'
 					self.md_bg_color = self.app.toggleOn
-					print('Success!')
 				else:
-					print(f'Turning off...{self.value}')
 					self.app.bus.send(
 						'command',
 						self.app.bus.activeDevices['thermostat'].address,
 						self.app.bus.activeDevices['thermostat'].command[self.value]
 					)
-					print('Command sent...')
 					self.value = 'fan_low_off'
 					self.md_bg_color = self.app.toggleOff
-					print('Success!')
 			except KeyError:
 					self.app.noDeviceFound_dialog('Fan')
 
@@ -201,6 +263,54 @@ class EnvHeatToggleButton(ToggleButtonBehavior, MDIconButton):
 					self.md_bg_color = self.app.toggleOff
 			except KeyError:
 					self.app.noDeviceFound_dialog('Heat pump')
+
+class WifiToggleButton(ToggleButtonBehavior, MDIconButton):
+
+	def __init__(self, **kwargs):
+		super().__init__(**kwargs)
+		self.app = ironVanApp.get_running_app()
+		self.value = 'wifi_off'
+		#self.set_disabled(True)
+
+	def on_state(self, instance, value):
+		if value == 'normal' and time.time() >= self.app.buttonReset:
+			self.app.buttonReset = time.time() + self.app.buttonDelay
+			try:
+				if self.value == 'wifi_off':
+					self.value = 'wifi_on'
+					self.md_bg_color = self.app.toggleOn
+					self.app.wifi.turnWifi('on')
+					self.app.wifiConnect_dialog()
+				else:
+					self.value = 'wifi_off'
+					self.md_bg_color = self.app.toggleOff
+					self.app.wifi.turnWifi('off')
+			except:
+					self.app.generalError_dialog('Wifi not available')
+   
+class BLEToggleButton(ToggleButtonBehavior, MDIconButton):
+
+	def __init__(self, **kwargs):
+		super().__init__(**kwargs)
+		self.app = ironVanApp.get_running_app()
+		self.value = 'ble_off'
+		self.set_disabled(True)
+
+	def on_state(self, instance, value):
+		if value == 'normal' and time.time() >= self.app.buttonReset:
+			self.app.buttonReset = time.time() + self.app.buttonDelay
+			try:
+				if self.value == 'ble_off':
+					self.value = 'ble_on'
+					self.md_bg_color = self.app.toggleOn
+				else:
+					self.value = 'ble_off'
+					self.md_bg_color = self.app.toggleOff
+			except:
+					self.app.generalError_dialog('Bluetooth not available')
+
+	def set_disabled(self, disabled):
+		self.disabled = disabled
 
 class WSPumpToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 
@@ -422,6 +532,9 @@ class BathroomLightToggleButton(ToggleButtonBehavior, MDIconButton):
 class SettingsHomeScreen(Screen):
 	pass
 
+class UserSettingsScreen(Screen):
+	pass
+
 class LSHomeScreen(Screen):
 	pass
 
@@ -440,6 +553,45 @@ class AppHomeScreen(Screen):
 class PageManager(ScreenManager):
 	pass
 
+class Keyboard(MDBoxLayout):
+	text = StringProperty()
+	text_object = ObjectProperty()
+
+class TextEntry(MDRelativeLayout):
+	text = StringProperty()
+	hint_text = StringProperty()
+	entry_type = StringProperty()
+
+class PasswordTextEntry(MDRelativeLayout):
+	text = StringProperty()
+	hint_text = StringProperty()
+	entry_type = StringProperty()
+
+class KeyboardButton(MDFillRoundFlatButton):
+	pass
+
+class SettingsToggleButton(MDRoundFlatButton, MDToggleButton):
+	def __init__(self, **kwargs):
+		super().__init__(**kwargs)
+		self.app = ironVanApp.get_running_app()
+	
+	def on_state(self, obj, value):
+		match obj.text:
+			
+			# Temperature scale selection
+			case 'Fahrenheit':
+				self.app.userSettings.tempCelsius = False
+		
+			case 'Celsius':
+				self.app.userSettings.tempCelsius = True
+
+			# Time format selection
+			case '24 hour':
+				self.app.userSettings.time24hr = True
+
+			case '12 hour':
+				self.app.userSettings.time24hr = False
+
 class ironVanApp(MDApp):
 
 	appIDs = appElementIDs()
@@ -448,6 +600,8 @@ class ironVanApp(MDApp):
 
 	location = weather.Location()
 	weather = weather.Weather()
+	wifi = network.Wifi()
+	userSettings = settings.UserSettings()
 
 	def build(self):
 
@@ -485,16 +639,21 @@ class ironVanApp(MDApp):
 		# All pop-up windows must be instantiated under the self.dialogBox object to ensure that dialog boxes do not stack
 		self.dialogBox = None
 
+		# The keyboard is a special type of dialog box and will be instantiated under self.keyboard
+		self.keyboard = None
+
+		self.userSettings.initUserSettings(self)
 		self.location.getLocation(self)
-		Clock.schedule_interval(partial(self.weather.getWeather, self), 10)
+		
+		Clock.schedule_interval(self.stateUpdate, 10)
 
 		# Initialize bus scan
 		# if(len(self.bus.activeDevices) != 0):
 		# 	Clock.schedule_interval(self.bus.regularScan, 1)
 		# 	Clock.schedule_interval(self.bus.parseResponses, 1)
 
-		return Builder.load_file('ironvan.kv')
-	
+		return
+
 	def switchTheme(self):
 		if time.time() < self.buttonReset: return
 		self.buttonReset = time.time() + self.buttonDelay
@@ -519,7 +678,7 @@ class ironVanApp(MDApp):
 				self.theme_cls.accent_dark if self.theme_cls.theme_style == 'Light' else self.theme_cls.accent_light
 			)
 
-		for id in self.appIDs.buttons:
+		for id in self.appIDs.navButtons:
 			self.root.ids[id].md_bg_color = (
 				self.theme_cls.primary_light if self.theme_cls.theme_style == 'Light' else self.theme_cls.primary_dark
 			)
@@ -533,7 +692,7 @@ class ironVanApp(MDApp):
 			self.toggleOff = self.theme_cls.accent_dark
 
 		# Set current state of toggle to new theme
-		for id in self.appIDs.toggles:
+		for id in self.appIDs.switches:
 			if self.theme_cls.theme_style == 'Light':
 				if 'off' in self.root.ids[id].value:
 					self.root.ids[id].md_bg_color = self.theme_cls.accent_light
@@ -544,6 +703,16 @@ class ironVanApp(MDApp):
 					self.root.ids[id].md_bg_color = self.theme_cls.accent_dark
 				else:
 					self.root.ids[id].md_bg_color = self.theme_cls.primary_dark
+
+		for id in self.appIDs.toggles:
+			if self.theme_cls.theme_style == 'Light':
+				if 'down' in self.root.ids[id].state:
+					self.root.ids[id].md_bg_color = self.theme_cls.primary_light
+					self.root.ids[id].text_color = self.theme_cls.accent_dark
+			else:
+				if 'down' in self.root.ids[id].state:
+					self.root.ids[id].md_bg_color = self.theme_cls.primary_dark
+					self.root.ids[id].text_color = self.theme_cls.accent_light
 				
 		for id in self.appIDs.cards:
 			self.root.ids[id].md_bg_color = (
@@ -566,7 +735,7 @@ class ironVanApp(MDApp):
 	def navButtonRouter(self, id):
 
 		# Copy list of navigation buttons to identify !ids
-		otherButtons = self.appIDs.buttons[:]
+		otherButtons = self.appIDs.navButtons[:]
 		otherButtons.remove(id)
 
 		# Create animation for the active button (pop-out)
@@ -633,6 +802,11 @@ class ironVanApp(MDApp):
 			case 'nav_button_settings':
 				self.root.ids.page_manager.current = 'settings_home_page'
 
+	def selectSettingsScreen(self, id):
+		match id:
+			case user_settings_screen:
+				self.root.ids.page_manager.current = 'settings_user_settings_page'
+
 	def lightingAdjust(self, *args):
 		value = args[1]
 		sliderID = args[2]
@@ -650,7 +824,7 @@ class ironVanApp(MDApp):
 				case _:
 					print('Error processing lightingAdjust()')
 					return
-			
+				
 			command.append(int(self.root.ids[sliderID].value))
 			self.bus.send(
 			'command',
@@ -660,11 +834,64 @@ class ironVanApp(MDApp):
 		except KeyError:
 			self.noDeviceFound_dialog('Light')
 
-	
-	# ---- Dialob Boxes ----
+	def stateUpdate(self, *args):
+		'''
+		This function runs {asynchronously - intended...currently running synchronously} in the main build() function at some defined interval, updating the following items:
+
+		- Wi-Fi signal
+		- Weather update
+		- Time/date update
+
+		'''
+		# Check/update Wi-Fi signal
+		self.wifi.networkStatus = self.wifi.parseWifiStatus()
+		try:
+			if(self.wifi.networkStatus['SSID'] != ''):
+				if(int(self.wifi.networkStatus['agrCtlRSSI']) > -50):
+					self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-4'
+				elif(int(self.wifi.networkStatus['agrCtlRSSI']) > -70):
+					self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-3'
+				elif(int(self.wifi.networkStatus['agrCtlRSSI']) > -90):
+					self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-2'
+				else:
+					self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-1'
+
+			else:
+				self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-off-outline'
+			
+			self.root.ids['wifi_quick_switch'].md_bg_color = self.toggleOn
+
+			self.root.ids['wifi_quick_switch'].value = 'wifi_on'
+
+		except TypeError:
+			self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-alert-outline'
+			self.root.ids['wifi_quick_switch'].md_bg_color = self.toggleOn
+
+		except KeyError:
+			self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-off-outline'
+			self.root.ids['wifi_quick_switch'].md_bg_color = self.toggleOff
+			self.root.ids['wifi_quick_switch'].value = 'wifi_off'
+
+		# Update weather solution
+		self.weather.getWeather(self, self.userSettings)
+
+		# Update time & date
+		if(self.userSettings.time24hr == True):
+			self.root.ids['home_time_label'].text = time.strftime('%H:%M')
+			self.root.ids['home_time_label'].font_style = 'H2'
+		else:
+			self.root.ids['home_time_label'].text = time.strftime('%I:%M %p')
+			self.root.ids['home_time_label'].font_style = 'H3'
+
+			if(self.root.ids['home_time_label'].text[0] == '0'):
+				self.root.ids['home_time_label'].text = self.root.ids['home_time_label'].text[1:]
+
+		self.root.ids['home_date_label'].text = time.strftime('%A, %d %B %y')
+
+	# ---- Dialog Boxes ----
 
 	def noDeviceFound_dialog(self, deviceName):
-		if(self.dialogBox == None):
+		if not self.dialogBox:
 			self.dialogBox = MDDialog(
 				text = f'{deviceName} is not responding.',
 				buttons = [
@@ -694,8 +921,367 @@ class ironVanApp(MDApp):
 			)
 			self.dialogBox.open()
 
+	def checkIfPasswordProtected(self, ssid, passwordAvailable):
+		'''
+		How to call:
+
+			self.checkIfPasswordProtected(ssid, passwordAvailable)
+
+		A special function used by the wifiConnect_dialog to check if a network requires the user to input a password.
+		'''
+
+		if((self.wifi.availableNetworks[ssid][1] == True) and (passwordAvailable == False)):
+			self.closeDialogBox('')
+			self.password_dialog(ssid)
+
+		elif(self.wifi.availableNetworks[ssid][1] == True and passwordAvailable == True):
+			error = self.wifi.connectToNetwork(ssid, self.dialogBox.content_cls.text)
+
+			self.closeDialogBox('')
+
+			if("Error" in error):
+				self.generalError_dialog(f'Unable to connect to {ssid}')
+
+		else:
+			error = self.wifi.connectToNetwork(ssid)
+
+			self.closeDialogBox('')
+
+			if("Error" in error):
+				self.generalError_dialog(f'Unable to connect to {ssid}')
+
+	def updateNetworkList(self, args):
+		'''
+		How to call:
+
+			self.updateNetworkList('')
+
+		Special function called by the wifiConnect_dialog() to call the wifi.listNetworks function, then convert available wifi networks into a selectable list.
+		'''
+
+		# wifi.listNetworks() is an asynchronous function. Becasue of this, the updates here will not apply until a few seconds have passed and the user presses 'Refresh'
+		self.wifi.listNetworks()
+		
+		networkItems = []
+		for ssid in self.wifi.availableNetworks.keys():
+			networkItems.append(
+				OneLineIconListItem(text = ssid,
+									on_release=lambda x: self.checkIfPasswordProtected(x.text, False))
+			)
+
+			if(self.wifi.availableNetworks[ssid][0] > -50):
+				networkItems[len(networkItems) - 1].add_widget(IconLeftWidget(icon = 'wifi-strength-4'))
+			elif(self.wifi.availableNetworks[ssid][0] > -70):
+				networkItems[len(networkItems) - 1].add_widget(IconLeftWidget(icon = 'wifi-strength-3'))
+			elif(self.wifi.availableNetworks[ssid][0] > -90):
+				networkItems[len(networkItems) - 1].add_widget(IconLeftWidget(icon = 'wifi-strength-2'))
+			else:
+				networkItems[len(networkItems) - 1].add_widget(IconLeftWidget(icon = 'wifi-strength-1'))
+
+		return networkItems
+
+	def wifiConnect_dialog(self):
+		'''
+		Creates a pop-up that lists the available wifi networks, then allows the user to connect to the network.
+		'''
+		networkItems = self.updateNetworkList('')
+
+		if not self.dialogBox:
+			self.dialogBox = MDDialog(
+				title = 'Choose Wifi Network',
+				type = 'simple',
+				items = networkItems,
+				buttons = [
+					MDRoundFlatButton(
+						text = 'Close',
+						on_release = self.closeDialogBox
+					),
+					MDFillRoundFlatButton(
+						text = 'Refresh',
+						on_release = self.updateNetworkList
+					)
+				]
+			)
+		
+			self.dialogBox.open()
+
+	def password_dialog(self, ssid):
+		'''
+		Called by checkIfPasswordProtected function. Creates a pop-up that allows the user to input a password
+		'''
+		if not self.dialogBox:
+			self.dialogBox = MDDialog(
+				title = 'Input Password',
+				type = 'custom',
+				content_cls = PasswordTextEntry(
+					entry_type = 'password'
+				),
+				buttons = [
+					MDRoundFlatButton(
+						text = 'Cancel',
+						on_release = self.closeDialogBox
+					),
+					MDFillRoundFlatButton(
+						text = 'Submit',
+						on_release=lambda x: self.checkIfPasswordProtected(ssid, True)
+					)
+				]
+			)
+
+			self.dialogBox.open()
+
 	def closeDialogBox(self, obj):
 		self.dialogBox.dismiss()
 		self.dialogBox = None
+
+	# ---- Keyboard ----
+ 
+	def shiftCase(self, obj):
+		for id in self.appIDs.keys:
+			if(id[1] == '_'):
+				if(obj.ids[id].text.islower()):
+					obj.ids[id].text = obj.ids[id].text.upper()
+				else:
+					obj.ids[id].text = obj.ids[id].text.lower()
+
+	def symbolKeys(self, obj):
+		for id in self.appIDs.keys:
+			match id:
+				case 'one_key':
+					if (obj.ids[id].text != ' [ '):
+						obj.ids[id].text = ' [ '
+					else:
+						obj.ids[id].text = '1'
+
+				case 'two_key':
+					if (obj.ids[id].text != ']'):
+						obj.ids[id].text = ']'
+					else:
+						obj.ids[id].text = '2'
+
+				case 'three_key':
+					if (obj.ids[id].text != '{'):
+						obj.ids[id].text = '{'
+					else:
+						obj.ids[id].text = '3'
+
+				case 'four_key':
+					if (obj.ids[id].text != '}'):
+						obj.ids[id].text = '}'
+					else:
+						obj.ids[id].text = '4'
+
+				case 'five_key':
+					if (obj.ids[id].text != '#'):
+						obj.ids[id].text = '#'
+					else:
+						obj.ids[id].text = '5'
+
+				case 'six_key':
+					if (obj.ids[id].text != '%'):
+						obj.ids[id].text = '%'
+					else:
+						obj.ids[id].text = '6'
+
+				case 'seven_key':
+					if (obj.ids[id].text != '^'):
+						obj.ids[id].text = '^'
+					else:
+						obj.ids[id].text = '7'
+
+				case 'eight_key':
+					if (obj.ids[id].text != '*'):
+						obj.ids[id].text = '*'
+					else:
+						obj.ids[id].text = '8'
+
+				case 'nine_key':
+					if (obj.ids[id].text != '+'):
+						obj.ids[id].text = '+'
+					else:
+						obj.ids[id].text = '9'
+
+				case 'zero_key':
+					if (obj.ids[id].text != '='):
+						obj.ids[id].text = '='
+					else:
+						obj.ids[id].text = '0'
+
+				case 'q_key':
+					if (obj.ids[id].text != '-'):
+						obj.ids[id].text = '-'
+					else:
+						obj.ids[id].text = 'q'
+
+				case 'w_key':
+					if (obj.ids[id].text != '/'):
+						obj.ids[id].text = '/'
+					else:
+						obj.ids[id].text = 'w'
+
+				case 'e_key':
+					if (obj.ids[id].text != ':'):
+						obj.ids[id].text = ':'
+					else:
+						obj.ids[id].text = 'e'
+
+				case 'r_key':
+					if (obj.ids[id].text != ';'):
+						obj.ids[id].text = ';'
+					else:
+						obj.ids[id].text = 'r'
+
+				case 't_key':
+					if (obj.ids[id].text != '('):
+						obj.ids[id].text = '('
+					else:
+						obj.ids[id].text = 't'
+
+				case 'y_key':
+					if (obj.ids[id].text != ')'):
+						obj.ids[id].text = ')'
+					else:
+						obj.ids[id].text = 'y'
+
+				case 'u_key':
+					if (obj.ids[id].text != '$'):
+						obj.ids[id].text = '$'
+					else:
+						obj.ids[id].text = 'u'
+
+				case 'i_key':
+					if (obj.ids[id].text != '&'):
+						obj.ids[id].text = '&'
+					else:
+						obj.ids[id].text = 'i'
+
+				case 'o_key':
+					if (obj.ids[id].text != '@'):
+						obj.ids[id].text = '@'
+					else:
+						obj.ids[id].text = 'o'
+
+				case 'p_key':
+					if (obj.ids[id].text != '"'):
+						obj.ids[id].text = '"'
+					else:
+						obj.ids[id].text = 'p'
+
+				case 'a_key':
+					if (obj.ids[id].text != '_'):
+						obj.ids[id].text = '_'
+					else:
+						obj.ids[id].text = 'a'
+
+				case 's_key':
+					if (obj.ids[id].text != '\\'):
+						obj.ids[id].text = '\\'
+					else:
+						obj.ids[id].text = 's'
+
+				case 'd_key':
+					if (obj.ids[id].text != '|'):
+						obj.ids[id].text = '|'
+					else:
+						obj.ids[id].text = 'd'
+
+				case 'f_key':
+					if (obj.ids[id].text != '~'):
+						obj.ids[id].text = '~'
+					else:
+						obj.ids[id].text = 'f'
+
+				case 'g_key':
+					if (obj.ids[id].text != '<'):
+						obj.ids[id].text = '<'
+					else:
+						obj.ids[id].text = 'g'
+
+				case 'h_key':
+					if (obj.ids[id].text != '>'):
+						obj.ids[id].text = '>'
+					else:
+						obj.ids[id].text = 'h'
+
+				case 'j_key':
+					if (obj.ids[id].text != '.'):
+						obj.ids[id].text = '.'
+					else:
+						obj.ids[id].text = 'j'
+
+				case 'k_key':
+					if (obj.ids[id].text != ','):
+						obj.ids[id].text = ','
+					else:
+						obj.ids[id].text = 'k'
+
+				case 'l_key':
+					if (obj.ids[id].text != '?'):
+						obj.ids[id].text = '?'
+					else:
+						obj.ids[id].text = 'l'
+
+				case 'z_key':
+					if (obj.ids[id].text != ''):
+						obj.ids[id].text = ''
+					else:
+						obj.ids[id].text = 'z'
+
+				case 'x_key':
+					if (obj.ids[id].text != ''):
+						obj.ids[id].text = ''
+					else:
+						obj.ids[id].text = 'x'
+
+				case 'c_key':
+					if (obj.ids[id].text != '!'):
+						obj.ids[id].text = '!'
+					else:
+						obj.ids[id].text = 'c'
+
+				case 'v_key':
+					if (obj.ids[id].text != "'"):
+						obj.ids[id].text = "'"
+					else:
+						obj.ids[id].text = 'v'
+
+				case 'b_key':
+					if (obj.ids[id].text != ''):
+						obj.ids[id].text = ''
+					else:
+						obj.ids[id].text = 'b'
+
+				case 'n_key':
+					if (obj.ids[id].text != ''):
+						obj.ids[id].text = ''
+					else:
+						obj.ids[id].text = 'n'
+
+				case 'm_key':
+					if (obj.ids[id].text != ''):
+						obj.ids[id].text = ''
+					else:
+						obj.ids[id].text = 'm'
+
+ 
+	def keyboard_dialog(self, obj):
+		
+		if not self.keyboard:
+			self.keyboard = MDDialog(
+				title = '',
+				type = 'custom',
+				content_cls = Keyboard(
+					text = obj.text,
+					text_object = obj,
+				),
+				size_hint = (None, None),
+				size = (Window.width, Window.width)
+			)
+			
+			self.keyboard.open()
+		
+		else:
+			self.keyboard.dismiss()
+			self.keyboard = None
 
 ironVanApp().run()

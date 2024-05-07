@@ -150,7 +150,7 @@ MDFloatLayout:
                             pos_hint: {'center_x': 0.7, 'center_y': 0.85}
                             AsyncImage:
                                 id: weather_icon
-                                source: 'https://openweathermap.org/img/wn/50d@2x.png'
+                                source: 'images/weather-unknown-1.png'
                                 fit_mode: 'fill'
                                 allow_stretch: 'false'
                                 pos_hint: {'center_x': 0.5, 'center_y': 0.5}
@@ -159,7 +159,14 @@ MDFloatLayout:
                             text: 'Today'
                             font_size: 36
                             theme_text_color: 'Hint'
-                            pos_hint: {'center_x': 0.64, 'center_y': .66}
+                            pos_hint: {'center_x': 0.64, 'center_y': .68}
+                        
+                        MDLabel:
+                            id: location_label
+                            text: ''
+                            font_size: 28
+                            theme_text_color: 'Hint'
+                            pos_hint: {'center_x': 0.61, 'center_y': 0.645}
                         
                         MDLabel:
                             text: 'High'
@@ -204,7 +211,7 @@ MDFloatLayout:
 
                         MDLabel:
                             id: inside_temp_quick_label
-                            text: u'69\N{DEGREE SIGN}'
+                            text: u'--\N{DEGREE SIGN}'
                             font_style: 'H1'
                             theme_text_color: 'Primary'
                             pos_hint: {'center_x': 0.6, 'center_y': 0.37}
@@ -271,6 +278,48 @@ MDFloatLayout:
                     md_bg_color: app.theme_cls.bg_darkest
                     size_hint: (0.4, 0.2)
                     pos_hint: {'center_x': 0.725, 'center_y': 0.85}
+
+                    MDFloatLayout:
+                        MDLabel:
+                            id: home_time_label
+                            text: '--:--'
+                            pos_hint: {'x': 0.1, 'center_y': 0.6}
+                            font_style: 'H2'
+                        
+                        MDLabel:
+                            id: home_date_label
+                            text: ''
+                            pos_hint: {'x': 0.1, 'center_y': 0.25}
+                            font_style: 'H6'
+
+                        WifiToggleButton:
+                            id: wifi_quick_switch
+                            icon: 'wifi-strength-off-outline'
+                            md_bg_color: app.theme_cls.accent_light
+                            ripple_scale: 0
+                            theme_text_color: 'Custom'
+                            text_color: app.theme_cls.accent_dark
+                            pos_hint: {'center_x': .7, 'center_y': 0.5}
+                            on_release: self.state = 'down' if self.state == 'normal' else 'normal'
+                        
+                        BLEToggleButton:
+                            id: ble_quick_switch
+                            icon: 'bluetooth-off'
+                            md_bg_color: app.theme_cls.accent_light
+                            ripple_scale: 0
+                            theme_text_color: 'Custom'
+                            text_color: app.theme_cls.accent_dark
+                            pos_hint: {'center_x': .8, 'center_y': 0.5}
+                            on_release: self.state = 'down' if self.state == 'normal' else 'normal'
+
+                        MDIconButton:
+                            id: device_quick_switch
+                            icon: 'rv-truck'
+                            ripple_scale: 0
+                            theme_text_color: 'Custom'
+                            text_color: app.theme_cls.accent_dark
+                            md_bg_color: app.theme_cls.primary_light if app.theme_cls.theme_style == 'Light' else app.theme_cls.primary_dark
+                            pos_hint: {'center_x': .9, 'center_y': 0.5}
 
                 # ---- Build BEMU Card ----
 
@@ -627,3 +676,555 @@ MDFloatLayout:
                     md_bg_color: app.theme_cls.bg_darkest
                     size_hint: (0.85, 0.9)
                     pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                    padding: (100, 50)
+
+                    MDFillRoundFlatIconButton:
+                        id: user_settings_button
+                        text: 'User Settings'
+                        icon: 'dip-switch'
+                        size_hint: (0.8, 0.1)
+                        pos_hint: {'center_x': 0.5, 'y': 0.85}
+                        theme_text_color: 'Custom'
+                        text_color: app.theme_cls.accent_dark if self.theme_cls.theme_style == 'Light' else self.theme_cls.accent_light
+                        icon_color: app.theme_cls.accent_dark if self.theme_cls.theme_style == 'Light' else self.theme_cls.accent_light
+                        md_bg_color: self.theme_cls.primary_light if self.theme_cls.theme_style == 'Light' else self.theme_cls.primary_dark
+                        font_size: 48
+                        on_release:
+                            app.selectSettingsScreen(self.id)
+
+        UserSettingsScreen:
+            name: 'settings_user_settings_page'
+
+            MDFloatLayout:
+                id: settings_user_settings_page_layout
+                size_hint: (0.95, 1)
+                pos_hint: {'center_x': 0.525, 'center_y': 0.5}
+
+                MDCard:
+                    id: settings_user_settings_card
+                    md_bg_color: app.theme_cls.bg_darkest
+                    size_hint: (0.85, 0.9)
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                    padding: (100, 50)
+
+                    MDBoxLayout:
+                        id: settings_user_settings_page_layout
+                        orientation: 'vertical'
+                        size_hint: (1, 1)
+
+                        MDFloatLayout:
+                            id: settings_user_settings_title_bar
+                            size_hint: (1, 0.1)
+
+                            MDIconButton:
+                                id: settings_user_settings_button_back
+                                icon: 'chevron-left'
+                                theme_text_color: 'Custom'
+                                text_color: app.theme_cls.accent_dark if self.theme_cls.theme_style == 'Light' else self.theme_cls.accent_light
+                                md_bg_color: self.theme_cls.primary_light if self.theme_cls.theme_style == 'Light' else self.theme_cls.primary_dark
+                                pos_hint: {'center_x': 0, 'center_y': 0.5}
+                                size_hint: (0.05, 0.7)
+                                on_release: app.navButtonRouter('nav_button_settings')
+
+                            MDIconButton:
+                                id: settings_user_settings_title_icon
+                                icon: 'dip-switch'
+                                theme_text_color: 'Custom'
+                                text_color: app.theme_cls.accent_dark
+                                md_bg_color: app.theme_cls.bg_darkest if app.theme_cls.theme_style == 'Light' else app.theme_cls.bg_light
+                                pos_hint: {'x': 0.35, 'center_y': 0.5}
+                                size_hint: (0.05, 0.7)
+
+                            MDLabel:
+                                id: settings_user_settings_title
+                                text: 'User Settings'
+                                theme_text_color: 'Custom'
+                                text_color: app.theme_cls.accent_dark
+                                font_size: 48
+                                pos_hint: {'x': 0.4, 'center_y': 0.5}
+
+                        MDFloatLayout:
+                            id: settings_user_settings_top_fill
+                            size_hint: (1, 0.05)
+                        
+                        MDFloatLayout:
+                            id: settings_user_settings_temp_select
+                            size_hint: (1, 0.1)
+
+                            MDLabel:
+                                id: settings_user_settings_temp_select_label
+                                text: 'Temperature Scale:'
+                                theme_text_color: 'Custom'
+                                text_color: app.theme_cls.accent_dark
+                                pos_hint: {'x': 0, 'center_y': 0.5}
+
+                            SettingsToggleButton:
+                                id: celsius_toggle
+                                text: 'Celsius'
+                                group: 'tempScale'
+                                pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+
+                            SettingsToggleButton:
+                                id: fahrenheit_toggle
+                                text: 'Fahrenheit'
+                                group: 'tempScale'
+                                pos_hint: {'center_x': 0.6, 'center_y': 0.5}
+                        
+                        MDFloatLayout:
+                            id: settings_user_settings_time_select
+                            size_hint: (1, 0.1)
+
+                            MDLabel:
+                                id: settings_user_settings_time_select_label
+                                text: 'Time Format:'
+                                theme_text_color: 'Custom'
+                                text_color: app.theme_cls.accent_dark
+                                pos_hint: {'x': 0, 'center_y': 0.5}
+
+                            SettingsToggleButton:
+                                id: hour12_toggle
+                                text: '12 hour'
+                                group: 'timeFormat'
+                                pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+
+                            SettingsToggleButton:
+                                id: hour24_toggle
+                                text: '24 hour'
+                                group: 'timeFormat'
+                                pos_hint: {'center_x': 0.6, 'center_y': 0.5}
+                        
+                        MDFloatLayout:
+                            id: settings_user_settings_fill_bottom
+                            size_hint: (1, 0.7)
+
+<Keyboard>
+    orientation: 'vertical'
+    size_hint: (None, None)
+    size: (0.9*kivy.core.window.Window.width, 0.9*kivy.core.window.Window.height)
+    padding: (0.05*kivy.core.window.Window.width, 0.05*kivy.core.window.Window.height)
+    spacing: 30
+
+    MDBoxLayout:
+        orientation: 'horizontal'
+        size_hint: (1, 0.2)
+
+        MDFloatLayout:
+            size_hint: (1, 1)
+
+            PasswordTextEntry:
+                id: keyboard_text_field
+                text: root.text
+                size_hint: (0.8, 0.8)
+                pos_hint: {'center_x': .5, 'center_y': 1}
+
+    MDBoxLayout:
+        orientation: 'horizontal'
+        spacing: 10
+        size_hint: (1, 0.2)
+
+        KeyboardButton:
+            id: one_key
+            text: '1'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+        KeyboardButton:
+            id: two_key
+            text: '2'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+        KeyboardButton:
+            id: three_key
+            text: '3'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+        KeyboardButton:
+            id: four_key
+            text: '4'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+        KeyboardButton:
+            id: five_key
+            text: '5'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+        KeyboardButton:
+            id: six_key
+            text: '6'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+        KeyboardButton:
+            id: seven_key
+            text: '7'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+        KeyboardButton:
+            id: eight_key
+            text: '8'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+        KeyboardButton:
+            id: nine_key
+            text: '9'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+        KeyboardButton:
+            id: zero_key
+            text: '0'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+    MDBoxLayout:
+        orientation: 'horizontal'
+        spacing: 10
+        size_hint: (1, 0.2)
+
+        KeyboardButton:
+            id: q_key
+            text: 'q'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+        KeyboardButton:
+            id: w_key
+            text: 'w'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+        KeyboardButton:
+            id: e_key
+            text: 'e'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+        
+        KeyboardButton:
+            id: r_key
+            text: 'r'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+        KeyboardButton:
+            id: t_key
+            text: 't'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+        KeyboardButton:
+            id: y_key
+            text: 'y'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+        
+        KeyboardButton:
+            id: u_key
+            text: 'u'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+        KeyboardButton:
+            id: i_key
+            text: 'i'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+        KeyboardButton:
+            id: o_key
+            text: 'o'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+        KeyboardButton:
+            id: p_key
+            text: 'p'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+    
+    MDBoxLayout:
+        orientation: 'horizontal'
+        spacing: 10
+        size_hint: (1, 0.2)
+        padding: (0.05*kivy.core.window.Window.width, 0)
+
+        KeyboardButton:
+            id: a_key
+            text: 'a'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+        KeyboardButton:
+            id: s_key
+            text: 's'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+        KeyboardButton:
+            id: d_key
+            text: 'd'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+        KeyboardButton:
+            id: f_key
+            text: 'f'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+        KeyboardButton:
+            id: g_key
+            text: 'g'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+        KeyboardButton:
+            id: h_key
+            text: 'h'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+        KeyboardButton:
+            id: j_key
+            text: 'j'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+        KeyboardButton:
+            id: k_key
+            text: 'k'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+        KeyboardButton:
+            id: l_key
+            text: 'l'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+    MDBoxLayout:
+        orientation: 'horizontal'
+        spacing: 10
+        size_hint: (1, 0.2)
+
+        KeyboardButton:
+            id: shift_key
+            text: 'Aa'
+            size_hint: (0.175, 1)
+            on_release: app.shiftCase(root)
+
+        KeyboardButton:
+            id: z_key
+            text: 'z'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+        KeyboardButton:
+            id: x_key
+            text: 'x'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+        KeyboardButton:
+            id: c_key
+            text: 'c'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+        KeyboardButton:
+            id: v_key
+            text: 'v'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+        KeyboardButton:
+            id: b_key
+            text: 'b'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+        KeyboardButton:
+            id: n_key
+            text: 'n'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+        
+        KeyboardButton:
+            id: m_key
+            text: 'm'
+            size_hint: (0.1, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+        KeyboardButton:
+            id: back_key
+            text: '<-'
+            size_hint: (0.175, 1)
+            on_release:
+                root.text += self.text
+                root.text_object.text += self.text
+
+    MDBoxLayout:
+        orientation: 'horizontal'
+        spacing: 10
+        size_hint: (1, 0.2)
+
+        KeyboardButton:
+            id: symbol_key
+            text: '#+='
+            size_hint: (0.2, 1)
+            on_release:
+                app.symbolKeys(root)
+
+        KeyboardButton:
+            id: space_key
+            text: '[_________]'
+            size_hint: (0.6, 1)
+            on_release:
+                root.text += ' '
+                root.text_object.text += ' '
+
+        KeyboardButton:
+            id: done_key
+            text: 'done'
+            size_hint: (0.2, 1)
+            on_release:
+                app.keyboard_dialog(root)
+
+<TextEntry>
+    height: text_field.height
+
+    MDTextField:
+        id: text_field
+        mode: 'round'
+        hint_text: root.hint_text
+        text: root.text
+        icon_left: "key-variant"
+
+    MDIconButton:
+        id: text_keyboard_icon
+        icon: "keyboard-outline"
+        pos_hint: {"center_y": .5}
+        pos: text_field.width - self.width, 0
+        theme_text_color: "Hint"
+        on_release: 
+            app.keyboard_dialog(root)
+
+<PasswordTextEntry>
+    height: text_field.height
+
+    MDTextField:
+        id: text_field
+        mode: 'round'
+        hint_text: root.hint_text
+        text: root.text
+        password: True
+        icon_left: "key-variant"
+
+    MDIconButton:
+        id: password_keyboard_icon
+        icon: "eye-off"
+        pos_hint: {"center_y": .5}
+        pos: text_field.width - self.width*1.75, 0
+        theme_text_color: "Hint"
+        on_release:
+            self.icon = "eye" if self.icon == "eye-off" else "eye-off"
+            text_field.password = False if text_field.password is True else True
+
+    MDIconButton:
+        icon: "keyboard-outline"
+        pos_hint: {"center_y": .5}
+        pos: text_field.width - self.width, 0
+        theme_text_color: "Hint"
+        on_release:
+            app.keyboard_dialog(root)
+
+<KeyboardButton>
+    text: root.text
+    bold: True
+    theme_text_color: 'Custom'
+    text_color: app.theme_cls.accent_dark if app.theme_cls.theme_style == 'Light' else app.theme_cls.accent_light
+    md_bg_color: app.theme_cls.primary_light if app.theme_cls.theme_style == 'Light' else app.theme_cls.primary_dark
+
+<SettingsToggleButton>
+    text: root.text
+    ripple_scale: 0
+    background_down: app.theme_cls.primary_light if app.theme_cls.theme_style == 'Light' else app.theme_cls.primary_dark
+    font_color_down: app.theme_cls.accent_dark if app.theme_cls.theme_style == 'Light' else app.theme_cls.accent_light
+    font_color_normal: app.theme_cls.primary_color
