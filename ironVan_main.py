@@ -37,6 +37,8 @@ class appElementIDs():
 		self.labels = [
 			'fresh_water_label',
 			'grey_water_label',
+			'fresh_water_quick_label',
+			'grey_water_quick_label',
 			'settings_user_settings_title_icon',
 			'settings_user_settings_title',
 			'settings_user_settings_temp_select_label',
@@ -62,8 +64,13 @@ class appElementIDs():
 			'env_heat_quick_switch',
 			'wifi_quick_switch',
 			'ble_quick_switch',
+			'ws_pump_quick_switch',
+			'ws_heater_quick_switch',
 			'ws_pump_switch',
 			'ws_heater_switch',
+			'shower_fan_switch',
+			'tank_heater_switch',
+			'tank_valve_switch',
 			'ls_1_quick_switch',
 			'ls_2_quick_switch',
 			'ls_3_quick_switch',
@@ -105,6 +112,18 @@ class appElementIDs():
 			'env_cool_quick_switch',
 			'env_heat_quick_switch',
 			'wifi_quick_switch',
+			'fresh_water_quick_icon_75',
+			'fresh_water_quick_icon_50',
+			'fresh_water_quick_icon_25',
+			'fresh_water_quick_icon_0',
+			'quick_fresh_to_pump_line',
+			'ws_pump_quick_switch',
+			'ws_heater_quick_switch',
+			'quick_pump_to_grey_line',
+			'grey_water_quick_icon_75',
+			'grey_water_quick_icon_50',
+			'grey_water_quick_icon_25',
+			'grey_water_quick_icon_0',
 			'fresh_water_icon_75',
 			'fresh_water_icon_50',
 			'fresh_water_icon_25',
@@ -117,6 +136,9 @@ class appElementIDs():
 			'grey_water_icon_50',
 			'grey_water_icon_25',
 			'grey_water_icon_0',
+			'shower_fan_switch',
+			'tank_heater_switch',
+			'tank_valve_switch',
 			'ls_1_quick_switch',
 			'ls_2_quick_switch',
 			'ls_3_quick_switch',
@@ -318,7 +340,7 @@ class WSPumpToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 		super().__init__(**kwargs)
 		self.app = ironVanApp.get_running_app()
 		self.value = 'water_pump_off'
-		#self.set_disabled(True)
+		self.set_disabled(False)
 
 	def on_state(self, instance, value):
 		if value == 'normal' and time.time() >= self.app.buttonReset:
@@ -330,16 +352,22 @@ class WSPumpToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 						self.app.bus.activeDevices['utilities'].address,
 						self.app.bus.activeDevices['utilities'].command[self.value]
 					)
-					self.value = 'water_pump_auto'
-					self.md_bg_color = self.app.toggleOn
+					self.app.root.ids['ws_pump_quick_switch'].value = 'water_pump_auto'
+					self.app.root.ids['ws_pump_quick_switch'].md_bg_color = self.app.toggleOn
+					
+					self.app.root.ids['ws_pump_switch'].value = 'water_pump_auto'
+					self.app.root.ids['ws_pump_switch'].md_bg_color = self.app.toggleOn
 				else:
 					self.app.bus.send(
 						'command',
 						self.app.bus.activeDevices['utilities'].address,
 						self.app.bus.activeDevices['utilities'].command[self.value]
 					)
-					self.value = 'water_pump_off'
-					self.md_bg_color = self.app.toggleOff
+					self.app.root.ids['ws_pump_quick_switch'].value = 'water_pump_off'
+					self.app.root.ids['ws_pump_quick_switch'].md_bg_color = self.app.toggleOff
+
+					self.app.root.ids['ws_pump_switch'].value = 'water_pump_off'
+					self.app.root.ids['ws_pump_switch'].md_bg_color = self.app.toggleOff
 			except KeyError:
 					self.app.noDeviceFound_dialog('Water pump')
 
@@ -347,8 +375,6 @@ class WSPumpToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 		self.disabled = disabled
 
 class WSHeaterToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
-	off = StringProperty('water_heater_off')
-	auto = StringProperty('water_heater_auto')
 
 	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
@@ -360,11 +386,116 @@ class WSHeaterToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 		if value == 'normal' and time.time() >= self.app.buttonReset:
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			if self.value == 'water_heater_off':
-				self.value = 'water_heater_on'
-				self.md_bg_color = self.app.toggleOn
+					self.app.root.ids['ws_heater_quick_switch'].value = 'water_heater_auto'
+					self.app.root.ids['ws_heater_quick_switch'].md_bg_color = self.app.toggleOn
+					
+					self.app.root.ids['ws_heater_switch'].value = 'water_heater_auto'
+					self.app.root.ids['ws_heater_switch'].md_bg_color = self.app.toggleOn
 			else:
-				self.value = 'water_heater_off'
-				self.md_bg_color = self.app.toggleOff
+					self.app.root.ids['ws_heater_quick_switch'].value = 'water_heater_off'
+					self.app.root.ids['ws_heater_quick_switch'].md_bg_color = self.app.toggleOff
+					
+					self.app.root.ids['ws_heater_switch'].value = 'water_heater_off'
+					self.app.root.ids['ws_heater_switch'].md_bg_color = self.app.toggleOff
+
+	def set_disabled(self, disabled):
+		self.disabled = disabled
+
+class ShowerFanToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
+
+	def __init__(self, **kwargs):
+		super().__init__(**kwargs)
+		self.app = ironVanApp.get_running_app()
+		self.value = 'shower_fan_off'
+		self.set_disabled(False)
+
+	def on_state(self, instance, value):
+		if value == 'normal' and time.time() >= self.app.buttonReset:
+			self.app.buttonReset = time.time() + self.app.buttonDelay
+			try:
+				if self.value == 'shower_fan_off':
+					self.app.bus.send(
+						'command',
+						self.app.bus.activeDevices['utilities'].address,
+						self.app.bus.activeDevices['utilities'].command[self.value]
+					)
+					self.value = 'shower_fan_auto'
+					self.md_bg_color = self.app.toggleOn
+				else:
+					self.app.bus.send(
+						'command',
+						self.app.bus.activeDevices['utilities'].address,
+						self.app.bus.activeDevices['utilities'].command[self.value]
+					)
+					self.value = 'shower_fan_off'
+					self.md_bg_color = self.app.toggleOff
+			except KeyError:
+					self.app.noDeviceFound_dialog('Shower fan')
+
+	def set_disabled(self, disabled):
+		self.disabled = disabled
+
+class TankHeaterToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
+
+	def __init__(self, **kwargs):
+		super().__init__(**kwargs)
+		self.app = ironVanApp.get_running_app()
+		self.value = 'tank_heater_off'
+		self.set_disabled(False)
+
+	def on_state(self, instance, value):
+		if value == 'normal' and time.time() >= self.app.buttonReset:
+			self.app.buttonReset = time.time() + self.app.buttonDelay
+			try:
+				if self.value == 'tank_heater_off':
+					self.app.bus.send(
+						'command',
+						self.app.bus.activeDevices['utilities'].address,
+						self.app.bus.activeDevices['utilities'].command[self.value]
+					)
+					self.value = 'tank_heater_auto'
+					self.md_bg_color = self.app.toggleOn
+				else:
+					self.app.bus.send(
+						'command',
+						self.app.bus.activeDevices['utilities'].address,
+						self.app.bus.activeDevices['utilities'].command[self.value]
+					)
+					self.value = 'tank_heater_off'
+					self.md_bg_color = self.app.toggleOff
+			except KeyError:
+					self.app.noDeviceFound_dialog('Grey tank heater')
+
+class TankValveToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
+
+	def __init__(self, **kwargs):
+		super().__init__(**kwargs)
+		self.app = ironVanApp.get_running_app()
+		self.value = 'tank_valve_off'
+		self.set_disabled(False)
+
+	def on_state(self, instance, value):
+		if value == 'normal' and time.time() >= self.app.buttonReset:
+			self.app.buttonReset = time.time() + self.app.buttonDelay
+			try:
+				if self.value == 'tank_valve_off':
+					self.app.bus.send(
+						'command',
+						self.app.bus.activeDevices['utilities'].address,
+						self.app.bus.activeDevices['utilities'].command[self.value]
+					)
+					self.value = 'tank_valve_auto'
+					self.md_bg_color = self.app.toggleOn
+				else:
+					self.app.bus.send(
+						'command',
+						self.app.bus.activeDevices['utilities'].address,
+						self.app.bus.activeDevices['utilities'].command[self.value]
+					)
+					self.value = 'tank_valve_off'
+					self.md_bg_color = self.app.toggleOff
+			except KeyError:
+					self.app.noDeviceFound_dialog('Grey tank dump valve')
 
 	def set_disabled(self, disabled):
 		self.disabled = disabled
@@ -389,8 +520,10 @@ class DiningLightToggleButton(ToggleButtonBehavior, MDIconButton):
 						self.app.bus.activeDevices['lighting'].address,
 						command
 					)
-					self.value = 'ls_1_on'
+					self.app.root.ids['ls_1_switch'].value = 'ls_1_on'
 					self.app.root.ids['ls_1_switch'].md_bg_color = self.app.toggleOn
+
+					self.app.root.ids['ls_1_quick_switch'].value = 'ls_1_on'
 					self.app.root.ids['ls_1_quick_switch'].md_bg_color = self.app.toggleOn
 				else:
 					command = self.app.bus.activeDevices['lighting'].command['ls_1_toggle'][:]
@@ -400,8 +533,9 @@ class DiningLightToggleButton(ToggleButtonBehavior, MDIconButton):
 						self.app.bus.activeDevices['lighting'].address,
 						command
 					)
-					self.value = 'ls_1_off'
+					self.app.root.ids['ls_1_switch'].value = 'ls_1_off'
 					self.app.root.ids['ls_1_switch'].md_bg_color = self.app.toggleOff
+					self.app.root.ids['ls_1_quick_switch'].value = 'ls_1_off'
 					self.app.root.ids['ls_1_quick_switch'].md_bg_color = self.app.toggleOff
 			except KeyError:
 					self.app.noDeviceFound_dialog('Dining room light')
@@ -429,8 +563,9 @@ class BedroomLightToggleButton(ToggleButtonBehavior, MDIconButton):
 						self.app.bus.activeDevices['lighting'].address,
 						command
 					)
-					self.value = 'ls_2_on'
+					self.app.root.ids['ls_2_switch'].value = 'ls_2_on'
 					self.app.root.ids['ls_2_switch'].md_bg_color = self.app.toggleOn
+					self.app.root.ids['ls_2_quick_switch'].value = 'ls_2_on'
 					self.app.root.ids['ls_2_quick_switch'].md_bg_color = self.app.toggleOn
 				else:
 					command = self.app.bus.activeDevices['lighting'].command['ls_2_toggle'][:]
@@ -440,8 +575,9 @@ class BedroomLightToggleButton(ToggleButtonBehavior, MDIconButton):
 						self.app.bus.activeDevices['lighting'].address,
 						command
 					)
-					self.value = 'ls_2_off'
+					self.app.root.ids['ls_2_switch'].value = 'ls_2_off'
 					self.app.root.ids['ls_2_switch'].md_bg_color = self.app.toggleOff
+					self.app.root.ids['ls_2_quick_switch'].value = 'ls_2_off'
 					self.app.root.ids['ls_2_quick_switch'].md_bg_color = self.app.toggleOff
 			except KeyError:
 					self.app.noDeviceFound_dialog('Bedroom light')
@@ -469,8 +605,9 @@ class KitchenLightToggleButton(ToggleButtonBehavior, MDIconButton):
 						self.app.bus.activeDevices['lighting'].address,
 						command
 					)
-					self.value = 'ls_3_on'
+					self.app.root.ids['ls_3_switch'].value = 'ls_3_on'
 					self.app.root.ids['ls_3_switch'].md_bg_color = self.app.toggleOn
+					self.app.root.ids['ls_3_quick_switch'].value = 'ls_3_on'
 					self.app.root.ids['ls_3_quick_switch'].md_bg_color = self.app.toggleOn
 				else:
 					command = self.app.bus.activeDevices['lighting'].command['ls_3_toggle'][:]
@@ -480,8 +617,9 @@ class KitchenLightToggleButton(ToggleButtonBehavior, MDIconButton):
 						self.app.bus.activeDevices['lighting'].address,
 						command
 					)
-					self.value = 'ls_3_off'
+					self.app.root.ids['ls_3_switch'].value = 'ls_3_off'
 					self.app.root.ids['ls_3_switch'].md_bg_color = self.app.toggleOff
+					self.app.root.ids['ls_3_quick_switch'].value = 'ls_3_off'
 					self.app.root.ids['ls_3_quick_switch'].md_bg_color = self.app.toggleOff
 			except KeyError:
 					self.app.noDeviceFound_dialog('Kitchen light')
@@ -509,8 +647,9 @@ class BathroomLightToggleButton(ToggleButtonBehavior, MDIconButton):
 						self.app.bus.activeDevices['lighting'].address,
 						command
 					)
-					self.value = 'ls_4_on'
+					self.app.root.ids['ls_4_switch'].value = 'ls_4_on'
 					self.app.root.ids['ls_4_switch'].md_bg_color = self.app.toggleOn
+					self.app.root.ids['ls_4_quick_switch'].value = 'ls_4_on'
 					self.app.root.ids['ls_4_quick_switch'].md_bg_color = self.app.toggleOn
 				else:
 					command = self.app.bus.activeDevices['lighting'].command['ls_4_toggle'][:]
@@ -520,8 +659,9 @@ class BathroomLightToggleButton(ToggleButtonBehavior, MDIconButton):
 						self.app.bus.activeDevices['lighting'].address,
 						command
 					)
-					self.value = 'ls_4_off'
+					self.app.root.ids['ls_4_switch'].value = 'ls_4_off'
 					self.app.root.ids['ls_4_switch'].md_bg_color = self.app.toggleOff
+					self.app.root.ids['ls_4_quick_switch'].value = 'ls_4_off'
 					self.app.root.ids['ls_4_quick_switch'].md_bg_color = self.app.toggleOff
 			except KeyError:
 					self.app.noDeviceFound_dialog('Bathroom light')
@@ -608,7 +748,7 @@ class ironVanApp(MDApp):
 		# ---- Build Window ----
 		Config.set('graphics', 'resizable', True)
 		# Note:  When uncommenting Window.fullscreen, ensure to delete comment out `size: (700, 480)` in the .kv file.
-		Window.fullscreen = 'auto'
+		#Window.fullscreen = 'auto'
 		
 		# ---- Build App Theme ----
 
@@ -878,15 +1018,15 @@ class ironVanApp(MDApp):
 		# Update time & date
 		if(self.userSettings.time24hr == True):
 			self.root.ids['home_time_label'].text = time.strftime('%H:%M')
-			self.root.ids['home_time_label'].font_style = 'H2'
+			self.root.ids['home_time_label'].font_style = 'H5'
 		else:
 			self.root.ids['home_time_label'].text = time.strftime('%I:%M %p')
-			self.root.ids['home_time_label'].font_style = 'H3'
+			self.root.ids['home_time_label'].font_style = 'H6'
 
 			if(self.root.ids['home_time_label'].text[0] == '0'):
 				self.root.ids['home_time_label'].text = self.root.ids['home_time_label'].text[1:]
 
-		self.root.ids['home_date_label'].text = time.strftime('%A, %d %B %y')
+		self.root.ids['home_date_label'].text = time.strftime('%A\n %d %B %y')
 
 	# ---- Dialog Boxes ----
 

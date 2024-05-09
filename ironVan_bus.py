@@ -27,6 +27,7 @@ class Device():
 		self.address = deviceAddr
 		self.command = None
 		self.request = None
+		self.errorCount = 0
 
 		# {gmtime: [byte_1, byte_2, ...]}
 		# # of bytes = # of bytes request in self.request['status']
@@ -104,9 +105,21 @@ class Device():
 					
 					self.request = {
 						'device_type':	[0x20, 14],
-						'current_temperature': [0x21, 2],
-						'light_switch_status': [0x22, 2]
+						'device_status': [0x21, 4]
 					}
+
+					match self.address:
+						case 0x0B:
+							# Kitchen & Dining Room
+							self.pairedLightSWIDs = ['ls_1', 'ls_3']
+						case 0x0C:
+							# Bedroom
+							self.pairedLightSWIDs = ['ls_2']
+						case 0x0D:
+							# Bathroom
+							self.pairedLightSWIDs = ['ls_4']
+						case _:
+							self.pairedLightSWIDs = []
 
 		# --- THERMOSTAT ---
 		if('temp' in deviceType):
@@ -177,30 +190,49 @@ class Device():
 						responseInt = responseInt >> 1
 						responseInt = responseInt & 240
 					except:
-						msg = 'Invalid response '
+						print(f'Invalid response from {self.name} device')
 
 					# Initialize local variables for tracking
 					# Initial state is case '0' (0b0000)
-					greyTank = 'close'
-					greyHeat = 'auto'
-					showerFan = 'auto'
-					waterPump = 'off'
+					greyTank = ''
+					greyHeat = ''
+					showerFan = ''
+					waterPump = 'water_pump_off'
 
 					# Check bit status by applying bit mask
 					if((1 & responseInt) == 1):
-						greyTank = 'open'
+						greyTank = ''
 
 					if((2 & responseInt) == 2):
-						greyHeat = 'off'
+						greyHeat = ''
 
 					if((4 & responseInt) == 4):
-						showerFan = 'off'
+						showerFan = ''
 
 					if((8 & responseInt) == 8):
-						waterPump = 'on'
+						waterPump = 'water_pump_auto'
 
-					# -- NEED TO IMPLEMENT ERROR CHECKING --
-					# --- Functionality not currently active
+					# Error check function
+	 				# Note: As button functionality is added for other switches in this device, add to the statements below. Any errors should result in an increment in the error count.
+					if(
+						app.root.ids['ws_pump_switch'].value != waterPump
+					):
+						# Increment error count
+						self.errorCount += 1
+
+						# Attempt to fix issues 10x before throwing error
+						app.root.ids['ws_pump_switch'].state = 'down' if waterPump == 'water_pump_auto' else 'normal'
+
+						# Revert GUI to match the device settings and alert user
+						if(self.errorCount == 10):
+							self.errorCount = 0
+							app.root.ids['ws_pump_switch'].state = 'down' if app.root.ids['ws_pump_switch'].state == 'normal' else 'normal'
+
+							app.generalError_dialog(
+								f'Communication issue with {self.name} device detected. All buttons have been reverted to match state of device.'
+							)
+					else:
+						self.errorCount = 0
 					
 		# --- LIGHTING ---
 		if('ltsy' in self.type):
@@ -223,6 +255,86 @@ class Device():
 				if("v0" in self.type):
 					
 					return
+
+		# --- LIGHT SWITCH & THERMOMETER ---
+		if('ltsw' in self.type):
+		# Choose PCB version
+		
+			if("b100" in self.type):
+				# Choose firmware major version
+
+				if("v0" in self.type):
+				
+					'''
+					ltsw_b100_v010 has one plottable feature - the temperature output. self.readout will store this value.
+
+					ltsw_b100_v010 readout will also send current light status. The makeup of the data exchange are below.
+
+					response = [byte_1, byte_2, byte_3, byte_4]
+						- byte_1:	lightOn -- 0 - off / 1 - on / else - maintain current state
+						- byte_2:	lightChange - # of pulses generated since last transmission // a signed char value (2's complement) where a negative value should cause a decrease in light intensity and a positive value should cause an increase in light intensity
+						- byte_3:	thermometerOutput (MSB)
+									x x x x x x bit_9 bit_8
+						- byte_4:	thermometerOutput (LSB)
+									bit_7 bit_6 bit_5 bit_4 bit_3 bit_2 bit_1 bit_0
+					'''
+					
+					lightOn = None
+					lightChange = None
+					thermometerOutput = None
+
+					try:
+						lightOn = int(response[0])
+						lightChange = self.twosComplement2Int(response[1])
+						thermometerOutput = (response[2] << 8) + response[3]
+
+					except:
+						print(f'Invalid response from {self.name} device')
+
+					# Check and change status
+					if(lightOn != None):
+						for id in self.pairedLightSWIDs:
+							app.root.ids[f'{id}_switch'].state = 'down' if lightOn == 1 else 'normal'
+
+					if(lightChange != None):
+						for id in self.pairedLightSWIDs:
+
+							prevValue = int(app.root.ids[f'{id}_switch'].value)
+							newValue = prevValue + lightChange
+							app.root.ids[f'{id}_switch'].value = newValue
+
+							app.lightingAdjust('', newValue, f'{id}_slider')
+
+					if(thermometerOutput != None):
+						# Fills readout with kelvin values
+						self.readout[requestTime] = -0.0962*thermometerOutput + 344.25
+						del self.readout[list(self.readout.keys())[0]]
+
+						self.errorCount = 0
+
+					else:
+						self.errorCount += 1
+
+						# Revert GUI to match the device settings and alert user
+						if(self.errorCount == 10):
+							self.errorCount = 0
+							app.generalError_dialog(
+								f'Communication issue with {self.name} device detected. Light switch and thermostat functionality may be limited.'
+							)
+						
+	
+	def twosComplement2Int(self, value):
+		'''
+		Convert a signed char value (8-bit, 2's complement value) to int
+		'''
+		if(value >= 128 and value <= 255):
+			value -= 1
+			value = value ^ 0b11111111
+			return -int(value)
+		elif(value >= 0 and value <= 127):
+			return int(value)
+		else:
+			raise ArithmeticError('Argument must be a signed char (8-bit) value.')
 
 class Bus():
 	def __init__(self, log):
@@ -270,6 +382,8 @@ class Bus():
 				self.activeDevices['utilities'] = Device('utilities', deviceType, deviceAddress[deviceType])
 			elif 'ltsy' in deviceType:
 				self.activeDevices['lighting'] = Device('lighting', deviceType, deviceAddress[deviceType])
+			elif 'ltsy' in deviceType:
+				self.activeDevices[f'light_switch_{deviceAddress[deviceType]}']
 			elif 'temp' in deviceType:
 				self.activeDevices['thermostat'] = Device('thermostat', deviceType, deviceAddress[deviceType])
 

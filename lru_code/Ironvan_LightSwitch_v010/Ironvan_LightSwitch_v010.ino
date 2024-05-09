@@ -23,6 +23,8 @@
  *
  *        - lightOn - 0 (off) or 1 (on)
  *        - lightChange - number of steps read from rotary encoder since last I2C transmission (signed)
+ *
+ *      The fastest quarter-turn (5 pulses of a K-040 rotary encoder) made by a human hand is about 0.15 seconds, resulting in a maximum processing time of 30 milliseconds. Since this device will be included on a bus with multiple devices, this means that the device status (request code 0x21) must be requested once every 30 milliseconds.
  */
 
 #include <Wire.h>
@@ -138,98 +140,93 @@ void requestEvent()
     Wire.write(DEVICE_TYPE);
     break;
 
-  // current_temperature
+  // device_status
   case 0x21:
-    Wire.write({(thermometerOutput >> 8) & 3,
+    Wire.write({(lightOn,
+                 lightChange,
+                 thermometerOutput >> 8) &
+                    3,
                 thermometerOutput & 255});
     break;
-
-  // light_switch_status
-  case 0x22:
-    Wire.write({lightOn,
-                lightChange});
-    lightChange = 0;
-    break;
   }
-}
 
-ISR(PCINT2_vect)
-{
-  // PORT D INTERRUPT
-
-  /*
-   * ENCODER <-> LS Interrupt sequence:
-   * 1. Apply mask to PIND (readable Port D input pin register) to isolate interruptable pins, compare (XOR) with previous state to identify changed pin.
-   * 2. If a SW signal is detected and the time elapsed since the previous valid activation ('lastPress') exceeds the debounce delay, then lightOn is cycled. Pending turns (readyTurn = true) are cancelled.
-   * 3. Identify if CLK or DT caused the interrupt. This signifies that the encoder is being turned.
-   *    Since direction is determined by the sequence of the CLK and DT pulses, readyTurn = false signifies that the initial pulse has not yet been detected.
-   *    If readyTurn is false and a CLK or DT signal is detected, readyTurn is set to true until the next pulse is detected.
-   * 4. If readyTurn = true (signaling that either a CLK or DT signal has been detected and the controller is awaiting the second pulse to determine direction), the detection of CLK or DT will determine the direction and increment or decrement the lightChange value.
-   */
-
-  // -- STEP 1 -- //
-
-  // Determine which pin caused interrupt
-  pinIdent = portDprev ^ (portDmask & PIND);
-
-  // -- STEP 2 -- //
-
-  // Identify switch activation and toggle light state (lightOn)
-
-  if (pinIdent == sw)
+  ISR(PCINT2_vect)
   {
-    if (millis() - lastPress > debounceDelay)
+    // PORT D INTERRUPT
+
+    /*
+     * ENCODER <-> LS Interrupt sequence:
+     * 1. Apply mask to PIND (readable Port D input pin register) to isolate interruptable pins, compare (XOR) with previous state to identify changed pin.
+     * 2. If a SW signal is detected and the time elapsed since the previous valid activation ('lastPress') exceeds the debounce delay, then lightOn is cycled. Pending turns (readyTurn = true) are cancelled.
+     * 3. Identify if CLK or DT caused the interrupt. This signifies that the encoder is being turned.
+     *    Since direction is determined by the sequence of the CLK and DT pulses, readyTurn = false signifies that the initial pulse has not yet been detected.
+     *    If readyTurn is false and a CLK or DT signal is detected, readyTurn is set to true until the next pulse is detected.
+     * 4. If readyTurn = true (signaling that either a CLK or DT signal has been detected and the controller is awaiting the second pulse to determine direction), the detection of CLK or DT will determine the direction and increment or decrement the lightChange value.
+     */
+
+    // -- STEP 1 -- //
+
+    // Determine which pin caused interrupt
+    pinIdent = portDprev ^ (portDmask & PIND);
+
+    // -- STEP 2 -- //
+
+    // Identify switch activation and toggle light state (lightOn)
+
+    if (pinIdent == sw)
     {
-      lightOn ^= lightOn;
-      lastPress = millis()
+      if (millis() - lastPress > debounceDelay)
+      {
+        lightOn ^= lightOn;
+        lastPress = millis()
+      }
+      else if (millis() - lastPress < 0)
+      {
+        lastPress = millis() // Ensures SW continues operating after millis rollover (2^32 ms or ~50 days)
+      }
+      readyTurnCW = false;
+      readyTurnCCW = false;
     }
-    else if (millis() - lastPress < 0)
+
+    // -- STEP 3 -- //
+
+    // Identify if CLK or DT is independently affected (signaling that the next pin change is a CW or CCW turn)
+    else if (readyTurnCW == false && readyTurnCCW == false)
     {
-      lastPress = millis() // Ensures SW continues operating after millis rollover (2^32 ms or ~50 days)
+      switch (pinIdent)
+      {
+      case clk:
+        readyTurnCW = true;
+        break;
+      case dt:
+        readyTurnCCW = true;
+        break;
+      }
     }
-    readyTurnCW = false;
-    readyTurnCCW = false;
+
+    // -- STEP 4 -- //
+
+    // ENCODER turn direction detection & corresponding lightChange
+
+    // CW turn (CLK followed by DT)
+    else if (pinIdent == dt && readyTurnCW == true)
+    {
+      if (lightOn == true)
+      {
+        lightChange += 1;
+      }
+      readyTurnCW = false;
+      readyTurnCCW = false;
+    }
+
+    // CCW turn (DT followed by CLK)
+    else if (pinIdent == clk && readyTurnCCW == true)
+    {
+      if (lightOn == true)
+      {
+        lightChange -= 1;
+      }
+      readyTurnCW = false;
+      readyTurnCCW = false;
+    }
   }
-
-  // -- STEP 3 -- //
-
-  // Identify if CLK or DT is independently affected (signaling that the next pin change is a CW or CCW turn)
-  else if (readyTurnCW == false && readyTurnCCW == false)
-  {
-    switch (pinIdent)
-    {
-    case clk:
-      readyTurnCW = true;
-      break;
-    case dt:
-      readyTurnCCW = true;
-      break;
-    }
-  }
-
-  // -- STEP 4 -- //
-
-  // ENCODER turn direction detection & corresponding lightChange
-
-  // CW turn (CLK followed by DT)
-  else if (pinIdent == dt && readyTurnCW == true)
-  {
-    if (lightOn == true)
-    {
-      lightChange += 1;
-    }
-    readyTurnCW = false;
-    readyTurnCCW = false;
-  }
-
-  // CCW turn (DT followed by CLK)
-  else if (pinIdent == clk && readyTurnCCW == true)
-  {
-    if (lightOn == true)
-    {
-      lightChange -= 1;
-    }
-    readyTurnCW = false;
-    readyTurnCCW = false;
-  }
-}
