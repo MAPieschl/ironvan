@@ -748,7 +748,7 @@ class ironVanApp(MDApp):
 		# ---- Build Window ----
 		Config.set('graphics', 'resizable', True)
 		# Note:  When uncommenting Window.fullscreen, ensure to delete comment out `size: (700, 480)` in the .kv file.
-		#Window.fullscreen = 'auto'
+		Window.fullscreen = 'auto'
 		
 		# ---- Build App Theme ----
 
