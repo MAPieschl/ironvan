@@ -105,7 +105,7 @@ void receiveEvent(int howMany)
   while (Wire.available())
   {
     byte msg = Wire.read();
-    /*
+
     switch (msg)
     {
 
@@ -171,7 +171,7 @@ void receiveEvent(int howMany)
       }
 
       break;
-    }*/
+    }
   }
 }
 
