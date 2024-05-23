@@ -513,6 +513,7 @@ class DiningLightToggleButton(ToggleButtonBehavior, MDIconButton):
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
 				if self.value == 'ls_1_off':
+					print(self.app.bus.activeDevices['lighting'].command)
 					command = self.app.bus.activeDevices['lighting'].command['ls_1_toggle'][:]
 					command.append(int(self.app.root.ids['ls_1_slider'].value))
 					self.app.bus.send(
