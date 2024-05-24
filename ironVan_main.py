@@ -787,7 +787,7 @@ class ironVanApp(MDApp):
 		self.userSettings.initUserSettings(self)
 		self.location.getLocation(self)
 		
-		# Counts from 0 to 3600 inside of self.stateUpdate to allow functions to be called anywhere from every 10 seconds to every 1 hour in 10 second intervals
+		# Counts from 0 to 3599 inside of self.stateUpdate to allow functions to be called anywhere from every 10 seconds to every 1 hour in 10 second intervals
 		self.updateCounter = 0
 		Clock.schedule_interval(self.stateUpdate, 10)
 
@@ -1032,6 +1032,11 @@ class ironVanApp(MDApp):
 				self.root.ids['home_time_label'].text = self.root.ids['home_time_label'].text[1:]
 
 		self.root.ids['home_date_label'].text = time.strftime('%A\n %d %B %y')
+
+		if(self.updateCounter < 3600):
+			self.updateCounter += 1
+		else:
+			self.updateCounter = 0
 
 	# ---- Dialog Boxes ----
 
