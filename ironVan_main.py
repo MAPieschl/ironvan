@@ -25,6 +25,7 @@ import ironVan_wifi as network
 import ironVan_settings as settings
 
 import time
+import subprocess
 
 class appElementIDs():
 	"""
@@ -1168,6 +1169,32 @@ class ironVanApp(MDApp):
 					MDFillRoundFlatButton(
 						text = 'Submit',
 						on_release=lambda x: self.checkIfPasswordProtected(ssid, True)
+					)
+				]
+			)
+
+			self.dialogBox.open()
+
+	def closeApp(tag: str):
+		subprocess.run(["sudo", "shutdown", tag, "now"])
+	
+	def power_dialog(self, obj):
+		if not self.dialogBox:
+			self.dialogBox = MDDialog(
+				title = 'Shutdown IronVan',
+				type = 'simple',
+				buttons = [
+					MDRoundFlatButton(
+						text = 'Cancel',
+						on_release = self.closeDialogBox
+					),
+					MDFillRoundFlatButton(
+						text = 'Restart',
+						on_release = lambda x: self.closeApp('-r')
+					),
+					MDFillRoundFlatButton(
+						text = 'Shutdown',
+						on_release = lambda x: self.closeApp('')
 					)
 				]
 			)
