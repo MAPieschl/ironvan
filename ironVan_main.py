@@ -786,6 +786,8 @@ class ironVanApp(MDApp):
 		self.userSettings.initUserSettings(self)
 		self.location.getLocation(self)
 		
+		# Counts from 0 to 3600 inside of self.stateUpdate to allow functions to be called anywhere from every 10 seconds to every 1 hour in 10 second intervals
+		self.updateCounter = 0
 		Clock.schedule_interval(self.stateUpdate, 10)
 
 		# Initialize bus scan
@@ -1013,8 +1015,9 @@ class ironVanApp(MDApp):
 			self.root.ids['wifi_quick_switch'].md_bg_color = self.toggleOff
 			self.root.ids['wifi_quick_switch'].value = 'wifi_off'
 
-		# Update weather solution
-		self.weather.getWeather(self, self.userSettings)
+		# Update weather solution - currently runs every 10 minutes
+		if((self.updateCounter/6) % 100 == 0):
+			self.weather.getWeather(self, self.userSettings)
 
 		# Update time & date
 		if(self.userSettings.time24hr == True):
