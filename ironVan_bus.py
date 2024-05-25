@@ -50,10 +50,10 @@ class Device():
 						'water_pump_off': [0x01],
 						'fan_auto': [0x02],
 						'fan_off': [0x03],
-						'grey_tank_heater_auto': [0x04],
-						'grey_tank_heater_off': [0x05],
-						'grey_tank_valve_open': [0x06],
-						'grey_tank_valve_close': [0x07]
+						'tank_heater_auto': [0x04],
+						'tank_heater_off': [0x05],
+						'tank_valve_open': [0x06],
+						'tank_valve_close': [0x07]
 					}
 
 					# Define available requests

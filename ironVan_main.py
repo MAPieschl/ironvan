@@ -351,7 +351,7 @@ class WSPumpToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 					self.app.bus.send(
 						'command',
 						self.app.bus.activeDevices['utilities'].address,
-						self.app.bus.activeDevices['utilities'].command[self.value]
+						self.app.bus.activeDevices['utilities'].command['water_pump_auto']
 					)
 					self.app.root.ids['ws_pump_quick_switch'].value = 'water_pump_auto'
 					self.app.root.ids['ws_pump_quick_switch'].md_bg_color = self.app.toggleOn
@@ -362,7 +362,7 @@ class WSPumpToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 					self.app.bus.send(
 						'command',
 						self.app.bus.activeDevices['utilities'].address,
-						self.app.bus.activeDevices['utilities'].command[self.value]
+						self.app.bus.activeDevices['utilities'].command['water_pump_off']
 					)
 					self.app.root.ids['ws_pump_quick_switch'].value = 'water_pump_off'
 					self.app.root.ids['ws_pump_quick_switch'].md_bg_color = self.app.toggleOff
@@ -418,7 +418,7 @@ class ShowerFanToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 					self.app.bus.send(
 						'command',
 						self.app.bus.activeDevices['utilities'].address,
-						self.app.bus.activeDevices['utilities'].command[self.value]
+						self.app.bus.activeDevices['utilities'].command['shower_fan_auto']
 					)
 					self.value = 'shower_fan_auto'
 					self.md_bg_color = self.app.toggleOn
@@ -426,7 +426,7 @@ class ShowerFanToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 					self.app.bus.send(
 						'command',
 						self.app.bus.activeDevices['utilities'].address,
-						self.app.bus.activeDevices['utilities'].command[self.value]
+						self.app.bus.activeDevices['utilities'].command['shower_fan_off']
 					)
 					self.value = 'shower_fan_off'
 					self.md_bg_color = self.app.toggleOff
@@ -452,7 +452,7 @@ class TankHeaterToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 					self.app.bus.send(
 						'command',
 						self.app.bus.activeDevices['utilities'].address,
-						self.app.bus.activeDevices['utilities'].command[self.value]
+						self.app.bus.activeDevices['utilities'].command['tank_heater_auto']
 					)
 					self.value = 'tank_heater_auto'
 					self.md_bg_color = self.app.toggleOn
@@ -460,7 +460,7 @@ class TankHeaterToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 					self.app.bus.send(
 						'command',
 						self.app.bus.activeDevices['utilities'].address,
-						self.app.bus.activeDevices['utilities'].command[self.value]
+						self.app.bus.activeDevices['utilities'].command['tank_heater_off']
 					)
 					self.value = 'tank_heater_off'
 					self.md_bg_color = self.app.toggleOff
@@ -483,7 +483,7 @@ class TankValveToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 					self.app.bus.send(
 						'command',
 						self.app.bus.activeDevices['utilities'].address,
-						self.app.bus.activeDevices['utilities'].command[self.value]
+						self.app.bus.activeDevices['utilities'].command['tank_valve_auto']
 					)
 					self.value = 'tank_valve_auto'
 					self.md_bg_color = self.app.toggleOn
@@ -491,7 +491,7 @@ class TankValveToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 					self.app.bus.send(
 						'command',
 						self.app.bus.activeDevices['utilities'].address,
-						self.app.bus.activeDevices['utilities'].command[self.value]
+						self.app.bus.activeDevices['utilities'].command['tank_valve_off']
 					)
 					self.value = 'tank_valve_off'
 					self.md_bg_color = self.app.toggleOff
@@ -507,14 +507,13 @@ class DiningLightToggleButton(ToggleButtonBehavior, MDIconButton):
 		super().__init__(**kwargs)
 		self.app = ironVanApp.get_running_app()
 		self.value = 'ls_1_off'
-		#self.set_disabled(True)
+		self.set_disabled(False)
 
 	def on_state(self, instance, value):
 		if value == 'normal' and time.time() >= self.app.buttonReset:
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
 				if self.value == 'ls_1_off':
-					print(self.app.bus.activeDevices['lighting'].command)
 					command = self.app.bus.activeDevices['lighting'].command['ls_1_toggle'][:]
 					command.append(int(self.app.root.ids['ls_1_slider'].value))
 					self.app.bus.send(
@@ -551,7 +550,7 @@ class BedroomLightToggleButton(ToggleButtonBehavior, MDIconButton):
 		super().__init__(**kwargs)
 		self.app = ironVanApp.get_running_app()
 		self.value = 'ls_2_off'
-		#self.set_disabled(True)
+		self.set_disabled(False)
 
 	def on_state(self, instance, value):
 		if value == 'normal' and time.time() >= self.app.buttonReset:
@@ -593,7 +592,7 @@ class KitchenLightToggleButton(ToggleButtonBehavior, MDIconButton):
 		super().__init__(**kwargs)
 		self.app = ironVanApp.get_running_app()
 		self.value = 'ls_3_off'
-		#self.set_disabled(True)
+		self.set_disabled(False)
 
 	def on_state(self, instance, value):
 		if value == 'normal' and time.time() >= self.app.buttonReset:
@@ -635,7 +634,7 @@ class BathroomLightToggleButton(ToggleButtonBehavior, MDIconButton):
 		super().__init__(**kwargs)
 		self.app = ironVanApp.get_running_app()
 		self.value = 'ls_4_off'
-		#self.set_disabled(True)
+		self.set_disabled(False)
 
 	def on_state(self, instance, value):
 		if value == 'normal' and time.time() >= self.app.buttonReset:
@@ -1186,7 +1185,7 @@ class ironVanApp(MDApp):
 	def power_dialog(self, obj):
 		if not self.dialogBox:
 			self.dialogBox = MDDialog(
-				title = 'Shutdown IronVan',
+				title = 'How would you like to power down?',
 				type = 'simple',
 				buttons = [
 					MDRoundFlatButton(
