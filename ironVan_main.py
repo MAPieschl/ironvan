@@ -472,28 +472,28 @@ class TankValveToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
 		self.app = ironVanApp.get_running_app()
-		self.value = 'tank_valve_off'
+		self.value = 'tank_valve_close'
 		self.set_disabled(False)
 
 	def on_state(self, instance, value):
 		if value == 'normal' and time.time() >= self.app.buttonReset:
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
-				if self.value == 'tank_valve_off':
+				if self.value == 'tank_valve_close':
 					self.app.bus.send(
 						'command',
 						self.app.bus.activeDevices['utilities'].address,
-						self.app.bus.activeDevices['utilities'].command['tank_valve_auto']
+						self.app.bus.activeDevices['utilities'].command['tank_valve_open']
 					)
-					self.value = 'tank_valve_auto'
+					self.value = 'tank_valve_open'
 					self.md_bg_color = self.app.toggleOn
 				else:
 					self.app.bus.send(
 						'command',
 						self.app.bus.activeDevices['utilities'].address,
-						self.app.bus.activeDevices['utilities'].command['tank_valve_off']
+						self.app.bus.activeDevices['utilities'].command['tank_valve_close']
 					)
-					self.value = 'tank_valve_off'
+					self.value = 'tank_valve_close'
 					self.md_bg_color = self.app.toggleOff
 			except KeyError:
 					self.app.noDeviceFound_dialog('Grey tank dump valve')
