@@ -210,7 +210,7 @@ class EnvFanToggleButton(ToggleButtonBehavior, MDIconButton):
 					self.app.bus.send(
 						'command',
 						self.app.bus.activeDevices['thermostat'].address,
-						self.app.bus.activeDevices['thermostat'].command[self.value]
+						self.app.bus.activeDevices['thermostat'].command['fan_low_on']
 					)
 					self.value = 'fan_low_on'
 					self.md_bg_color = self.app.toggleOn
@@ -218,7 +218,7 @@ class EnvFanToggleButton(ToggleButtonBehavior, MDIconButton):
 					self.app.bus.send(
 						'command',
 						self.app.bus.activeDevices['thermostat'].address,
-						self.app.bus.activeDevices['thermostat'].command[self.value]
+						self.app.bus.activeDevices['thermostat'].command['fan_low_off']
 					)
 					self.value = 'fan_low_off'
 					self.md_bg_color = self.app.toggleOff
@@ -241,7 +241,7 @@ class EnvCoolToggleButton(ToggleButtonBehavior, MDIconButton):
 					self.app.bus.send(
 						'command',
 						self.app.bus.activeDevices['thermostat'].address,
-						self.app.bus.activeDevices['thermostat'].command[self.value]
+						self.app.bus.activeDevices['thermostat'].command['ac_on']
 					)
 					self.value = 'ac_on'
 					self.md_bg_color = self.app.toggleOn
@@ -249,7 +249,7 @@ class EnvCoolToggleButton(ToggleButtonBehavior, MDIconButton):
 					self.app.bus.send(
 						'command',
 						self.app.bus.activeDevices['thermostat'].address,
-						self.app.bus.activeDevices['thermostat'].command[self.value]
+						self.app.bus.activeDevices['thermostat'].command['ac_off']
 					)
 					self.value = 'ac_off'
 					self.md_bg_color = self.app.toggleOff
@@ -272,7 +272,7 @@ class EnvHeatToggleButton(ToggleButtonBehavior, MDIconButton):
 					self.app.bus.send(
 						'command',
 						self.app.bus.activeDevices['thermostat'].address,
-						self.app.bus.activeDevices['thermostat'].command[self.value]
+						self.app.bus.activeDevices['thermostat'].command['heat_on']
 					)
 					self.value = 'heat_on'
 					self.md_bg_color = self.app.toggleOn
@@ -280,7 +280,7 @@ class EnvHeatToggleButton(ToggleButtonBehavior, MDIconButton):
 					self.app.bus.send(
 						'command',
 						self.app.bus.activeDevices['thermostat'].address,
-						self.app.bus.activeDevices['thermostat'].command[self.value]
+						self.app.bus.activeDevices['thermostat'].command['heat_off']
 					)
 					self.value = 'heat_off'
 					self.md_bg_color = self.app.toggleOff

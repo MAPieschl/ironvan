@@ -127,7 +127,7 @@ MDFloatLayout:
                     MDFloatLayout:
                         MDLabel:
                             text: 'Outside Temp'
-                            font_size: 28
+                            font_size: 14
                             theme_text_color: 'Hint'
                             pos_hint: {'center_x': 0.62, 'center_y': 0.78}
 
@@ -157,20 +157,20 @@ MDFloatLayout:
 
                         MDLabel:
                             text: 'Today'
-                            font_size: 28
+                            font_size: 14
                             theme_text_color: 'Hint'
                             pos_hint: {'center_x': 0.64, 'center_y': .68}
                         
                         MDLabel:
                             id: location_label
                             text: ''
-                            font_size: 20
+                            font_size: 10
                             theme_text_color: 'Hint'
                             pos_hint: {'center_x': 0.58, 'center_y': 0.62}
                         
                         MDLabel:
                             text: 'High'
-                            font_size: 24
+                            font_size: 12
                             theme_text_color: 'Hint'
                             pos_hint: {'center_x': 0.97, 'center_y': .62}
 
@@ -183,7 +183,7 @@ MDFloatLayout:
                         
                         MDLabel:
                             text: 'Low'
-                            font_size: 24
+                            font_size: 12
                             theme_text_color: 'Hint'
                             pos_hint: {'center_x': 1.23, 'center_y': .62}
 
@@ -206,6 +206,7 @@ MDFloatLayout:
 
                         MDLabel:
                             text: 'Inside Temp'
+                            font_size: 12
                             theme_text_color: 'Hint'
                             pos_hint: {'center_x': 0.63, 'center_y': .23}
 
@@ -360,16 +361,6 @@ MDFloatLayout:
                             text_color: app.theme_cls.primary_light
                             pos_hint: {'center_x': 0.2,'center_y': 0.2}
 
-                        MDLabel:
-                            id: fresh_water_quick_label
-                            text: 'Fresh\nWater'
-                            halign: 'right'
-                            theme_text_color: 'Custom'
-                            text_color: app.theme_cls.accent_dark
-                            font_size: 12
-                            bold: True
-                            pos_hint: {'center_x': -0.35,'center_y': 0.5}
-
                         MDIcon:
                             id: quick_fresh_to_pump_line
                             icon: 'minus'
@@ -431,15 +422,6 @@ MDFloatLayout:
                             theme_text_color: 'Custom'
                             text_color: app.theme_cls.accent_light
                             pos_hint: {'center_x': 0.8,'center_y': 0.2}
-
-                        MDLabel:
-                            id: grey_water_quick_label
-                            text: 'Grey\nWater'
-                            theme_text_color: 'Custom'
-                            text_color: app.theme_cls.accent_dark
-                            font_size: 12
-                            bold: True
-                            pos_hint: {'center_x': 1.36,'center_y': 0.5}
 
                 # ---- Build LS Card ----
 
