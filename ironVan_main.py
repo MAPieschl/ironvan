@@ -749,7 +749,7 @@ class ironVanApp(MDApp):
 		# ---- Build Window ----
 		Config.set('graphics', 'resizable', True)
 		# Note:  When uncommenting Window.fullscreen, ensure to delete comment out `size: (700, 480)` in the .kv file.
-		Window.fullscreen = 'auto'
+		#Window.fullscreen = 'auto'
 		
 		# ---- Build App Theme ----
 
@@ -1018,6 +1018,17 @@ class ironVanApp(MDApp):
 		# Update weather solution - currently runs every 10 minutes
 		if((self.updateCounter/6) % 100 == 0):
 			self.weather.getWeather(self, self.userSettings)
+			response = self.bus.send(
+				'request',
+				self.bus.activeDevices['utilities'].address,
+				self.bus.activeDevices['utilities'].request['status']
+			)
+
+		self.bus.activeDevices['utilities'].updateDevice(
+			self,
+			time.time(),
+			response
+		)
 
 		# Update time & date
 		if(self.userSettings.time24hr == True):
