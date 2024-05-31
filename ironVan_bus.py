@@ -217,6 +217,8 @@ class Device():
 
 					# Error check function
 	 				# Note: As button functionality is added for other switches in this device, add to the statements below. Any errors should result in an increment in the error count.
+					print(app.root.ids['ws_pump_switch'].value != waterPump)
+					print(app.root.ids['ws_pump_switch'].value != waterPump or app.root.ids['shower_fan_switch'].value != showerFan)
 					if(
 						app.root.ids['ws_pump_switch'].value != waterPump or
 						app.root.ids['shower_fan_switch'].value != showerFan or
