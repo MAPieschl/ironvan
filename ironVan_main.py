@@ -1018,12 +1018,12 @@ class ironVanApp(MDApp):
 		# Update weather solution - currently runs every 10 minutes
 		if((self.updateCounter/6) % 100 == 0):
 			self.weather.getWeather(self, self.userSettings)
-			response = self.bus.send(
-				'request',
-				self.bus.activeDevices['utilities'].address,
-				self.bus.activeDevices['utilities'].request['status']
-			)
 
+		response = self.bus.send(
+			'request',
+			self.bus.activeDevices['utilities'].address,
+			self.bus.activeDevices['utilities'].request['device_status']
+		)
 		self.bus.activeDevices['utilities'].updateDevice(
 			self,
 			time.time(),
