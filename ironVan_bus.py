@@ -233,7 +233,8 @@ class Device():
 
 						# Attempt to fix issues 10x before throwing error - these lines will toggle the current value of each switch and then trigger an on_state function activation
 						app.root.ids['ws_pump_switch'].value = 'water_pump_auto' if app.root.ids['ws_pump_switch'] == 'water_pump_off' else 'water_pump_off'
-						app.root.ids['ws_pump_switch'].state = 'normal'
+						
+						app.root.ids['ws_pump_switch'].on_state(app.root.ids['ws_pump_switch'], 'normal')
 
 						app.root.ids['shower_fan_switch'].value = 'shower_fan_auto' if app.root.ids['shower_fan_switch'] == 'shower_fan_off' else 'shower_fan_off'
 						app.root.ids['shower_fan_switch'].state = 'normal'
