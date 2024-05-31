@@ -501,7 +501,10 @@ class Bus():
 			return 'command sent'
 		
 		elif('request' in msgType):
+			msg = self.bus.read_i2c_block_data(addr, message[0], message[1])
+			print(msg)
 			msg = self.rawMsg2Str(self.bus.read_i2c_block_data(addr, message[0], message[1]))
+			print(msg)
 			return msg
 		
 	async def regularScan(self, app):
