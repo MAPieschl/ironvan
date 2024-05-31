@@ -48,8 +48,8 @@ class Device():
 					self.command = {
 						'water_pump_auto': [0x00],
 						'water_pump_off': [0x01],
-						'fan_auto': [0x02],
-						'fan_off': [0x03],
+						'shower_fan_auto': [0x02],
+						'shower_fan_off': [0x03],
 						'tank_heater_auto': [0x04],
 						'tank_heater_off': [0x05],
 						'tank_valve_open': [0x06],
@@ -197,7 +197,7 @@ class Device():
 					# Initial state is case '0' (0b0000)
 					greyValve = 'tank_valve_close'
 					greyHeat = 'tank_heat_auto'
-					showerFan = 'fan_auto'
+					showerFan = 'shower_fan_auto'
 					waterPump = 'water_pump_off'
 
 					# Check bit status by applying bit mask
@@ -208,7 +208,7 @@ class Device():
 						greyHeat = 'tank_heat_off'
 
 					if((4 & responseInt) == 4):
-						showerFan = 'fan_off'
+						showerFan = 'shower_fan_off'
 
 					if((8 & responseInt) == 8):
 						waterPump = 'water_pump_auto'
@@ -338,7 +338,7 @@ class Device():
 					print(f'Error check for {self}:')
 					print(lowFan, '  ', app.root.ids['env_fan_quick_switch'].value)
 					print(highFan, '  ', app.root.ids[
-					'env_cool_quick_switch'], '//', app.root.ids['env_heat_quick_switch'].value)
+					'env_cool_quick_switch'].value, '//', app.root.ids['env_heat_quick_switch'].value)
 					print(airCon, '  ', app.root.ids['env_cool_quick_switch'].value)
 					print(heatPump, '  ', app.root.ids['env_heat_quick_switch'].value)
 
@@ -351,6 +351,7 @@ class Device():
 						app.root.ids['env_heat_quick_switch'].value != heatPump or
 						('on' in app.root.ids['env_heat_quick_switch'].value and not 'on' in highFan)
 					):
+						print('Thermostat error caught')
 						# Increment error count
 						self.errorCount += 1
 
