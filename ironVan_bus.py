@@ -190,7 +190,7 @@ class Device():
 
 						# Isolate PB1 thru PB4
 						responseInt = responseInt >> 1
-						responseInt = responseInt & 240
+						responseInt = responseInt & 0b1111
 					except:
 						print(f'Invalid response from {self.name} device')
 						return
