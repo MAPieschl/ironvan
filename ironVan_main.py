@@ -200,7 +200,7 @@ class EnvFanToggleButton(ToggleButtonBehavior, MDIconButton):
 		#self.set_disabled(True)
 
 	def on_state(self, instance, value):
-		print('Passed to on_state')
+		print('Called EnvFanToggleButton')
 		if value == 'normal' and time.time() >= self.app.buttonReset:
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
@@ -233,6 +233,7 @@ class EnvCoolToggleButton(ToggleButtonBehavior, MDIconButton):
 		#self.set_disabled(True)
 
 	def on_state(self, instance, value):
+		print('Called EnvCoolToggleButton')
 		if value == 'normal' and time.time() >= self.app.buttonReset:
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
@@ -264,6 +265,7 @@ class EnvHeatToggleButton(ToggleButtonBehavior, MDIconButton):
 		#self.set_disabled(True)
 
 	def on_state(self, instance, value):
+		print('Called EnvHeatToggleButton')
 		if value == 'normal' and time.time() >= self.app.buttonReset:
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:

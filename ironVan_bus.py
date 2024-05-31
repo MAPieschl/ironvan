@@ -533,6 +533,7 @@ class Bus():
 		
 		elif('request' in msgType):
 			msg = self.rawMsg2Str(self.bus.read_i2c_block_data(addr, message[0], message[1]))
+			print('Raw return: ', msg)
 			return msg
 		
 	async def regularScan(self, app):
