@@ -200,6 +200,7 @@ class EnvFanToggleButton(ToggleButtonBehavior, MDIconButton):
 		#self.set_disabled(True)
 
 	def on_state(self, instance, value):
+		print('Passed to on_state')
 		if value == 'normal' and time.time() >= self.app.buttonReset:
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
