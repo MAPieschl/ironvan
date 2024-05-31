@@ -214,10 +214,10 @@ class Device():
 						waterPump = 'water_pump_auto'
 
 					print(f'Error check for {self}:')
-					print(waterPump, '  ', self.root.ids['ws_pump_switch'].value)
-					print(showerFan, '  ', self.root.ids['shower_fan_switch'].value)
-					print(greyHeat, '  ', self.root.ids['tank_heater_switch'].value)
-					print(greyValve, '  ', self.root.ids['tank_valve_switch'].value)
+					print(waterPump, '  ', app.root.ids['ws_pump_switch'].value)
+					print(showerFan, '  ', app.root.ids['shower_fan_switch'].value)
+					print(greyHeat, '  ', app.root.ids['tank_heater_switch'].value)
+					print(greyValve, '  ', app.root.ids['tank_valve_switch'].value)
 
 					# Error check function
 	 				# Note: As button functionality is added for other switches in this device, add to the statements below. Any errors should result in an increment in the error count.
