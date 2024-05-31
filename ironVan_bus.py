@@ -184,8 +184,6 @@ class Device():
 					#del self.readout[list(self.readout.keys())[0]]
 					
 					try:
-						print('Updating device...')
-						print(f'Response received: {response}')
 						responseInt = int(response)
 
 						# Isolate PB1 thru PB4
@@ -217,33 +215,27 @@ class Device():
 
 					# Error check function
 	 				# Note: As button functionality is added for other switches in this device, add to the statements below. Any errors should result in an increment in the error count.
-					print(app.root.ids['ws_pump_switch'].value != waterPump)
-					print(app.root.ids['ws_pump_switch'].value != waterPump or app.root.ids['shower_fan_switch'].value != showerFan)
 					if(
 						app.root.ids['ws_pump_switch'].value != waterPump or
 						app.root.ids['shower_fan_switch'].value != showerFan or
 						app.root.ids['tank_heater_switch'].value != greyHeat or
 						app.root.ids['tank_valve_switch'].value != greyValve
 					):
-						print('Error detected')
-						print(f"Switch: {app.root.ids['ws_pump_switch'].value}")
-						print(f'Pump: {waterPump}')
 						# Increment error count
 						self.errorCount += 1
 
 						# Attempt to fix issues 10x before throwing error - these lines will toggle the current value of each switch and then trigger an on_state function activation
 						app.root.ids['ws_pump_switch'].value = 'water_pump_auto' if app.root.ids['ws_pump_switch'] == 'water_pump_off' else 'water_pump_off'
-						
 						app.root.ids['ws_pump_switch'].on_state(app.root.ids['ws_pump_switch'], 'normal')
 
 						app.root.ids['shower_fan_switch'].value = 'shower_fan_auto' if app.root.ids['shower_fan_switch'] == 'shower_fan_off' else 'shower_fan_off'
-						app.root.ids['shower_fan_switch'].state = 'normal'
+						app.root.ids['shower_fan_switch'].on_state(app.root.ids['shower_fan_switch'], 'normal')
 
 						app.root.ids['tank_heater_switch'].value = 'tank_heater_auto' if app.root.ids['tank_heater_switch'] == 'tank_heater_off' else 'tank_heater_off'
-						app.root.ids['tank_heater_switch'].state = 'normal'
+						app.root.ids['tank_heater_switch'].on_state(app.root.ids['tank_heater_switch'], 'normal')
 
 						app.root.ids['tank_valve_switch'].value = 'tank_valve_open' if app.root.ids['tank_valve_switch'] == 'tank_valve_close' else 'tank_valve_close'
-						app.root.ids['tank_valve_switch'].state = 'normal'
+						app.root.ids['tank_valve_switch'].on_state(app.root.ids['tank_valve_switch'], 'normal')
 
 						# Revert GUI to match the device settings and alert user
 						if(self.errorCount == 10):
@@ -251,24 +243,22 @@ class Device():
 
 							# Change the switch position to match the detected state of the board. The value will be switched to the opposite of the value of the board, then a state change will call the 'toggle' functionality of the button and cause it to switch states.
 							app.root.ids['ws_pump_switch'].value = 'water_pump_auto' if waterPump == 'water_pump_off' else 'water_pump_auto'
-							app.root.ids['ws_pump_switch'].state = 'normal'
+							app.root.ids['ws_pump_switch'].on_state(app.root.ids['ws_pump_switch'], 'normal')
 
 							app.root.ids['shower_fan_switch'].value = 'shower_fan_auto' if showerFan == 'shower_fan_off' else 'shower_fan_off'
-							app.root.ids['shower_fan_switch'].state = 'normal'
+							app.root.ids['shower_fan_switch'].on_state(app.root.ids['shower_fan_switch'], 'normal')
 
 							app.root.ids['tank_heater_switch'].value = 'tank_heater_auto' if greyHeat == 'tank_heater_off' else 'tank_heater_off'
-							app.root.ids['tank_heater_switch'].state = 'normal'
+							app.root.ids['tank_heater_switch'].on_state(app.root.ids['tank_heater_switch'], 'normal')
 
 							app.root.ids['tank_valve_switch'].value = 'tank_valve_open' if greyValve == 'tank_valve_close' else 'tank_valve_close'
-							app.root.ids['tank_valve_switch'].state = 'normal'
+							app.root.ids['tank_valve_switch'].on_state(app.root.ids['tank_valve_switch'], 'normal')
 
 							app.generalError_dialog(
 								f'Communication issue with {self.name} device detected. All buttons have been reverted to match state of device.'
 							)
 					else:
 						self.errorCount = 0
-
-					print(waterPump, showerFan, greyHeat, greyValve)
 					
 		# --- LIGHTING ---
 		if('ltsy' in self.type):
@@ -309,56 +299,77 @@ class Device():
 					#self.readout[requestTime] = response
 					#del self.readout[list(self.readout.keys())[0]]
 					
-					# try:
-					# 	responseInt = int(response)
+					try:
+						responseInt = int(response)
 
-					# 	# Isolate PB1 thru PB4
-					# 	responseInt = responseInt >> 1
-					# 	responseInt = responseInt & 240
-					# except:
-					# 	print(f'Invalid response from {self.name} device')
+						# Isolate PB1 thru PB4
+						responseInt = responseInt >> 1
+						responseInt = responseInt & 0b1111
+					except:
+						print(f'Invalid response from {self.name} device')
+						return
 
-					# # Initialize local variables for tracking
-					# # Initial state is case '0' (0b0000)
-					# greyValve = 'tank_valve_close'
-					# greyHeat = 'tank_heat_auto'
-					# showerFan = 'fan_auto'
-					# waterPump = 'water_pump_off'
+					# Initialize local variables for tracking
+					# Initial state is case '0' (0b0000)
+					heatPump = 'heat_off'
+					airCon = 'ac_off'
+					highFan = 'fan_high_off'
+					lowFan = 'fan_low_off'
 
-					# # Check bit status by applying bit mask
-					# if((1 & responseInt) == 1):
-					# 	greyValve = 'tank_valve_open'
+					# Check bit status by applying bit mask
+					if((1 & responseInt) == 1):
+						greyValve = 'heat_on'
 
-					# if((2 & responseInt) == 2):
-					# 	greyHeat = 'tank_heat_off'
+					if((2 & responseInt) == 2):
+						airCon = 'ac_on'
 
-					# if((4 & responseInt) == 4):
-					# 	showerFan = 'fan_off'
+					if((4 & responseInt) == 4):
+						highFan = 'fan_high_on'
 
-					# if((8 & responseInt) == 8):
-					# 	waterPump = 'water_pump_auto'
+					if((8 & responseInt) == 8):
+						lowFan = 'fan_low_on'
 
-					# # Error check function
-	 				# # Note: As button functionality is added for other switches in this device, add to the statements below. Any errors should result in an increment in the error count.
-					# if(
-					# 	app.root.ids['ws_pump_switch'].value != waterPump
-					# ):
-					# 	# Increment error count
-					# 	self.errorCount += 1
+					# Error check function
+	 				# Note: As button functionality is added for other switches in this device, add to the statements below. Any errors should result in an increment in the error count.
+					if(
+						app.root.ids['env_fan_quick_switch'].value != lowFan or
+						app.root.ids['env_cool_quick_switch'].value != airCon or
+						('on' in app.root.ids['env_cool_quick_switch'].value and not 'on' in highFan) or
+						app.root.ids['env_heat_quick_switch'].value != heatPump or
+						('on' in app.root.ids['env_heat_quick_switch'].value and not 'on' in highFan)
+					):
+						# Increment error count
+						self.errorCount += 1
 
-					# 	# Attempt to fix issues 10x before throwing error (this line will change the GUI state of the toggle and trigger the 'on_state' function)
-					# 	app.root.ids['ws_pump_switch'].state = 'down' if waterPump == 'water_pump_auto' else 'normal'
+						# Attempt to fix issues 10x before throwing error - these lines will toggle the current value of each switch and then trigger an on_state function activation
+						app.root.ids['env_fan_quick_switch'].value = 'fan_low_on' if app.root.ids['env_fan_quick_switch'] == 'fan_low_off' else 'fan_low_off'
+						app.root.ids['env_fan_quick_switch'].on_state(app.root.ids['env_fan_quick_switch'], 'normal')
 
-					# 	# Revert GUI to match the device settings and alert user
-					# 	if(self.errorCount == 10):
-					# 		self.errorCount = 0
-					# 		app.root.ids['ws_pump_switch'].state = 'down' if waterPump == 'water_pump_auto' else 'normal'
+						app.root.ids['env_cool_quick_switch'].value = 'ac_on' if app.root.ids['env_cool_quick_switch'] == 'ac_off' else 'ac_off'
+						app.root.ids['env_cool_quick_switch'].on_state(app.root.ids['env_cool_quick_switch'], 'normal')
 
-					# 		app.generalError_dialog(
-					# 			f'Communication issue with {self.name} device detected. All buttons have been reverted to match state of device.'
-					# 		)
-					# else:
-					# 	self.errorCount = 0
+						app.root.ids['env_heat_quick_switch'].value = 'heat_on' if app.root.ids['env_heat_quick_switch'] == 'heat_off' else 'heat_off'
+						app.root.ids['env_heat_quick_switch'].on_state(app.root.ids['env_heat_quick_switch'], 'normal')
+
+						# Revert GUI to match the device settings and alert user
+						if(self.errorCount == 10):
+							self.errorCount = 0
+
+							# Change the switch position to match the detected state of the board. The value will be switched to the opposite of the value of the board, then a state change will call the 'toggle' functionality of the button and cause it to switch states.
+							app.root.ids['env_fan_quick_switch'].value = 'fan_low_on' if lowFan == 'fan_low_off' else 'fan_low_on'
+							app.root.ids['env_fan_quick_switch'].on_state(app.root.ids['env_fan_quick_switch'], 'normal')
+
+							app.root.ids['env_cool_quick_switch'].value = 'ac_on' if airCon == 'ac_on' else 'ac_off'
+							app.root.ids['env_cool_quick_switch'].on_state(app.root.ids['env_cool_quick_switch'], 'normal')
+
+							app.root.ids['env_heat_quick_switch'].value = 'heat_on' if heatPump == 'heat_off' else 'heat_off'
+							app.root.ids['env_heat_quick_switch'].on_state(app.root.ids['env_heat_quick_switch'], 'normal')
+
+							app.generalError_dialog(
+								f'Communication issue with {self.name} device detected. All buttons have been reverted to match state of device.'
+							)
+					else:
+						self.errorCount = 0
 
 		# --- LIGHT SWITCH & THERMOMETER ---
 		if('ltsw' in self.type):
@@ -507,10 +518,7 @@ class Bus():
 			return 'command sent'
 		
 		elif('request' in msgType):
-			msg = self.bus.read_i2c_block_data(addr, message[0], message[1])
-			print(msg, type(msg[0]))
 			msg = self.rawMsg2Str(self.bus.read_i2c_block_data(addr, message[0], message[1]))
-			print(msg)
 			return msg
 		
 	async def regularScan(self, app):

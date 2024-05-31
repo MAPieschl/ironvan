@@ -38,8 +38,6 @@ class appElementIDs():
 		self.labels = [
 			'fresh_water_label',
 			'grey_water_label',
-			'fresh_water_quick_label',
-			'grey_water_quick_label',
 			'settings_user_settings_title_icon',
 			'settings_user_settings_title',
 			'settings_user_settings_temp_select_label',
