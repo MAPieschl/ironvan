@@ -336,11 +336,11 @@ class Device():
 						lowFan = 'fan_low_on'
 
 					print(f'Error check for {self}:')
-					print(lowFan, '  ', self.root.ids['env_fan_quick_switch'].value)
-					print(highFan, '  ', self.root.ids[
-					'env_cool_quick_switch'], '//', self.root.ids['env_heat_quick_switch'].value)
-					print(airCon, '  ', self.root.ids['env_cool_quick_switch'].value)
-					print(heatPump, '  ', self.root.ids['env_heat_quick_switch'].value)
+					print(lowFan, '  ', app.root.ids['env_fan_quick_switch'].value)
+					print(highFan, '  ', app.root.ids[
+					'env_cool_quick_switch'], '//', app.root.ids['env_heat_quick_switch'].value)
+					print(airCon, '  ', app.root.ids['env_cool_quick_switch'].value)
+					print(heatPump, '  ', app.root.ids['env_heat_quick_switch'].value)
 
 					# Error check function
 	 				# Note: As button functionality is added for other switches in this device, add to the statements below. Any errors should result in an increment in the error count.
