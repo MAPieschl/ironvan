@@ -544,7 +544,9 @@ class Bus():
 		outputStr = ''
 		
 		for x in charList:
-			outputStr += chr(x)
-			print(x, outputStr)
+			if(x <= 31):
+				outputStr += str(x)
+			else:
+				outputStr += chr(x)
 			
 		return outputStr
