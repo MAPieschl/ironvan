@@ -545,5 +545,6 @@ class Bus():
 		
 		for x in charList:
 			outputStr += chr(x)
+			print(x, outputStr)
 			
 		return outputStr
