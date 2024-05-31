@@ -344,6 +344,7 @@ class WSPumpToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 		self.set_disabled(False)
 
 	def on_state(self, instance, value):
+		print('State change detected')
 		if value == 'normal' and time.time() >= self.app.buttonReset:
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
