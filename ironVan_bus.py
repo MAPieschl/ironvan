@@ -213,6 +213,12 @@ class Device():
 					if((8 & responseInt) == 8):
 						waterPump = 'water_pump_auto'
 
+					print(f'Error check for {self}:')
+					print(waterPump, '  ', self.root.ids['ws_pump_switch'].value)
+					print(showerFan, '  ', self.root.ids['shower_fan_switch'].value)
+					print(greyHeat, '  ', self.root.ids['tank_heater_switch'].value)
+					print(greyValve, '  ', self.root.ids['tank_valve_switch'].value)
+
 					# Error check function
 	 				# Note: As button functionality is added for other switches in this device, add to the statements below. Any errors should result in an increment in the error count.
 					if(
@@ -318,7 +324,7 @@ class Device():
 
 					# Check bit status by applying bit mask
 					if((1 & responseInt) == 1):
-						greyValve = 'heat_on'
+						heatPump = 'heat_on'
 
 					if((2 & responseInt) == 2):
 						airCon = 'ac_on'
@@ -328,6 +334,13 @@ class Device():
 
 					if((8 & responseInt) == 8):
 						lowFan = 'fan_low_on'
+
+					print(f'Error check for {self}:')
+					print(lowFan, '  ', self.root.ids['env_fan_quick_switch'].value)
+					print(highFan, '  ', self.root.ids[
+					'env_cool_quick_switch'], '//', self.root.ids['env_heat_quick_switch'].value)
+					print(airCon, '  ', self.root.ids['env_cool_quick_switch'].value)
+					print(heatPump, '  ', self.root.ids['env_heat_quick_switch'].value)
 
 					# Error check function
 	 				# Note: As button functionality is added for other switches in this device, add to the statements below. Any errors should result in an increment in the error count.
