@@ -362,7 +362,7 @@ class Device():
 						else:
 							app.root.ids['env_fan_quick_switch'].value = 'fan_low_offs'
 						print(app.root.ids['env_fan_quick_switch'].value)
-						app.root.ids['env_fan_quick_switch'].on_state(app.root.ids['env_fan_quick_switch'], 'normal')
+						app.root.ids['env_fan_quick_switch'].on_state(app.root.ids['env_fan_quick_switch'], 'override')
 
 						app.root.ids['env_cool_quick_switch'].value = 'ac_on' if app.root.ids['env_cool_quick_switch'] == 'ac_off' else 'ac_off'
 						app.root.ids['env_cool_quick_switch'].on_state(app.root.ids['env_cool_quick_switch'], 'normal')

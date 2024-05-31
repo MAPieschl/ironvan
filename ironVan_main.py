@@ -200,8 +200,9 @@ class EnvFanToggleButton(ToggleButtonBehavior, MDIconButton):
 		#self.set_disabled(True)
 
 	def on_state(self, instance, value):
+
 		print('Called EnvFanToggleButton with value = ', self.value)
-		if value == 'normal' and time.time() >= self.app.buttonReset:
+		if (value == 'normal' and time.time() >= self.app.buttonReset) or value == 'override':
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
 				if self.value == 'fan_low_off':
