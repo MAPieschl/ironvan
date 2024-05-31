@@ -226,7 +226,7 @@ class Device():
 						app.root.ids['tank_valve_switch'].value != greyValve
 					):
 						print('Error detected')
-						print(f'Switch: {app.root.ids['ws_pump_switch'].value}')
+						print(f"Switch: {app.root.ids['ws_pump_switch'].value}")
 						print(f'Pump: {waterPump}')
 						# Increment error count
 						self.errorCount += 1
