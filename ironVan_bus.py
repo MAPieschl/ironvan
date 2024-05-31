@@ -357,7 +357,10 @@ class Device():
 
 						# Attempt to fix issues 10x before throwing error - these lines will toggle the current value of each switch and then trigger an on_state function activation
 						print(app.root.ids['env_fan_quick_switch'].value)
-						app.root.ids['env_fan_quick_switch'].value = 'fan_low_on' if app.root.ids['env_fan_quick_switch'] == 'fan_low_off' else 'fan_low_off'
+						if(app.root.ids['env_fan_quick_switch'] == 'fan_low_off'):
+							app.root.ids['env_fan_quick_switch'] = 'fan_low_on'
+						else:
+							app.root.ids['env_fan_quick_switch'] = 'fan_low_offs'
 						print(app.root.ids['env_fan_quick_switch'].value)
 						app.root.ids['env_fan_quick_switch'].on_state(app.root.ids['env_fan_quick_switch'], 'normal')
 
