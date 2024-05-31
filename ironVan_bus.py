@@ -184,6 +184,8 @@ class Device():
 					#del self.readout[list(self.readout.keys())[0]]
 					
 					try:
+						print('Updating device...')
+						print(f'Response received: {response}')
 						responseInt = int(response)
 
 						# Isolate PB1 thru PB4
@@ -191,6 +193,7 @@ class Device():
 						responseInt = responseInt & 240
 					except:
 						print(f'Invalid response from {self.name} device')
+						return
 
 					# Initialize local variables for tracking
 					# Initial state is case '0' (0b0000)
@@ -300,56 +303,56 @@ class Device():
 					#self.readout[requestTime] = response
 					#del self.readout[list(self.readout.keys())[0]]
 					
-					try:
-						responseInt = int(response)
+					# try:
+					# 	responseInt = int(response)
 
-						# Isolate PB1 thru PB4
-						responseInt = responseInt >> 1
-						responseInt = responseInt & 240
-					except:
-						print(f'Invalid response from {self.name} device')
+					# 	# Isolate PB1 thru PB4
+					# 	responseInt = responseInt >> 1
+					# 	responseInt = responseInt & 240
+					# except:
+					# 	print(f'Invalid response from {self.name} device')
 
-					# Initialize local variables for tracking
-					# Initial state is case '0' (0b0000)
-					greyValve = 'tank_valve_close'
-					greyHeat = 'tank_heat_auto'
-					showerFan = 'fan_auto'
-					waterPump = 'water_pump_off'
+					# # Initialize local variables for tracking
+					# # Initial state is case '0' (0b0000)
+					# greyValve = 'tank_valve_close'
+					# greyHeat = 'tank_heat_auto'
+					# showerFan = 'fan_auto'
+					# waterPump = 'water_pump_off'
 
-					# Check bit status by applying bit mask
-					if((1 & responseInt) == 1):
-						greyValve = 'tank_valve_open'
+					# # Check bit status by applying bit mask
+					# if((1 & responseInt) == 1):
+					# 	greyValve = 'tank_valve_open'
 
-					if((2 & responseInt) == 2):
-						greyHeat = 'tank_heat_off'
+					# if((2 & responseInt) == 2):
+					# 	greyHeat = 'tank_heat_off'
 
-					if((4 & responseInt) == 4):
-						showerFan = 'fan_off'
+					# if((4 & responseInt) == 4):
+					# 	showerFan = 'fan_off'
 
-					if((8 & responseInt) == 8):
-						waterPump = 'water_pump_auto'
+					# if((8 & responseInt) == 8):
+					# 	waterPump = 'water_pump_auto'
 
-					# Error check function
-	 				# Note: As button functionality is added for other switches in this device, add to the statements below. Any errors should result in an increment in the error count.
-					if(
-						app.root.ids['ws_pump_switch'].value != waterPump
-					):
-						# Increment error count
-						self.errorCount += 1
+					# # Error check function
+	 				# # Note: As button functionality is added for other switches in this device, add to the statements below. Any errors should result in an increment in the error count.
+					# if(
+					# 	app.root.ids['ws_pump_switch'].value != waterPump
+					# ):
+					# 	# Increment error count
+					# 	self.errorCount += 1
 
-						# Attempt to fix issues 10x before throwing error (this line will change the GUI state of the toggle and trigger the 'on_state' function)
-						app.root.ids['ws_pump_switch'].state = 'down' if waterPump == 'water_pump_auto' else 'normal'
+					# 	# Attempt to fix issues 10x before throwing error (this line will change the GUI state of the toggle and trigger the 'on_state' function)
+					# 	app.root.ids['ws_pump_switch'].state = 'down' if waterPump == 'water_pump_auto' else 'normal'
 
-						# Revert GUI to match the device settings and alert user
-						if(self.errorCount == 10):
-							self.errorCount = 0
-							app.root.ids['ws_pump_switch'].state = 'down' if waterPump == 'water_pump_auto' else 'normal'
+					# 	# Revert GUI to match the device settings and alert user
+					# 	if(self.errorCount == 10):
+					# 		self.errorCount = 0
+					# 		app.root.ids['ws_pump_switch'].state = 'down' if waterPump == 'water_pump_auto' else 'normal'
 
-							app.generalError_dialog(
-								f'Communication issue with {self.name} device detected. All buttons have been reverted to match state of device.'
-							)
-					else:
-						self.errorCount = 0
+					# 		app.generalError_dialog(
+					# 			f'Communication issue with {self.name} device detected. All buttons have been reverted to match state of device.'
+					# 		)
+					# else:
+					# 	self.errorCount = 0
 
 		# --- LIGHT SWITCH & THERMOMETER ---
 		if('ltsw' in self.type):
