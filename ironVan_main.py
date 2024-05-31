@@ -205,7 +205,7 @@ class EnvFanToggleButton(ToggleButtonBehavior, MDIconButton):
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
 				if self.value == 'fan_low_off':
-					print(f'Turning on...{self.value}')
+					print(f'Turning low fan on')
 					self.app.bus.send(
 						'command',
 						self.app.bus.activeDevices['thermostat'].address,
@@ -214,6 +214,7 @@ class EnvFanToggleButton(ToggleButtonBehavior, MDIconButton):
 					self.value = 'fan_low_on'
 					self.md_bg_color = self.app.toggleOn
 				else:
+					print('Turning low fan off')
 					self.app.bus.send(
 						'command',
 						self.app.bus.activeDevices['thermostat'].address,
@@ -221,7 +222,7 @@ class EnvFanToggleButton(ToggleButtonBehavior, MDIconButton):
 					)
 					self.value = 'fan_low_off'
 					self.md_bg_color = self.app.toggleOff
-			except KeyError:
+			except:
 					self.app.noDeviceFound_dialog('Fan')
 
 class EnvCoolToggleButton(ToggleButtonBehavior, MDIconButton):
