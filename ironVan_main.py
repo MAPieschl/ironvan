@@ -1018,12 +1018,23 @@ class ironVanApp(MDApp):
 		if((self.updateCounter/6) % 100 == 0):
 			self.weather.getWeather(self, self.userSettings)
 
+		# Temporary code below -- include error handling once testing is complete
 		response = self.bus.send(
 			'request',
 			self.bus.activeDevices['utilities'].address,
 			self.bus.activeDevices['utilities'].request['device_status']
 		)
 		self.bus.activeDevices['utilities'].updateDevice(
+			self,
+			time.time(),
+			response
+		)
+		response = self.bus.send(
+			'request',
+			self.bus.activeDevices['thermostat'].address,
+			self.bus.activeDevices['thermostat'].request['device_status']
+		)
+		self.bus.activeDevices['thermostat'].updateDevice(
 			self,
 			time.time(),
 			response

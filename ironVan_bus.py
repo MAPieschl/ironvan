@@ -146,7 +146,7 @@ class Device():
 					
 					self.request = {
 						'device_type':	[0x20, 14],
-						'status':  [0x21, 1]
+						'device_status':  [0x21, 1]
 					}
 
 	def updateDevice(self, app, requestTime, response):
