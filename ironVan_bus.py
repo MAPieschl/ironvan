@@ -255,19 +255,6 @@ class Device():
 						if(self.errorCount == 10):
 							self.errorCount = 0
 
-							# Change the switch position to match the detected state of the board. The value will be switched to the opposite of the value of the board, then a state change will call the 'toggle' functionality of the button and cause it to switch states.
-							app.root.ids['ws_pump_switch'].value = 'water_pump_auto' if waterPump == 'water_pump_off' else 'water_pump_auto'
-							app.root.ids['ws_pump_switch'].on_state(app.root.ids['ws_pump_switch'], 'normal')
-
-							app.root.ids['shower_fan_switch'].value = 'shower_fan_auto' if showerFan == 'shower_fan_off' else 'shower_fan_off'
-							app.root.ids['shower_fan_switch'].on_state(app.root.ids['shower_fan_switch'], 'normal')
-
-							app.root.ids['tank_heater_switch'].value = 'tank_heater_auto' if greyHeat == 'tank_heater_off' else 'tank_heater_off'
-							app.root.ids['tank_heater_switch'].on_state(app.root.ids['tank_heater_switch'], 'normal')
-
-							app.root.ids['tank_valve_switch'].value = 'tank_valve_open' if greyValve == 'tank_valve_close' else 'tank_valve_close'
-							app.root.ids['tank_valve_switch'].on_state(app.root.ids['tank_valve_switch'], 'normal')
-
 							app.generalError_dialog(
 								f'Communication issue with {self.name} device detected. All buttons have been reverted to match state of device.'
 							)
@@ -285,119 +272,99 @@ class Device():
 					
 					return
 
-		# --- THERMOSTAT ---
-		if('temp' in self.type):
-			# Choose PCB version
+		# # --- THERMOSTAT ---
+		# if('temp' in self.type):
+		# 	# Choose PCB version
 			
-			if("b100" in self.type):
-				# Choose firmware major version
+		# 	if("b100" in self.type):
+		# 		# Choose firmware major version
 
-				if("v0" in self.type):
-					'''
-					temp_b100_v010 has no plottable features - i.e. there is no need for a self.readout.
+		# 		if("v0" in self.type):
+		# 			'''
+		# 			temp_b100_v010 has no plottable features - i.e. there is no need for a self.readout.
 
-					temp_b100_v010 readout will simply confirm the button position with the state of the device and throw a flag if the device is commanding an action not commanded by the user and vice versa.
+		# 			temp_b100_v010 readout will simply confirm the button position with the state of the device and throw a flag if the device is commanding an action not commanded by the user and vice versa.
 
-					This version of the board has the following pinout:
-					 - Digital Pin 9 / PB1 - Heat pump
-					 	- 0 - 'off' / 1 - 'on'
-					 - Digital Pin 10 / PB2 - AC pump
-					 	- 0 - 'off' / 1 - 'on'
-					 - Digital Pin 11 / PB3 - Fan (high)
-					 	- 0 - 'off' / 1 - 'on'
-					 - Digital Pin 12 / PB4 - Fan (low)
-					 	- 0 - 'off' / 1 - 'on'
+		# 			This version of the board has the following pinout:
+		# 			 - Digital Pin 9 / PB1 - Heat pump
+		# 			 	- 0 - 'off' / 1 - 'on'
+		# 			 - Digital Pin 10 / PB2 - AC pump
+		# 			 	- 0 - 'off' / 1 - 'on'
+		# 			 - Digital Pin 11 / PB3 - Fan (high)
+		# 			 	- 0 - 'off' / 1 - 'on'
+		# 			 - Digital Pin 12 / PB4 - Fan (low)
+		# 			 	- 0 - 'off' / 1 - 'on'
 						 
-					PINB is initially read, then isolated to a single nibble -> MSB - PB4 / LSB - PB1
-					'''
-					#self.readout[requestTime] = response
-					#del self.readout[list(self.readout.keys())[0]]
+		# 			PINB is initially read, then isolated to a single nibble -> MSB - PB4 / LSB - PB1
+		# 			'''
+		# 			#self.readout[requestTime] = response
+		# 			#del self.readout[list(self.readout.keys())[0]]
 					
-					try:
-						responseInt = int(response)
+		# 			try:
+		# 				responseInt = int(response)
 
-						# Isolate PB1 thru PB4
-						responseInt = responseInt >> 1
-						responseInt = responseInt & 0b1111
-					except:
-						print(f'Invalid response from {self.name} device')
-						return
+		# 				# Isolate PB1 thru PB4
+		# 				responseInt = responseInt >> 1
+		# 				responseInt = responseInt & 0b1111
+		# 			except:
+		# 				print(f'Invalid response from {self.name} device')
+		# 				return
 
-					# Initialize local variables for tracking
-					# Initial state is case '0' (0b0000)
-					heatPump = 'heat_off'
-					airCon = 'ac_off'
-					highFan = 'fan_high_off'
-					lowFan = 'fan_low_off'
+		# 			# Initialize local variables for tracking
+		# 			# Initial state is case '0' (0b0000)
+		# 			heatPump = 'heat_off'
+		# 			airCon = 'ac_off'
+		# 			highFan = 'fan_high_off'
+		# 			lowFan = 'fan_low_off'
 
-					# Check bit status by applying bit mask
-					if((1 & responseInt) == 1):
-						heatPump = 'heat_on'
+		# 			# Check bit status by applying bit mask
+		# 			if((1 & responseInt) == 1):
+		# 				heatPump = 'heat_on'
 
-					if((2 & responseInt) == 2):
-						airCon = 'ac_on'
+		# 			if((2 & responseInt) == 2):
+		# 				airCon = 'ac_on'
 
-					if((4 & responseInt) == 4):
-						highFan = 'fan_high_on'
+		# 			if((4 & responseInt) == 4):
+		# 				highFan = 'fan_high_on'
 
-					if((8 & responseInt) == 8):
-						lowFan = 'fan_low_on'
+		# 			if((8 & responseInt) == 8):
+		# 				lowFan = 'fan_low_on'
 
-					print(f'Error check for {self}:')
-					print(lowFan, '  ', app.root.ids['env_fan_quick_switch'].value)
-					print(highFan, '  ', app.root.ids[
-					'env_cool_quick_switch'].value, '//', app.root.ids['env_heat_quick_switch'].value)
-					print(airCon, '  ', app.root.ids['env_cool_quick_switch'].value)
-					print(heatPump, '  ', app.root.ids['env_heat_quick_switch'].value)
+		# 			print(f'Error check for {self}:')
+		# 			print(lowFan, '  ', app.root.ids['env_fan_quick_switch'].value)
+		# 			print(highFan, '  ', app.root.ids[
+		# 			'env_cool_quick_switch'].value, '//', app.root.ids['env_heat_quick_switch'].value)
+		# 			print(airCon, '  ', app.root.ids['env_cool_quick_switch'].value)
+		# 			print(heatPump, '  ', app.root.ids['env_heat_quick_switch'].value)
 
-					# Error check function
-	 				# Note: As button functionality is added for other switches in this device, add to the statements below. Any errors should result in an increment in the error count.
-					if(
-						app.root.ids['env_fan_quick_switch'].value != lowFan or
-						app.root.ids['env_cool_quick_switch'].value != airCon or
-						('on' in app.root.ids['env_cool_quick_switch'].value and not 'on' in highFan) or
-						app.root.ids['env_heat_quick_switch'].value != heatPump or
-						('on' in app.root.ids['env_heat_quick_switch'].value and not 'on' in highFan)
-					):
-						print('Thermostat error caught')
-						# Increment error count
-						self.errorCount += 1
+		# 			# Error check function
+	 	# 			# Note: As button functionality is added for other switches in this device, add to the statements below. Any errors should result in an increment in the error count.
+		# 			if(
+		# 				app.root.ids['env_fan_quick_switch'].value != lowFan or
+		# 				app.root.ids['env_cool_quick_switch'].value != airCon or
+		# 				('on' in app.root.ids['env_cool_quick_switch'].value and not 'on' in highFan) or
+		# 				app.root.ids['env_heat_quick_switch'].value != heatPump or
+		# 				('on' in app.root.ids['env_heat_quick_switch'].value and not 'on' in highFan)
+		# 			):
+		# 				print('Thermostat error caught')
+		# 				# Increment error count
+		# 				self.errorCount += 1
 
-						# Attempt to fix issues 10x before throwing error - these lines will toggle the current value of each switch and then trigger an on_state function activation
-						self.repairSwitch(app, 'fix',
-											'env_fan_quick_switch',
-						  					'fan_low_on',
-											'fan_low_off')
+		# 				# Attempt to fix issues 10x before throwing error - these lines will toggle the current value of each switch and then trigger an on_state function activation
+		# 				self.repairSwitch(app, 'fix',
+		# 									'env_fan_quick_switch',
+		# 				  					'fan_low_on',
+		# 									'fan_low_off')
 						
-						self.repairSwitch(app, 'fix',
-											'env_cool_quick_switch',
-						  					'ac_on',
-											'ac_off')
+		# 				self.repairSwitch(app, 'fix',
+		# 									'env_cool_quick_switch',
+		# 				  					'ac_on',
+		# 									'ac_off')
 						
-						self.repairSwitch(app, 'fix',
-											'env_heat_quick_switch',
-						  					'heat_on',
-											'heat_off')
-
-						# Revert GUI to match the device settings and alert user
-						if(self.errorCount == 10):
-							self.errorCount = 0
-
-							# Change the switch position to match the detected state of the board. The value will be switched to the opposite of the value of the board, then a state change will call the 'toggle' functionality of the button and cause it to switch states.
-							app.root.ids['env_fan_quick_switch'].value = 'fan_low_on' if lowFan == 'fan_low_off' else 'fan_low_on'
-							app.root.ids['env_fan_quick_switch'].on_state(app.root.ids['env_fan_quick_switch'], 'normal')
-
-							app.root.ids['env_cool_quick_switch'].value = 'ac_on' if airCon == 'ac_on' else 'ac_off'
-							app.root.ids['env_cool_quick_switch'].on_state(app.root.ids['env_cool_quick_switch'], 'normal')
-
-							app.root.ids['env_heat_quick_switch'].value = 'heat_on' if heatPump == 'heat_off' else 'heat_off'
-							app.root.ids['env_heat_quick_switch'].on_state(app.root.ids['env_heat_quick_switch'], 'normal')
-
-							app.generalError_dialog(
-								f'Communication issue with {self.name} device detected. All buttons have been reverted to match state of device.'
-							)
-					else:
-						self.errorCount = 0
+		# 				self.repairSwitch(app, 'fix',
+		# 									'env_heat_quick_switch',
+		# 				  					'heat_on',
+		# 									'heat_off')
 
 		# --- LIGHT SWITCH & THERMOMETER ---
 		if('ltsw' in self.type):
