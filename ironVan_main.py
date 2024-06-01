@@ -344,9 +344,11 @@ class WSPumpToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 
 	def on_state(self, instance, value):
 		if (value == 'normal' and time.time() >= self.app.buttonReset) or value == 'override':
+			print('Entered water pump on_state()')
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
 				if self.value == 'water_pump_off':
+					print('Turning pump on...')
 					self.app.bus.send(
 						'command',
 						self.app.bus.activeDevices['utilities'].address,
@@ -358,6 +360,7 @@ class WSPumpToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 					self.app.root.ids['ws_pump_switch'].value = 'water_pump_auto'
 					self.app.root.ids['ws_pump_switch'].md_bg_color = self.app.toggleOn
 				else:
+					print('Turning pump off...')
 					self.app.bus.send(
 						'command',
 						self.app.bus.activeDevices['utilities'].address,
