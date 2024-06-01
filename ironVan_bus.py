@@ -246,7 +246,7 @@ class Device():
 						  					'tank_heat_auto',
 											'tank_heat_off')
 						
-						self.repairSwitch(app, 'fix'
+						self.repairSwitch(app, 'fix',
 											'tank_valve_switch',
 						  					'tank_valve_open',
 											'tank_valve_close')
