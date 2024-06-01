@@ -364,10 +364,10 @@ class Device():
 						self.errorCount += 1
 
 						# Attempt to fix issues 10x before throwing error - these lines will toggle the current value of each switch and then trigger an on_state function activation
-						print(app.root.ids['env_fan_quick_switch'].value)
-						app.root.ids['env_fan_quick_switch'].value = 'fan_low_on' if app.root.ids['env_fan_quick_switch'] == 'fan_low_off' else 'fan_low_off'
-						print(app.root.ids['env_fan_quick_switch'].value)
-						app.root.ids['env_fan_quick_switch'].on_state(app.root.ids['env_fan_quick_switch'], 'override')
+						self.repairSwitch(app, 'fix',
+											'env_fan_quick_switch',
+						  					'fan_low_on',
+											'fan_low_off')
 
 						app.root.ids['env_cool_quick_switch'].value = 'ac_on' if app.root.ids['env_cool_quick_switch'] == 'ac_off' else 'ac_off'
 						app.root.ids['env_cool_quick_switch'].on_state(app.root.ids['env_cool_quick_switch'], 'normal')
