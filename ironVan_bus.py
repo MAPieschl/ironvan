@@ -368,12 +368,16 @@ class Device():
 											'env_fan_quick_switch',
 						  					'fan_low_on',
 											'fan_low_off')
-
-						app.root.ids['env_cool_quick_switch'].value = 'ac_on' if app.root.ids['env_cool_quick_switch'] == 'ac_off' else 'ac_off'
-						app.root.ids['env_cool_quick_switch'].on_state(app.root.ids['env_cool_quick_switch'], 'normal')
-
-						app.root.ids['env_heat_quick_switch'].value = 'heat_on' if app.root.ids['env_heat_quick_switch'] == 'heat_off' else 'heat_off'
-						app.root.ids['env_heat_quick_switch'].on_state(app.root.ids['env_heat_quick_switch'], 'normal')
+						
+						self.repairSwitch(app, 'fix',
+											'env_cool_quick_switch',
+						  					'ac_on',
+											'ac_off')
+						
+						self.repairSwitch(app, 'fix',
+											'env_heat_quick_switch',
+						  					'heat_on',
+											'heat_off')
 
 						# Revert GUI to match the device settings and alert user
 						if(self.errorCount == 10):
