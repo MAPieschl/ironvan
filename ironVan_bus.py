@@ -149,6 +149,10 @@ class Device():
 						'device_status':  [0x21, 1]
 					}
 
+	def repairSwitch(self, app, switchID, loState, hiState):
+		app.root.ids[switchID].value = hiState if app.root.ids[switchID] == loState else loState
+		app.root.ids[switchID].on_state(app.root.ids[switchID], 'override')
+
 	def updateDevice(self, app, requestTime, response):
 		'''
 		Called by bus.parseResponse to update:
@@ -231,11 +235,13 @@ class Device():
 						self.errorCount += 1
 
 						# Attempt to fix issues 10x before throwing error - these lines will toggle the current value of each switch and then trigger an on_state function activation
-						app.root.ids['ws_pump_switch'].value = 'water_pump_auto' if app.root.ids['ws_pump_switch'] == 'water_pump_off' else 'water_pump_off'
-						app.root.ids['ws_pump_switch'].on_state(app.root.ids['ws_pump_switch'], 'normal')
+						self.repairSwitch('ws_pump_switch',
+						  					'water_pump_auto',
+											'water_pump_off')
+						
 
 						app.root.ids['shower_fan_switch'].value = 'shower_fan_auto' if app.root.ids['shower_fan_switch'] == 'shower_fan_off' else 'shower_fan_off'
-						app.root.ids['shower_fan_switch'].on_state(app.root.ids['shower_fan_switch'], 'normal')
+						app.root.ids['shower_fan_switch'].on_state(app.root.ids['shower_fan_switch'], 'override')
 
 						app.root.ids['tank_heater_switch'].value = 'tank_heater_auto' if app.root.ids['tank_heater_switch'] == 'tank_heater_off' else 'tank_heater_off'
 						app.root.ids['tank_heater_switch'].on_state(app.root.ids['tank_heater_switch'], 'normal')

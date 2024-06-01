@@ -200,8 +200,6 @@ class EnvFanToggleButton(ToggleButtonBehavior, MDIconButton):
 		#self.set_disabled(True)
 
 	def on_state(self, instance, value):
-
-		print('Called EnvFanToggleButton with value = ', self.value)
 		if (value == 'normal' and time.time() >= self.app.buttonReset) or value == 'override':
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
@@ -235,8 +233,7 @@ class EnvCoolToggleButton(ToggleButtonBehavior, MDIconButton):
 		#self.set_disabled(True)
 
 	def on_state(self, instance, value):
-		print('Called EnvCoolToggleButton with value = ', self.value)
-		if value == 'normal' and time.time() >= self.app.buttonReset:
+		if (value == 'normal' and time.time() >= self.app.buttonReset) or value == 'override':
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
 				if self.value == 'ac_off':
@@ -267,8 +264,7 @@ class EnvHeatToggleButton(ToggleButtonBehavior, MDIconButton):
 		#self.set_disabled(True)
 
 	def on_state(self, instance, value):
-		print('Called EnvHeatToggleButton with value = ', self.value)
-		if value == 'normal' and time.time() >= self.app.buttonReset:
+		if (value == 'normal' and time.time() >= self.app.buttonReset) or value == 'override':
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
 				if self.value == 'heat_off':
@@ -347,8 +343,7 @@ class WSPumpToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 		self.set_disabled(False)
 
 	def on_state(self, instance, value):
-		print('State change detected')
-		if value == 'normal' and time.time() >= self.app.buttonReset:
+		if (value == 'normal' and time.time() >= self.app.buttonReset) or value == 'override':
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
 				if self.value == 'water_pump_off':
@@ -388,7 +383,7 @@ class WSHeaterToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 		self.set_disabled(True)
 
 	def on_state(self, instance, value):
-		if value == 'normal' and time.time() >= self.app.buttonReset:
+		if (value == 'normal' and time.time() >= self.app.buttonReset) or value == 'override':
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			if self.value == 'water_heater_off':
 					self.app.root.ids['ws_heater_quick_switch'].value = 'water_heater_auto'
@@ -415,7 +410,7 @@ class ShowerFanToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 		self.set_disabled(False)
 
 	def on_state(self, instance, value):
-		if value == 'normal' and time.time() >= self.app.buttonReset:
+		if (value == 'normal' and time.time() >= self.app.buttonReset) or value == 'override':
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
 				if self.value == 'shower_fan_off':
@@ -449,7 +444,7 @@ class TankHeaterToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 		self.set_disabled(False)
 
 	def on_state(self, instance, value):
-		if value == 'normal' and time.time() >= self.app.buttonReset:
+		if (value == 'normal' and time.time() >= self.app.buttonReset) or value == 'override':
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
 				if self.value == 'tank_heater_off':
@@ -480,7 +475,7 @@ class TankValveToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 		self.set_disabled(False)
 
 	def on_state(self, instance, value):
-		if value == 'normal' and time.time() >= self.app.buttonReset:
+		if (value == 'normal' and time.time() >= self.app.buttonReset) or value == 'override':
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
 				if self.value == 'tank_valve_close':
@@ -514,7 +509,7 @@ class DiningLightToggleButton(ToggleButtonBehavior, MDIconButton):
 		self.set_disabled(False)
 
 	def on_state(self, instance, value):
-		if value == 'normal' and time.time() >= self.app.buttonReset:
+		if (value == 'normal' and time.time() >= self.app.buttonReset) or value == 'override':
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
 				if self.value == 'ls_1_off':
@@ -557,7 +552,7 @@ class BedroomLightToggleButton(ToggleButtonBehavior, MDIconButton):
 		self.set_disabled(False)
 
 	def on_state(self, instance, value):
-		if value == 'normal' and time.time() >= self.app.buttonReset:
+		if (value == 'normal' and time.time() >= self.app.buttonReset) or value == 'override':
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
 				if self.value == 'ls_2_off':
@@ -599,7 +594,7 @@ class KitchenLightToggleButton(ToggleButtonBehavior, MDIconButton):
 		self.set_disabled(False)
 
 	def on_state(self, instance, value):
-		if value == 'normal' and time.time() >= self.app.buttonReset:
+		if (value == 'normal' and time.time() >= self.app.buttonReset) or value == 'override':
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
 				if self.value == 'ls_3_off':
@@ -641,7 +636,7 @@ class BathroomLightToggleButton(ToggleButtonBehavior, MDIconButton):
 		self.set_disabled(False)
 
 	def on_state(self, instance, value):
-		if value == 'normal' and time.time() >= self.app.buttonReset:
+		if (value == 'normal' and time.time() >= self.app.buttonReset) or value == 'override':
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
 				if self.value == 'ls_4_off':
