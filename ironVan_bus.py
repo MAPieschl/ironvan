@@ -149,10 +149,6 @@ class Device():
 						'device_status':  [0x21, 1]
 					}
 
-	def repairSwitch(self, app, switchID, loState, hiState):
-		app.root.ids[switchID].value = hiState if app.root.ids[switchID] == loState else loState
-		app.root.ids[switchID].on_state(app.root.ids[switchID], 'override')
-
 	def updateDevice(self, app, requestTime, response):
 		'''
 		Called by bus.parseResponse to update:
@@ -235,7 +231,8 @@ class Device():
 						self.errorCount += 1
 
 						# Attempt to fix issues 10x before throwing error - these lines will toggle the current value of each switch and then trigger an on_state function activation
-						self.repairSwitch('ws_pump_switch',
+						self.repairSwitch(app,
+											'ws_pump_switch',
 						  					'water_pump_auto',
 											'water_pump_off')
 						
@@ -472,6 +469,10 @@ class Device():
 			return int(value)
 		else:
 			raise ArithmeticError('Argument must be a signed char (8-bit) value.')
+
+	def repairSwitch(self, app, switchID, loState, hiState):
+		app.root.ids[switchID].value = hiState if app.root.ids[switchID] == loState else loState
+		app.root.ids[switchID].on_state(app.root.ids[switchID], 'override')
 
 class Bus():
 	def __init__(self, log):
