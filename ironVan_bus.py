@@ -231,20 +231,25 @@ class Device():
 						self.errorCount += 1
 
 						# Attempt to fix issues 10x before throwing error - these lines will toggle the current value of each switch and then trigger an on_state function activation
-						self.repairSwitch(app,
+						self.repairSwitch(app, 'fix',
 											'ws_pump_switch',
 						  					'water_pump_auto',
 											'water_pump_off')
 						
-
-						app.root.ids['shower_fan_switch'].value = 'shower_fan_auto' if app.root.ids['shower_fan_switch'] == 'shower_fan_off' else 'shower_fan_off'
-						app.root.ids['shower_fan_switch'].on_state(app.root.ids['shower_fan_switch'], 'override')
-
-						app.root.ids['tank_heater_switch'].value = 'tank_heater_auto' if app.root.ids['tank_heater_switch'] == 'tank_heater_off' else 'tank_heater_off'
-						app.root.ids['tank_heater_switch'].on_state(app.root.ids['tank_heater_switch'], 'normal')
-
-						app.root.ids['tank_valve_switch'].value = 'tank_valve_open' if app.root.ids['tank_valve_switch'] == 'tank_valve_close' else 'tank_valve_close'
-						app.root.ids['tank_valve_switch'].on_state(app.root.ids['tank_valve_switch'], 'normal')
+						self.repairSwitch(app, 'fix',
+											'shower_fan_switch',
+						  					'shower_fan_auto',
+											'shower_fan_off')
+						
+						self.repairSwitch(app, 'fix',
+											'tank_heater_switch',
+						  					'tank_heater_auto',
+											'tank_heater_off')
+						
+						self.repairSwitch(app, 'fix'
+											'tank_valve_switch',
+						  					'tank_valve_open',
+											'tank_valve_close')
 
 						# Revert GUI to match the device settings and alert user
 						if(self.errorCount == 10):
@@ -470,9 +475,11 @@ class Device():
 		else:
 			raise ArithmeticError('Argument must be a signed char (8-bit) value.')
 
-	def repairSwitch(self, app, switchID, loState, hiState):
-		app.root.ids[switchID].value = hiState if app.root.ids[switchID] == loState else loState
-		app.root.ids[switchID].on_state(app.root.ids[switchID], 'override')
+	def repairSwitch(self, app, solution: str, switchID: str, loState: str, hiState: str):
+		match solution:
+			case 'fix':
+				app.root.ids[switchID].value = hiState if app.root.ids[switchID] == loState else loState
+				app.root.ids[switchID].on_state(app.root.ids[switchID], 'override')
 
 class Bus():
 	def __init__(self, log):
