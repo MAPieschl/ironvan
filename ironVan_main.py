@@ -1027,21 +1027,21 @@ class ironVanApp(MDApp):
 			self.bus.activeDevices['utilities'].address,
 			self.bus.activeDevices['utilities'].request['device_status']
 		)
-		self.bus.activeDevices['utilities'].updateDevice(
-			self,
-			time.time(),
-			response
-		)
+		# self.bus.activeDevices['utilities'].updateDevice(
+		# 	self,
+		# 	time.time(),
+		# 	response
+		# )
 		response = self.bus.send(
 			'request',
 			self.bus.activeDevices['thermostat'].address,
 			self.bus.activeDevices['thermostat'].request['device_status']
 		)
-		self.bus.activeDevices['thermostat'].updateDevice(
-			self,
-			time.time(),
-			response
-		)
+		# self.bus.activeDevices['thermostat'].updateDevice(
+		# 	self,
+		# 	time.time(),
+		# 	response
+		# )
 
 		# Update time & date
 		if(self.userSettings.time24hr == True):
