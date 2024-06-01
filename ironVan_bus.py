@@ -242,7 +242,7 @@ class Device():
 											'shower_fan_off')
 						
 						self.repairSwitch(app, 'fix',
-											'tank_heat_switch',
+											'tank_heater_switch',
 						  					'tank_heat_auto',
 											'tank_heat_off')
 						
