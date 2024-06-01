@@ -476,9 +476,11 @@ class Device():
 			raise ArithmeticError('Argument must be a signed char (8-bit) value.')
 
 	def repairSwitch(self, app, solution: str, switchID: str, loState: str, hiState: str):
+		print('Original state: ', app.root.ids[switchID].value)
 		match solution:
 			case 'fix':
 				app.root.ids[switchID].value = hiState if app.root.ids[switchID] == loState else loState
+				print('New state: ', app.root.ids[switchID].value)
 				app.root.ids[switchID].on_state(app.root.ids[switchID], 'override')
 
 class Bus():
