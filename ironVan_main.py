@@ -1022,11 +1022,11 @@ class ironVanApp(MDApp):
 			self.weather.getWeather(self, self.userSettings)
 
 		# Temporary code below -- include error handling once testing is complete
-		response = self.bus.send(
-			'request',
-			self.bus.activeDevices['utilities'].address,
-			self.bus.activeDevices['utilities'].request['device_status']
-		)
+		# response = self.bus.send(
+		# 	'request',
+		# 	self.bus.activeDevices['utilities'].address,
+		# 	self.bus.activeDevices['utilities'].request['device_status']
+		# )
 		# self.bus.activeDevices['utilities'].updateDevice(
 		# 	self,
 		# 	time.time(),

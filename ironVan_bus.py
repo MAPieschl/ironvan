@@ -300,71 +300,71 @@ class Device():
 		# 			#self.readout[requestTime] = response
 		# 			#del self.readout[list(self.readout.keys())[0]]
 					
-		# 			try:
-		# 				responseInt = int(response)
+					try:
+						responseInt = int(response)
 
-		# 				# Isolate PB1 thru PB4
-		# 				responseInt = responseInt >> 1
-		# 				responseInt = responseInt & 0b1111
-		# 			except:
-		# 				print(f'Invalid response from {self.name} device')
-		# 				return
+						# Isolate PB1 thru PB4
+						responseInt = responseInt >> 1
+						responseInt = responseInt & 0b1111
+					except:
+						print(f'Invalid response from {self.name} device')
+						return
 
-		# 			# Initialize local variables for tracking
-		# 			# Initial state is case '0' (0b0000)
-		# 			heatPump = 'heat_off'
-		# 			airCon = 'ac_off'
-		# 			highFan = 'fan_high_off'
-		# 			lowFan = 'fan_low_off'
+					# Initialize local variables for tracking
+					# Initial state is case '0' (0b0000)
+					heatPump = 'heat_off'
+					airCon = 'ac_off'
+					highFan = 'fan_high_off'
+					lowFan = 'fan_low_off'
 
-		# 			# Check bit status by applying bit mask
-		# 			if((1 & responseInt) == 1):
-		# 				heatPump = 'heat_on'
+					# Check bit status by applying bit mask
+					if((1 & responseInt) == 1):
+						heatPump = 'heat_on'
 
-		# 			if((2 & responseInt) == 2):
-		# 				airCon = 'ac_on'
+					if((2 & responseInt) == 2):
+						airCon = 'ac_on'
 
-		# 			if((4 & responseInt) == 4):
-		# 				highFan = 'fan_high_on'
+					if((4 & responseInt) == 4):
+						highFan = 'fan_high_on'
 
-		# 			if((8 & responseInt) == 8):
-		# 				lowFan = 'fan_low_on'
+					if((8 & responseInt) == 8):
+						lowFan = 'fan_low_on'
 
-		# 			print(f'Error check for {self}:')
-		# 			print(lowFan, '  ', app.root.ids['env_fan_quick_switch'].value)
-		# 			print(highFan, '  ', app.root.ids[
-		# 			'env_cool_quick_switch'].value, '//', app.root.ids['env_heat_quick_switch'].value)
-		# 			print(airCon, '  ', app.root.ids['env_cool_quick_switch'].value)
-		# 			print(heatPump, '  ', app.root.ids['env_heat_quick_switch'].value)
+					print(f'Error check for {self}:')
+					print(lowFan, '  ', app.root.ids['env_fan_quick_switch'].value)
+					print(highFan, '  ', app.root.ids[
+					'env_cool_quick_switch'].value, '//', app.root.ids['env_heat_quick_switch'].value)
+					print(airCon, '  ', app.root.ids['env_cool_quick_switch'].value)
+					print(heatPump, '  ', app.root.ids['env_heat_quick_switch'].value)
 
-		# 			# Error check function
-	 	# 			# Note: As button functionality is added for other switches in this device, add to the statements below. Any errors should result in an increment in the error count.
-		# 			if(
-		# 				app.root.ids['env_fan_quick_switch'].value != lowFan or
-		# 				app.root.ids['env_cool_quick_switch'].value != airCon or
-		# 				('on' in app.root.ids['env_cool_quick_switch'].value and not 'on' in highFan) or
-		# 				app.root.ids['env_heat_quick_switch'].value != heatPump or
-		# 				('on' in app.root.ids['env_heat_quick_switch'].value and not 'on' in highFan)
-		# 			):
-		# 				print('Thermostat error caught')
-		# 				# Increment error count
-		# 				self.errorCount += 1
+					# Error check function
+	 				# Note: As button functionality is added for other switches in this device, add to the statements below. Any errors should result in an increment in the error count.
+					if(
+						app.root.ids['env_fan_quick_switch'].value != lowFan or
+						app.root.ids['env_cool_quick_switch'].value != airCon or
+						('on' in app.root.ids['env_cool_quick_switch'].value and not 'on' in highFan) or
+						app.root.ids['env_heat_quick_switch'].value != heatPump or
+						('on' in app.root.ids['env_heat_quick_switch'].value and not 'on' in highFan)
+					):
+						print('Thermostat error caught')
+						# Increment error count
+						self.errorCount += 1
 
-		# 				# Attempt to fix issues 10x before throwing error - these lines will toggle the current value of each switch and then trigger an on_state function activation
-		# 				self.repairSwitch(app, 'fix',
-		# 									'env_fan_quick_switch',
-		# 				  					'fan_low_on',
-		# 									'fan_low_off')
+						# Attempt to fix issues 10x before throwing error - these lines will toggle the current value of each switch and then trigger an on_state function activation
+						self.repairSwitch(app, 'fix',
+											'env_fan_quick_switch',
+						  					'fan_low_on',
+											'fan_low_off')
 						
-		# 				self.repairSwitch(app, 'fix',
-		# 									'env_cool_quick_switch',
-		# 				  					'ac_on',
-		# 									'ac_off')
+						self.repairSwitch(app, 'fix',
+											'env_cool_quick_switch',
+						  					'ac_on',
+											'ac_off')
 						
-		# 				self.repairSwitch(app, 'fix',
-		# 									'env_heat_quick_switch',
-		# 				  					'heat_on',
-		# 									'heat_off')
+						self.repairSwitch(app, 'fix',
+											'env_heat_quick_switch',
+						  					'heat_on',
+											'heat_off')
 
 		# --- LIGHT SWITCH & THERMOMETER ---
 		if('ltsw' in self.type):
@@ -474,7 +474,7 @@ class Bus():
 		# Stores {device type: addr}
 		deviceAddress = {}
 		
-		for addr in range(0x03, 0x77):
+		for addr in range(0x08, 0x0F):
 			try:
 				# Request device type from address (addr)
 
