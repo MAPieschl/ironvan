@@ -196,30 +196,30 @@ class EnvFanToggleButton(ToggleButtonBehavior, MDIconButton):
 	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
 		self.app = ironVanApp.get_running_app()
-		self.value = 'fan_low_off'
+		self.value = 'fan_high_off'
 		#self.set_disabled(True)
 
 	def on_state(self, instance, value):
 		if (value == 'normal' and time.time() >= self.app.buttonReset) or value == 'override':
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
-				if self.value == 'fan_low_off':
-					print(f'Turning low fan on')
+				if self.value == 'fan_high_off':
+					print(f'Turning high fan on')
 					self.app.bus.send(
 						'command',
 						self.app.bus.activeDevices['thermostat'].address,
-						self.app.bus.activeDevices['thermostat'].command['fan_low_on']
+						self.app.bus.activeDevices['thermostat'].command['fan_high_on']
 					)
-					self.value = 'fan_low_on'
+					self.value = 'fan_high_on'
 					self.md_bg_color = self.app.toggleOn
 				else:
-					print('Turning low fan off')
+					print('Turning high fan off')
 					self.app.bus.send(
 						'command',
 						self.app.bus.activeDevices['thermostat'].address,
-						self.app.bus.activeDevices['thermostat'].command['fan_low_off']
+						self.app.bus.activeDevices['thermostat'].command['fan_high_off']
 					)
-					self.value = 'fan_low_off'
+					self.value = 'fan_high_off'
 					self.md_bg_color = self.app.toggleOff
 			except:
 					self.app.noDeviceFound_dialog('Fan')
