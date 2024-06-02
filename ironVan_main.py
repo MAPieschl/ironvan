@@ -1032,11 +1032,11 @@ class ironVanApp(MDApp):
 		# 	time.time(),
 		# 	response
 		# )
-		response = self.bus.send(
-			'request',
-			self.bus.activeDevices['thermostat'].address,
-			self.bus.activeDevices['thermostat'].request['device_status']
-		)
+		# response = self.bus.send(
+		# 	'request',
+		# 	self.bus.activeDevices['thermostat'].address,
+		# 	self.bus.activeDevices['thermostat'].request['device_status']
+		# )
 		# self.bus.activeDevices['thermostat'].updateDevice(
 		# 	self,
 		# 	time.time(),
