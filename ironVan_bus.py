@@ -556,7 +556,7 @@ class Bus():
 					time.sleep(1)
 			except:
 				print("I/O error. Proceeding...")
-				return
+				time.sleep(1)
 	
 	async def parseResponses(self, app):
 		'''
