@@ -553,8 +553,10 @@ class Bus():
 						self.activeDevices[device].request['device_status']
 					)
 					print(f'Key: {key} // Response: {self.responseBuffer[key]}\n')
+					time.sleep(1)
 			except:
 				print("I/O error. Proceeding...")
+				return
 	
 	async def parseResponses(self, app):
 		'''
