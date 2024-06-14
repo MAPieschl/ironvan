@@ -480,7 +480,8 @@ class Bus():
 				# Request device type from address (addr)
 
 				# Request 14 char DEVICE_TYPE from each address
-				msg = self.bus.read_i2c_block_data(addr, 0x20, 14)
+				#msg = self.bus.read_i2c_block_data(addr, 0x20, 14)
+				msg = self.send('request', 0x20, 14)
 				
 				deviceType = self.rawMsg2Str(msg)
 
@@ -556,7 +557,7 @@ class Bus():
 					time.sleep(1)
 			except:
 				print("I/O error. Proceeding...")
-				time.sleep(1)
+				time.sleep(0.5)
 	
 	async def parseResponses(self, app):
 		'''
