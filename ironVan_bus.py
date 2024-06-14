@@ -544,7 +544,7 @@ class Bus():
 
 		# Synchronous version -- add 'async def' to function definition if moving to the asynchronous version
 		while(self.bus != ''):
-			with self.activeDevices as devices:
+			with self.activeDevices.keys() as devices:
 				for device in devices:
 					key = f'{device}_{time.gmtime}'
 					self.responseBuffer[key] = self.send(
