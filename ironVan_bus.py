@@ -480,10 +480,7 @@ class Bus():
 				# Request device type from address (addr)
 
 				# Request 14 char DEVICE_TYPE from each address
-				#msg = self.bus.read_i2c_block_data(addr, 0x20, 14)
-				msg = self.send('request', addr, [0x20, 14])
-				
-				deviceType = self.rawMsg2Str(msg)
+				deviceType = self.send('request', addr, [0x20, 14])
 
 				# Store device type defined by address if found - stored separate from self.storeDevices to allow for future development of dynamic addressing
 				deviceAddress[deviceType] = addr
