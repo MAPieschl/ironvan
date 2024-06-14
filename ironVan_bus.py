@@ -544,14 +544,17 @@ class Bus():
 
 		# Synchronous version -- add 'async def' to function definition if moving to the asynchronous version
 		while(self.bus != ''):
-			for device in self.activeDevices.keys():
-				key = f'{device}_{time.gmtime}'
-				self.responseBuffer[key] = self.send(
-					'request',
-					self.activeDevices[device].address,
-					self.activeDevices[device].request['device_status']
-				)
-				print(f'Key: {key} // Response: {self.responseBuffer[key]}\n')
+			try:
+				for device in self.activeDevices.keys():
+					key = f'{device}_{time.gmtime}'
+					self.responseBuffer[key] = self.send(
+						'request',
+						self.activeDevices[device].address,
+						self.activeDevices[device].request['device_status']
+					)
+					print(f'Key: {key} // Response: {self.responseBuffer[key]}\n')
+			except:
+				print("I/O error. Proceeding...")
 	
 	async def parseResponses(self, app):
 		'''
