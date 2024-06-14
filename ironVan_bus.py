@@ -468,6 +468,7 @@ class Bus():
 			self.bus = SMBus(1)
 
 		except:
+			self.bus = ''
 			print('No active bus...')
 			return
 
@@ -525,17 +526,33 @@ class Bus():
 			print('Raw return: ', msg)
 			return msg
 		
-	async def regularScan(self, app):
+	def regularScan(self, app):
 		'''
 		Asynchronous function scheduled by ironVanApp.build() that fills the responseBuffer with time-stamped responses. The responses are parsed and cleared in parseResponses.
 		'''
-		async with self.activeDevices as devices:
-			for device in devices:
-				self.responseBuffer[f'{device}_{time.gmtime}'] = await self.send(
-					'request',
-					devices[device].address,
-					devices[device].request['device_status']
-				)
+		print('Regular scan initialized on bus: ', self.bus)
+		# while(self.bus != ''):
+		# 	async with self.activeDevices as devices:
+		# 		for device in devices:
+		# 			key = f'{device}_{time.gmtime}'
+		# 			self.responseBuffer[key] = await self.send(
+		# 				'request',
+		# 				devices[device].address,
+		# 				devices[device].request['device_status']
+		# 			)
+		# 			print(self.responseBuffer[key])
+
+		# Synchronous version -- add 'async def' to function definition if moving to the asynchronous version
+		while(self.bus != ''):
+			with self.activeDevices as devices:
+				for device in devices:
+					key = f'{device}_{time.gmtime}'
+					self.responseBuffer[key] = self.send(
+						'request',
+						devices[device].address,
+						devices[device].request['device_status']
+					)
+					print(f'Key: {key} // Response: {self.responseBuffer[key]}\n')
 	
 	async def parseResponses(self, app):
 		'''

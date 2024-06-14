@@ -26,6 +26,7 @@ import ironVan_settings as settings
 
 import time
 import subprocess
+import threading
 
 class appElementIDs():
 	"""
@@ -740,9 +741,7 @@ class ironVanApp(MDApp):
 	appIDs = appElementIDs()
 	log = ivLog.Log()
 	bus = ivBus.Bus(log)
-
 	location = weather.Location()
-	weather = weather.Weather()
 	wifi = network.Wifi()
 	userSettings = settings.UserSettings()
 
@@ -753,7 +752,10 @@ class ironVanApp(MDApp):
 		# Note:  When uncommenting Window.fullscreen, ensure to delete comment out `size: (700, 480)` in the .kv file.
 		Window.fullscreen = 'auto'
 		
+
 		# ---- Build App Theme ----
+
+		# self.switchThemes() (below) is used to toggle between themes
 
 		# Custom variables to hold color themes
 		self.lightPrimary = 'Teal'
@@ -769,6 +771,12 @@ class ironVanApp(MDApp):
 		self.theme_cls.accent_light_hue = '300'
 		self.theme_cls.accent_dark_hue = '800'
 
+		self.toggleOn = self.theme_cls.primary_light
+		self.toggleOff = self.theme_cls.accent_light
+
+
+		# ---- Initialize Debounce Functionality ----
+
 		# Master reset for allowing button presses - used globally for debouncing
 		# Note:  every button that uses buttonReset MUST reset self.buttonReset after use
 
@@ -776,8 +784,8 @@ class ironVanApp(MDApp):
 		self.buttonDelay = 0.25
 		self.buttonReset = time.time() + self.buttonDelay
 
-		self.toggleOn = self.theme_cls.primary_light
-		self.toggleOff = self.theme_cls.accent_light
+
+		# ---- Build Dialog Boxes ----
 
 		# All pop-up windows must be instantiated under the self.dialogBox object to ensure that dialog boxes do not stack
 		self.dialogBox = None
@@ -785,17 +793,15 @@ class ironVanApp(MDApp):
 		# The keyboard is a special type of dialog box and will be instantiated under self.keyboard
 		self.keyboard = None
 
-		self.userSettings.initUserSettings(self)
-		self.location.getLocation(self)
-		
-		# Counts from 0 to 3599 inside of self.stateUpdate to allow functions to be called anywhere from every 10 seconds to every 1 hour in 10 second intervals
-		self.updateCounter = 0
-		Clock.schedule_interval(self.stateUpdate, 10)
 
-		# Initialize bus scan
-		# if(len(self.bus.activeDevices) != 0):
-		# 	Clock.schedule_interval(self.bus.regularScan, 1)
-		# 	Clock.schedule_interval(self.bus.parseResponses, 1)
+		# ---- Initialize User Settings ----
+
+		self.userSettings.initUserSettings(self)
+
+		# ---- Initiate Background Threads ----
+
+		bus_thread = threading.Thread(target = self.bus.regularScan, args = (self,), name = 'bus_thread')
+		bus_thread.start()
 
 		return
 
@@ -1019,7 +1025,7 @@ class ironVanApp(MDApp):
 
 		# Update weather solution - currently runs every 10 minutes
 		if((self.updateCounter/6) % 100 == 0):
-			self.weather.getWeather(self, self.userSettings)
+			self.location.weather.getWeather(self, self.userSettings)
 
 		# Temporary code below -- include error handling once testing is complete
 		# response = self.bus.send(
@@ -1483,4 +1489,5 @@ class ironVanApp(MDApp):
 			self.keyboard.dismiss()
 			self.keyboard = None
 
-ironVanApp().run()
+if __name__ == '__main__':
+	ironVanApp().run()

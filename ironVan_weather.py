@@ -4,6 +4,7 @@ import json
 
 class Location():
     def __init__(self):
+        self.weather = Weather()
         self.api_key = 'ipb_live_FKgcNeSzddarJZyyDS22NSgfNaEtFR7lf0tx4SRM'
         self.base_url = 'https://api.ipbase.com/v2/info?apikey=ipb_live_FKgcNeSzddarJZyyDS22NSgfNaEtFR7lf0tx4SRM&ip'
 
