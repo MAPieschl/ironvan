@@ -17,6 +17,7 @@ from kivymd.uix.floatlayout import MDFloatLayout
 from kivymd.uix.relativelayout import MDRelativeLayout
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.behaviors.toggle_behavior import MDToggleButton
+from kivymd.uix.label import MDLabel
 
 import ironVan_log as ivLog
 import ironVan_bus as ivBus
@@ -803,6 +804,7 @@ class ironVanApp(MDApp):
 
 		# ---- Initiate Background Threads ----
 
+		self.log.print2Debug(self, 'Initializing threads...', 'normal')
 		bus_thread = threading.Thread(target = self.bus.regularScan, args = (self,), name = 'bus_thread', daemon = True)
 		bus_thread.start()
 

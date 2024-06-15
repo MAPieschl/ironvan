@@ -551,10 +551,10 @@ class Bus():
 						self.activeDevices[device].address,
 						self.activeDevices[device].request['device_status']
 					)
-					app.root.ids['debug_layout'].add_widget(MDLabel(text = f'{key}: {self.responseBuffer[key]}\n'))
+					app.log.print2Debug(app, f'{key}: {self.responseBuffer[key]}', 'normal')
 					time.sleep(0.5)
 			except:
-				app.root.ids['debug_layout'].add_widget(MDLabel(text = f'I/O error at {time.time()}. Attempting to reacquire device...\n'))
+				app.log.print2Debug(app, f'{key}: {self.responseBuffer[key]}', 'error')
 				time.sleep(0.5)
 	
 	async def parseResponses(self, app):
