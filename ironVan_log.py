@@ -19,7 +19,7 @@ class Log():
             case _:
                 color = (44/255, 252/255, 3/255, 1)
 
-        label = MDLabel(text = f'[b]{msg}\n[/b]',
+        label = MDLabel(text = '[b]{}\n[/b]'.format(msg),
                         markup = True,
                         theme_text_color = 'Custom',
                         text_color = color)
