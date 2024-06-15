@@ -530,7 +530,10 @@ class Bus():
 		Asynchronous function scheduled by ironVanApp.build() that fills the responseBuffer with time-stamped responses. The responses are parsed and cleared in parseResponses.
 		'''
 		activeError = False
+		counter = 0
 		while(self.bus != ''):
+			app.messageBuffer[f'temp_{counter}'] = [f'{activeError}', 'normal']
+			counter += 1
 			try:
 				for device in self.activeDevices.keys():
 					key = f'{device}_{time.gmtime}'
