@@ -554,7 +554,7 @@ class Bus():
 				activeError = True
 				time.sleep(0.5)
 
-			print('Sweep time: ', time.time() - startTime - 0.5)
+			print('Sweep time: ', time.time() - startTime - 0.5*len(self.activeDevices.keys()))
 	
 	async def parseResponses(self, app):
 		'''
