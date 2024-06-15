@@ -679,6 +679,9 @@ class SettingsHomeScreen(Screen):
 class UserSettingsScreen(Screen):
 	pass
 
+class DebugScreen(Screen):
+	pass
+
 class LSHomeScreen(Screen):
 	pass
 
@@ -954,9 +957,12 @@ class ironVanApp(MDApp):
 				self.root.ids.page_manager.current = 'settings_home_page'
 
 	def selectSettingsScreen(self, id):
+		print(id)
 		match id:
-			case user_settings_screen:
+			case 'user_settings_button':
 				self.root.ids.page_manager.current = 'settings_user_settings_page'
+			case 'debug_button':
+				self.root.ids.page_manager.current = 'settings_debug_page'
 
 	def lightingAdjust(self, *args):
 		value = args[1]
