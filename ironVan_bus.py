@@ -557,7 +557,7 @@ class Bus():
 					time.sleep(0.5)
 			except:
 				print('I/O error')
-				app.log.print2Debug(app, f'{key}: {self.responseBuffer[key]}', 'error')
+				app.messageBuffer[key] = [f'{key}: {self.responseBuffer[key]}', 'normal']
 				time.sleep(0.5)
 	
 	async def parseResponses(self, app):
