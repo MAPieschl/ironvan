@@ -10,6 +10,8 @@
 import asyncio
 import time
 
+from kivymd.uix.label import MDLabel
+
 try:	
 	from smbus2 import SMBus, i2c_msg
 
@@ -481,7 +483,6 @@ class Bus():
 
 				# Request 14 char DEVICE_TYPE from each address
 				deviceType = self.send('request', addr, [0x20, 14])
-				print(deviceType)
 
 				# Store device type defined by address if found - stored separate from self.storeDevices to allow for future development of dynamic addressing
 				deviceAddress[deviceType] = addr
@@ -514,7 +515,7 @@ class Bus():
 		# - msgType - 'request' or 'command'
 		# - addr - Device().address
 		# - message - Device().command['x_command'] or Device().request('')
-		print(f'Command sent: {addr} // {message}')
+		
 		if('command' in msgType):
 			#self.bus.write_byte_data(addr, 0, message)
 			self.bus.write_i2c_block_data(addr, 0, message)
@@ -522,7 +523,6 @@ class Bus():
 		
 		elif('request' in msgType):
 			msg = self.rawMsg2Str(self.bus.read_i2c_block_data(addr, message[0], message[1]))
-			print('Raw return: ', msg)
 			return msg
 		
 	def regularScan(self, app):
@@ -551,10 +551,10 @@ class Bus():
 						self.activeDevices[device].address,
 						self.activeDevices[device].request['device_status']
 					)
-					print(f'Key: {key} // Response: {self.responseBuffer[key]}\n')
-					time.sleep(1)
+					app.root.ids['debug_layout'].add_widget(MDLabel(text = f'{key}: {self.responseBuffer[key]}\n'))
+					time.sleep(0.5)
 			except:
-				print("I/O error. Proceeding...")
+				app.root.ids['debug_layout'].add_widget(MDLabel(text = f'I/O error at {time.time()}. Attempting to reacquire device...\n'))
 				time.sleep(0.5)
 	
 	async def parseResponses(self, app):
