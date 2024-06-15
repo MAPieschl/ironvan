@@ -4,7 +4,7 @@ class Log():
     def __init__(self):
         return
     
-    def print2Debug(self, app, msg: str, type: str):
+    def print2Debug(self, app, msg: str, mType: str):
         '''
         Prints message to the settings debug view.
 
@@ -13,7 +13,7 @@ class Log():
          - msg - unformatted message -> message will be emboldend and line management is handled by the function
          - type - 'normal' (will be printed in green) // 'error' (will be printed in red)
         '''
-        match type:
+        match mType:
             case 'error':
                 color = (252/255, 3/255, 3/255, 1)
             case _:

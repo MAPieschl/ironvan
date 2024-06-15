@@ -804,9 +804,16 @@ class ironVanApp(MDApp):
 
 		# ---- Initiate Background Threads ----
 
+		# messageBuffer holds messages to be printed to the debug frame within the main app thread. MEssages are added to the message buffer by outside threads, then handled within the main thread using the stateUpdate() method. Format is messageBuffer[device_gmtime] = {[msg, msgType]}, where msgType is 'normal' or 'error' and effects the color of the line printout in the debug frame
+		self.messageBuffer = {}
+
 		self.log.print2Debug(self, 'Initializing threads...', 'normal')
 		bus_thread = threading.Thread(target = self.bus.regularScan, args = (self,), name = 'bus_thread', daemon = True)
 		bus_thread.start()
+
+		# ---- Initialize GUI State Update ----
+
+		self.stateLoop = Clock.schedule_interval(self.stateUpdate, 1)
 
 		return
 
@@ -1002,78 +1009,81 @@ class ironVanApp(MDApp):
 		- Time/date update
 
 		'''
-		# Check/update Wi-Fi signal
-		self.wifi.networkStatus = self.wifi.parseWifiStatus()
-		try:
-			if(self.wifi.networkStatus['SSID'] != ''):
-				if(int(self.wifi.networkStatus['agrCtlRSSI']) > -50):
-					self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-4'
-				elif(int(self.wifi.networkStatus['agrCtlRSSI']) > -70):
-					self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-3'
-				elif(int(self.wifi.networkStatus['agrCtlRSSI']) > -90):
-					self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-2'
-				else:
-					self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-1'
+		# # Check/update Wi-Fi signal
+		# self.wifi.networkStatus = self.wifi.parseWifiStatus()
+		# try:
+		# 	if(self.wifi.networkStatus['SSID'] != ''):
+		# 		if(int(self.wifi.networkStatus['agrCtlRSSI']) > -50):
+		# 			self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-4'
+		# 		elif(int(self.wifi.networkStatus['agrCtlRSSI']) > -70):
+		# 			self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-3'
+		# 		elif(int(self.wifi.networkStatus['agrCtlRSSI']) > -90):
+		# 			self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-2'
+		# 		else:
+		# 			self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-1'
 
-			else:
-				self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-off-outline'
+		# 	else:
+		# 		self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-off-outline'
 			
-			self.root.ids['wifi_quick_switch'].md_bg_color = self.toggleOn
+		# 	self.root.ids['wifi_quick_switch'].md_bg_color = self.toggleOn
 
-			self.root.ids['wifi_quick_switch'].value = 'wifi_on'
+		# 	self.root.ids['wifi_quick_switch'].value = 'wifi_on'
 
-		except TypeError:
-			self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-alert-outline'
-			self.root.ids['wifi_quick_switch'].md_bg_color = self.toggleOn
+		# except TypeError:
+		# 	self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-alert-outline'
+		# 	self.root.ids['wifi_quick_switch'].md_bg_color = self.toggleOn
 
-		except KeyError:
-			self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-off-outline'
-			self.root.ids['wifi_quick_switch'].md_bg_color = self.toggleOff
-			self.root.ids['wifi_quick_switch'].value = 'wifi_off'
+		# except KeyError:
+		# 	self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-off-outline'
+		# 	self.root.ids['wifi_quick_switch'].md_bg_color = self.toggleOff
+		# 	self.root.ids['wifi_quick_switch'].value = 'wifi_off'
 
-		# Update weather solution - currently runs every 10 minutes
-		if((self.updateCounter/6) % 100 == 0):
-			self.location.weather.getWeather(self, self.userSettings)
+		# # Update weather solution - currently runs every 10 minutes
+		# if((self.updateCounter/6) % 100 == 0):
+		# 	self.location.weather.getWeather(self, self.userSettings)
 
-		# Temporary code below -- include error handling once testing is complete
-		# response = self.bus.send(
-		# 	'request',
-		# 	self.bus.activeDevices['utilities'].address,
-		# 	self.bus.activeDevices['utilities'].request['device_status']
-		# )
-		# self.bus.activeDevices['utilities'].updateDevice(
-		# 	self,
-		# 	time.time(),
-		# 	response
-		# )
-		# response = self.bus.send(
-		# 	'request',
-		# 	self.bus.activeDevices['thermostat'].address,
-		# 	self.bus.activeDevices['thermostat'].request['device_status']
-		# )
-		# self.bus.activeDevices['thermostat'].updateDevice(
-		# 	self,
-		# 	time.time(),
-		# 	response
-		# )
+		# # Temporary code below -- include error handling once testing is complete
+		# # response = self.bus.send(
+		# # 	'request',
+		# # 	self.bus.activeDevices['utilities'].address,
+		# # 	self.bus.activeDevices['utilities'].request['device_status']
+		# # )
+		# # self.bus.activeDevices['utilities'].updateDevice(
+		# # 	self,
+		# # 	time.time(),
+		# # 	response
+		# # )
+		# # response = self.bus.send(
+		# # 	'request',
+		# # 	self.bus.activeDevices['thermostat'].address,
+		# # 	self.bus.activeDevices['thermostat'].request['device_status']
+		# # )
+		# # self.bus.activeDevices['thermostat'].updateDevice(
+		# # 	self,
+		# # 	time.time(),
+		# # 	response
+		# # )
 
-		# Update time & date
-		if(self.userSettings.time24hr == True):
-			self.root.ids['home_time_label'].text = time.strftime('%H:%M')
-			self.root.ids['home_time_label'].font_style = 'H5'
-		else:
-			self.root.ids['home_time_label'].text = time.strftime('%I:%M %p')
-			self.root.ids['home_time_label'].font_style = 'H6'
+		# # Update time & date
+		# if(self.userSettings.time24hr == True):
+		# 	self.root.ids['home_time_label'].text = time.strftime('%H:%M')
+		# 	self.root.ids['home_time_label'].font_style = 'H5'
+		# else:
+		# 	self.root.ids['home_time_label'].text = time.strftime('%I:%M %p')
+		# 	self.root.ids['home_time_label'].font_style = 'H6'
 
-			if(self.root.ids['home_time_label'].text[0] == '0'):
-				self.root.ids['home_time_label'].text = self.root.ids['home_time_label'].text[1:]
+		# 	if(self.root.ids['home_time_label'].text[0] == '0'):
+		# 		self.root.ids['home_time_label'].text = self.root.ids['home_time_label'].text[1:]
 
-		self.root.ids['home_date_label'].text = time.strftime('%A\n %d %B %y')
+		# self.root.ids['home_date_label'].text = time.strftime('%A\n %d %B %y')
 
-		if(self.updateCounter < 3600):
-			self.updateCounter += 1
-		else:
-			self.updateCounter = 0
+		# if(self.updateCounter < 3600):
+		# 	self.updateCounter += 1
+		# else:
+		# 	self.updateCounter = 0
+
+		for key in self.messageBuffer.keys():
+			self.log.print2Debug(self, self.messageBuffer[key][0], self.messageBuffer[key][0])
 
 	# ---- Dialog Boxes ----
 
