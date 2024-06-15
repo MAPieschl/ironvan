@@ -2,7 +2,8 @@ from kivymd.uix.label import MDLabel
 
 class Log():
     def __init__(self):
-        return
+        # Used to orgnaize the gridLayout into rows
+        self.debugCounter = 1
     
     def print2Debug(self, app, msg: str, mType: str):
         '''
@@ -24,4 +25,7 @@ class Log():
                         theme_text_color = 'Custom',
                         text_color = color)
         
+        app.root.ids['debug_layout'].rows = self.debugCounter
         app.root.ids['debug_layout'].add_widget(label)
+
+        self.debugCounter += 1
