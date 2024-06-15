@@ -533,7 +533,7 @@ class Bus():
 		while(self.bus != ''):
 			try:
 				for device in self.activeDevices.keys():
-					key = f'{device}_{time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}'
+					key = f"{device}_{time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}"
 					self.responseBuffer[key] = self.send(
 						'request',
 						self.activeDevices[device].address,
@@ -541,12 +541,12 @@ class Bus():
 					)
 
 					if(activeError == True):
-						app.messageBuffer[key] = [f'{device} reaquired at {time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}. Current device status: {self.responseBuffer[key]}', 'normal']
+						app.messageBuffer[key] = [f"{device} reaquired at {time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}. Current device status: {self.responseBuffer[key]}", 'normal']
 				
 				activeError = False
 
 			except:
-				app.messageBuffer[key] = [f'Communication lost with: {key} at {time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}. Attempting to reacquire device...', 'error']
+				app.messageBuffer[key] = [f"Communication lost with: {key} at {time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}. Attempting to reacquire device...", 'error']
 				activeError = True
 	
 	async def parseResponses(self, app):
