@@ -481,6 +481,7 @@ class Bus():
 
 				# Request 14 char DEVICE_TYPE from each address
 				deviceType = self.send('request', addr, [0x20, 14])
+				print(deviceType)
 
 				# Store device type defined by address if found - stored separate from self.storeDevices to allow for future development of dynamic addressing
 				deviceAddress[deviceType] = addr
