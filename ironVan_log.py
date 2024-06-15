@@ -22,4 +22,6 @@ class Log():
         app.root.ids['debug_layout'].add_widget(MDLabel(text = '[b]{}\n[/b]'.format(msg),
                                                         markup = True,
                                                         theme_text_color = 'Custom',
-                                                        text_color = color))
+                                                        text_color = color,
+                                                        size_hint_y = None,
+                                                        height = self.texture_size[1] + 10))
