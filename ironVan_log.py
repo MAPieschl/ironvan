@@ -24,4 +24,4 @@ class Log():
                                                         theme_text_color = 'Custom',
                                                         text_color = color,
                                                         size_hint_y = None,
-                                                        height = self.texture_size[1] + 10))
+                                                        height = 30))
