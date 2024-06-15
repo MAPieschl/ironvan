@@ -552,8 +552,7 @@ class Bus():
 						self.activeDevices[device].request['device_status']
 					)
 					print(self.responseBuffer[key])
-					msg = f'{key}: {self.responseBuffer[key]}'
-					app.log.print2Debug(app, msg, 'normal')
+					app.log.print2Debug(app, '{}: {}'.format(key, self.responseBuffer[key]), 'normal')
 					time.sleep(0.5)
 			except:
 				print('I/O error')
