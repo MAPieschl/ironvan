@@ -534,12 +534,14 @@ class Bus():
 			startTime = time.time()
 			try:
 				for device in self.activeDevices.keys():
+					iterationTime = time.time()
 					key = f'{device}_{time.gmtime}'
 					self.responseBuffer[key] = self.send(
 						'request',
 						self.activeDevices[device].address,
 						self.activeDevices[device].request['device_status']
 					)
+					print(f'Iteration time for {self.responseBuffer[key]}: {time.time() - iterationTime}')
 					time.sleep(0.5)
 
 					if(activeError == True):
