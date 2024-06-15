@@ -1083,7 +1083,7 @@ class ironVanApp(MDApp):
 		# 	self.updateCounter = 0
 
 		for key in self.messageBuffer.keys():
-			self.log.print2Debug(self, self.messageBuffer[key][0], self.messageBuffer[key][0])
+			self.log.print2Debug(self, self.messageBuffer[key][0], self.messageBuffer[key][1])
 
 	# ---- Dialog Boxes ----
 

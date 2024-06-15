@@ -558,7 +558,7 @@ class Bus():
 		if(len(self.responseBuffer) > 100):
 			self.responseBuffer.clear()
 			# The following console print should be replaced by an error log
-			app.messageBuffer[key] = [, 'error']
+			app.messageBuffer[f'parser_{time.gmtime}'] = ['Parser overflow. Clearing buffer...', 'error']
 			return
 		elif(len(self.responseBuffer) < 1):
 			return
