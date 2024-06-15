@@ -531,7 +531,6 @@ class Bus():
 		'''
 		activeError = False
 		while(self.bus != ''):
-			startTime = time.time()
 			try:
 				for device in self.activeDevices.keys():
 					iterationTime = time.time()
@@ -541,8 +540,6 @@ class Bus():
 						self.activeDevices[device].address,
 						self.activeDevices[device].request['device_status']
 					)
-					print(f'Iteration time for {self.responseBuffer[key]}: {time.time() - iterationTime}')
-					time.sleep(0.5)
 
 					if(activeError == True):
 						app.messageBuffer[key] = [f'{device} reaquired. Current device status: {self.responseBuffer[key]}', 'normal']
@@ -552,9 +549,6 @@ class Bus():
 			except:
 				app.messageBuffer[key] = ['Communication lost with: {key}. Attempting to reacquire device...', 'error']
 				activeError = True
-				time.sleep(0.5)
-
-			print('Sweep time: ', time.time() - startTime - 0.5*len(self.activeDevices.keys()))
 	
 	async def parseResponses(self, app):
 		'''
