@@ -529,19 +529,7 @@ class Bus():
 		'''
 		Asynchronous function scheduled by ironVanApp.build() that fills the responseBuffer with time-stamped responses. The responses are parsed and cleared in parseResponses.
 		'''
-		print('Regular scan initialized on bus: ', self.bus)
-		# while(self.bus != ''):
-		# 	async with self.activeDevices as devices:
-		# 		for device in devices:
-		# 			key = f'{device}_{time.gmtime}'
-		# 			self.responseBuffer[key] = await self.send(
-		# 				'request',
-		# 				devices[device].address,
-		# 				devices[device].request['device_status']
-		# 			)
-		# 			print(self.responseBuffer[key])
-
-		# Synchronous version -- add 'async def' to function definition if moving to the asynchronous version
+		activeError = False
 		while(self.bus != ''):
 			try:
 				for device in self.activeDevices.keys():
@@ -551,13 +539,16 @@ class Bus():
 						self.activeDevices[device].address,
 						self.activeDevices[device].request['device_status']
 					)
-					print(self.responseBuffer[key])
-					#app.log.print2Debug(app, '{}: {}'.format(key, self.responseBuffer[key]), 'normal')
-					app.messageBuffer[key] = [f'{key}: {self.responseBuffer[key]}', 'normal']
 					time.sleep(0.5)
+
+					if(activeError == True):
+						app.messageBuffer[key] = [f'{device} reaquired. Current device status: {self.responseBuffer[key]}', 'normal']
+				
+				activeError = False
+
 			except:
-				print('I/O error')
-				app.messageBuffer[key] = [f'{key}: {self.responseBuffer[key]}', 'normal']
+				app.messageBuffer[key] = ['Communication lost with: {key}. Attempting to reacquire device...', 'error']
+				activeError = True
 				time.sleep(0.5)
 	
 	async def parseResponses(self, app):
@@ -567,7 +558,7 @@ class Bus():
 		if(len(self.responseBuffer) > 100):
 			self.responseBuffer.clear()
 			# The following console print should be replaced by an error log
-			print('Response buffer overloaded and flushed.')
+			app.messageBuffer[key] = [, 'error']
 			return
 		elif(len(self.responseBuffer) < 1):
 			return
