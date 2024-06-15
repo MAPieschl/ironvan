@@ -958,15 +958,14 @@ MDFloatLayout:
 
                     MDScrollView:
                         id: debug_terminal
+                        size: (kivy.core.window.Window.width, 0.8*kivy.core.window.Window.height)
+                        do_scroll_y: True
                         scroll_y: 1
-                        # pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-                        # do_scroll_y: True
 
                         MDBoxLayout:
                             orientation: 'vertical'
-                            md_bg_color: app.theme_cls.bg_darkest if app.theme_cls.theme_style == 'Dark' else app.theme_cls.bg_light
                             size_hint_y: None
-                            height: 0.7*kivy.core.window.Window.height
+                            height: self.minimum_height
                             padding: dp(10)
 
                             MDLabel:

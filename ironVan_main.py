@@ -803,7 +803,7 @@ class ironVanApp(MDApp):
 
 		# ---- Initiate Background Threads ----
 
-		bus_thread = threading.Thread(target = self.bus.regularScan, args = (self,), name = 'bus_thread')
+		bus_thread = threading.Thread(target = self.bus.regularScan, args = (self,), name = 'bus_thread', daemon = True)
 		bus_thread.start()
 
 		return
