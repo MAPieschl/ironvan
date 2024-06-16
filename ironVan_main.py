@@ -809,11 +809,11 @@ class ironVanApp(MDApp):
 
 		self.log.print2Debug(self, 'Initializing threads...', 'normal')
 		bus_thread = threading.Thread(target = self.bus.regularScan, args = (self,), name = 'bus_thread', daemon = True)
-		bus_thread.start()
+		# bus_thread.start()
 
 		# ---- Initialize GUI State Update ----
 
-		self.stateLoop = Clock.schedule_interval(self.stateUpdate, 1)
+		# self.stateLoop = Clock.schedule_interval(self.stateUpdate, 1)
 
 		return
 
