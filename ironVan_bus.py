@@ -68,27 +68,40 @@ class Device():
 		# --- LIGHTING ---
 		if('ltsy' in deviceType):
 		# Choose PCB version
+			self.command = {
+				'ls_1_toggle': [0x01],
+				'ls_2_toggle': [0x02],
+				'ls_3_toggle': [0x03],
+				'ls_4_toggle': [0x04]
+			}
+
+			# Define available requests
+			
+			self.request = {
+				'device_type':	[0x20, 14],
+				'device_status': [0x21, 4]
+			}
 		
-			if("b100" in deviceType):
-				# Choose firmware major version
+			# if("b100" in deviceType):
+			# 	# Choose firmware major version
 
-				if("v0" in deviceType):
-					# Define available commands
-	 				# Note:  The 'ls_n_toggle' commands are appended with a 1 byte value from either -- the toggle button (0 or current slider value) -- or -- app.lightingAdjust() (slider value)
+			# 	if("v0" in deviceType):
+			# 		# Define available commands
+	 		# 		# Note:  The 'ls_n_toggle' commands are appended with a 1 byte value from either -- the toggle button (0 or current slider value) -- or -- app.lightingAdjust() (slider value)
 
-					self.command = {
-						'ls_1_toggle': [0x01],
-						'ls_2_toggle': [0x02],
-						'ls_3_toggle': [0x03],
-						'ls_4_toggle': [0x04]
-					}
+			# 		self.command = {
+			# 			'ls_1_toggle': [0x01],
+			# 			'ls_2_toggle': [0x02],
+			# 			'ls_3_toggle': [0x03],
+			# 			'ls_4_toggle': [0x04]
+			# 		}
 
-					# Define available requests
+			# 		# Define available requests
 					
-					self.request = {
-						'device_type':	[0x20, 14],
-						'device_status': [0x21, 4]
-					}
+			# 		self.request = {
+			# 			'device_type':	[0x20, 14],
+			# 			'device_status': [0x21, 4]
+			# 		}
 
 		# --- LIGHT SWITCH & THERMOMETER ---
 		if('ltsw' in deviceType):
