@@ -620,7 +620,7 @@ class Bus():
 		'''
 		timeoutStart = time.time()
 		while(app.messageBufferLock == True):
-			if(time.time() >= timeoutStart + 1):
+			if(time.time() >= timeoutStart + 10):
 				return False
 			else:
 				continue
