@@ -584,6 +584,7 @@ class Bus():
 
 					if(activeError == True):
 						success = self.write2MessageBuffer(app, key, f"{device} reacquired at {time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}. Current device status: {self.responseBuffer[key]}", 'normal')
+						print("1: ", success)
 						if(success == False):
 							print(f'Timeout occured on messageBuffer - {key}')
 				
@@ -591,6 +592,7 @@ class Bus():
 
 			except:
 				success = self.write2MessageBuffer(app, key, f"Communication lost with: {key} at {time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}. Attempting to reacquire device...", 'error')
+				print("2: ", success)
 				if(success == False):
 					print(f'Timeout occured on messageBuffer - {key}')
 				activeError = True
@@ -618,6 +620,7 @@ class Bus():
 
 		Returns True if the message was added successfully and False if a timeout occured
 		'''
+		print("Start: ", app.messageBuffer)
 		timeoutStart = time.time()
 		while(app.messageBufferLock == True):
 			if(time.time() >= timeoutStart + 10):
@@ -625,6 +628,8 @@ class Bus():
 			else:
 				continue
 		app.messageBuffer[key] = [f"Communication lost with: {key} at {time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}. Attempting to reacquire device...", 'error']
+
+		print("Finish: ", app.messageBuffer)
 
 		return True
 
