@@ -568,32 +568,21 @@ class Bus():
 			time.sleep(5)
 			try:
 				for device in self.activeDevices.keys():
-					print(self.activeDevices)
-					print(self.activeDevices[device].address)
-					print(self.activeDevices[device].request)
 					key = f"{device}_{time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}"
 					self.responseBuffer[key] = self.send(
 						'request',
 						self.activeDevices[device].address,
 						self.activeDevices[device].request['device_status']
 					)
-					print("responseBuffer = ", self.responseBuffer[key])
 					success = self.write2MessageBuffer(app, key, f"{self.responseBuffer[key]}", 'normal')
-					print("success = ", success)
-					if(success == False):
-						print(f'Timeout occured on messageBuffer - {key}')
 
 					if(activeError == True):
 						success = self.write2MessageBuffer(app, key, f"{device} reacquired at {time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}. Current device status: {self.responseBuffer[key]}", 'normal')
-						print("1: ", success)
-						if(success == False):
-							print(f'Timeout occured on messageBuffer - {key}')
 				
 				activeError = False
 
 			except:
 				success = self.write2MessageBuffer(app, key, f"Communication lost with: {key} at {time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}. Attempting to reacquire device...", 'error')
-				print("2: ", success)
 				if(success == False):
 					print(f'Timeout occured on messageBuffer - {key}')
 				activeError = True
@@ -621,16 +610,14 @@ class Bus():
 
 		Returns True if the message was added successfully and False if a timeout occured
 		'''
-		print("Start: ", app.messageBuffer)
 		timeoutStart = time.time()
 		while(app.messageBufferLock == True):
 			if(time.time() >= timeoutStart + 10):
+				print(f'Timeout occured on messageBuffer - {key}')
 				return False
 			else:
 				continue
-		app.messageBuffer[key] = [f"Communication lost with: {key} at {time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}. Attempting to reacquire device...", 'error']
-
-		print("Finish: ", app.messageBuffer)
+		app.messageBuffer[key] = [msg, msgType]
 
 		return True
 
