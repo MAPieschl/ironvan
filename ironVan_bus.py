@@ -554,6 +554,10 @@ class Bus():
 						self.activeDevices[device].request['device_status']
 					)
 
+					success = self.write2MessageBuffer(app, key, f"{self.responseBuffer[key]}", 'normal')
+					if(success == False):
+						print(f'Timeout occured on messageBuffer - {key}')
+
 					if(activeError == True):
 						success = self.write2MessageBuffer(app, key, f"{device} reacquired at {time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}. Current device status: {self.responseBuffer[key]}", 'normal')
 						if(success == False):
