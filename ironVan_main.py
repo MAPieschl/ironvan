@@ -1089,6 +1089,8 @@ class ironVanApp(MDApp):
 		for key in self.messageBuffer.keys():
 			self.log.print2Debug(self, self.messageBuffer[key][0], self.messageBuffer[key][1])
 
+		self.messageBuffer = {}
+
 		# Unlock messageBuffer
 		self.messageBufferLock = False
 
