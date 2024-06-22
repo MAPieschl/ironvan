@@ -547,6 +547,9 @@ class Bus():
 			time.sleep(5)
 			try:
 				for device in self.activeDevices.keys():
+					print(self.activeDevices)
+					print(self.activeDevices[device].address)
+					print(self.activeDevices[device].request)
 					key = f"{device}_{time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}"
 					self.responseBuffer[key] = self.send(
 						'request',

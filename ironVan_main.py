@@ -967,7 +967,6 @@ class ironVanApp(MDApp):
 				self.root.ids.page_manager.current = 'settings_home_page'
 
 	def selectSettingsScreen(self, id):
-		print(id)
 		match id:
 			case 'user_settings_button':
 				self.root.ids.page_manager.current = 'settings_user_settings_page'
