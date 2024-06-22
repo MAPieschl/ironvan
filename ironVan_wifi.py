@@ -259,3 +259,33 @@ class Wifi():
                 )
 
                 return output.stdout
+            
+    def updateWifi(self, app):
+        # Check/update Wi-Fi signal
+        self.networkStatus = self.parseWifiStatus()
+        try:
+            if(self.networkStatus['SSID'] != ''):
+                if(int(self.networkStatus['agrCtlRSSI']) > -50):
+                    app.root.ids['wifi_quick_switch'].icon = 'wifi-strength-4'
+                elif(int(self.networkStatus['agrCtlRSSI']) > -70):
+                    app.root.ids['wifi_quick_switch'].icon = 'wifi-strength-3'
+                elif(int(self.networkStatus['agrCtlRSSI']) > -90):
+                    app.root.ids['wifi_quick_switch'].icon = 'wifi-strength-2'
+                else:
+                    app.root.ids['wifi_quick_switch'].icon = 'wifi-strength-1'
+
+            else:
+                app.root.ids['wifi_quick_switch'].icon = 'wifi-strength-off-outline'
+            
+            app.root.ids['wifi_quick_switch'].md_bg_color = app.toggleOn
+
+            app.root.ids['wifi_quick_switch'].value = 'wifi_on'
+
+        except TypeError:
+            app.root.ids['wifi_quick_switch'].icon = 'wifi-strength-alert-outline'
+            app.root.ids['wifi_quick_switch'].md_bg_color = app.toggleOn
+
+        except KeyError:
+            app.root.ids['wifi_quick_switch'].icon = 'wifi-strength-off-outline'
+            app.root.ids['wifi_quick_switch'].md_bg_color = app.toggleOff
+            app.root.ids['wifi_quick_switch'].value = 'wifi_off'

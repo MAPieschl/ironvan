@@ -118,7 +118,6 @@ class Weather():
                     app.root.ids['high_temp_quick_label'].text = f'{maxTemp}' + u'\N{DEGREE SIGN}'
         except:
             print('Could not extract min/max temperature from forecast data.')
-            
 
 class DailyForecast():
     def __init__(self, forecast, userSettings):

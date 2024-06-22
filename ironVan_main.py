@@ -809,8 +809,15 @@ class ironVanApp(MDApp):
 		self.messageBufferLock = False
 
 		self.log.print2Debug(self, 'Initializing threads...', 'normal')
+
 		bus_thread = threading.Thread(target = self.bus.regularScan, args = (self,), name = 'bus_thread', daemon = True)
 		bus_thread.start()
+
+		wifi_thread = threading.Thread(target = self.wifi.updateWifi, args = (self, ), name = 'wifi_thread', daemon = True)
+		wifi_thread.start()
+
+		weather_thread = threading.Thread(target = self.location.weather.getWeather, args = (self, self.userSettings), name = 'weather_thread', daemon = True)
+		weather_thread.start()
 
 		# ---- Initialize GUI State Update ----
 
@@ -1001,68 +1008,6 @@ class ironVanApp(MDApp):
 			self.noDeviceFound_dialog('Light')
 
 	def stateUpdate(self, *args):
-		'''
-		This function runs {asynchronously - intended...currently running synchronously} in the main build() function at some defined interval, updating the following items:
-
-		- Wi-Fi signal
-		- Weather update
-		- Time/date update
-
-		'''
-		# # Check/update Wi-Fi signal
-		# self.wifi.networkStatus = self.wifi.parseWifiStatus()
-		# try:
-		# 	if(self.wifi.networkStatus['SSID'] != ''):
-		# 		if(int(self.wifi.networkStatus['agrCtlRSSI']) > -50):
-		# 			self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-4'
-		# 		elif(int(self.wifi.networkStatus['agrCtlRSSI']) > -70):
-		# 			self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-3'
-		# 		elif(int(self.wifi.networkStatus['agrCtlRSSI']) > -90):
-		# 			self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-2'
-		# 		else:
-		# 			self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-1'
-
-		# 	else:
-		# 		self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-off-outline'
-			
-		# 	self.root.ids['wifi_quick_switch'].md_bg_color = self.toggleOn
-
-		# 	self.root.ids['wifi_quick_switch'].value = 'wifi_on'
-
-		# except TypeError:
-		# 	self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-alert-outline'
-		# 	self.root.ids['wifi_quick_switch'].md_bg_color = self.toggleOn
-
-		# except KeyError:
-		# 	self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-off-outline'
-		# 	self.root.ids['wifi_quick_switch'].md_bg_color = self.toggleOff
-		# 	self.root.ids['wifi_quick_switch'].value = 'wifi_off'
-
-		# # Update weather solution - currently runs every 10 minutes
-		# if((self.updateCounter/6) % 100 == 0):
-		# 	self.location.weather.getWeather(self, self.userSettings)
-
-		# # Temporary code below -- include error handling once testing is complete
-		# # response = self.bus.send(
-		# # 	'request',
-		# # 	self.bus.activeDevices['utilities'].address,
-		# # 	self.bus.activeDevices['utilities'].request['device_status']
-		# # )
-		# # self.bus.activeDevices['utilities'].updateDevice(
-		# # 	self,
-		# # 	time.time(),
-		# # 	response
-		# # )
-		# # response = self.bus.send(
-		# # 	'request',
-		# # 	self.bus.activeDevices['thermostat'].address,
-		# # 	self.bus.activeDevices['thermostat'].request['device_status']
-		# # )
-		# # self.bus.activeDevices['thermostat'].updateDevice(
-		# # 	self,
-		# # 	time.time(),
-		# # 	response
-		# # )
 
 		# # Update time & date
 		# if(self.userSettings.time24hr == True):

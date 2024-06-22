@@ -554,9 +554,7 @@ class Bus():
 			return 'command sent'
 		
 		elif('request' in msgType):
-			print('Requesting...')
 			msg = self.rawMsg2Str(self.bus.read_i2c_block_data(addr, message[0], message[1]))
-			print('Success - ', msg)
 			return msg
 		
 	def regularScan(self, app):
