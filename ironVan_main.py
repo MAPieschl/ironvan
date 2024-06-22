@@ -813,13 +813,11 @@ class ironVanApp(MDApp):
 		bus_thread = threading.Thread(target = self.bus.regularScan, args = (self,), name = 'bus_thread', daemon = True)
 		bus_thread.start()
 
-		wifi_thread = threading.Thread(target = self.wifi.updateWifi, args = (self, ), name = 'wifi_thread', daemon = True)
+		wifi_thread = threading.Thread(target = self.wifi.updateWifi, args = (self,), name = 'wifi_thread', daemon = True)
 		wifi_thread.start()
 
-		# weather_thread = threading.Thread(target = self.location.weather.getWeather, args = (self, self.userSettings), name = 'weather_thread', daemon = True)
-		# weather_thread.start()
-		
-		self.location.weather.getWeather(self, self.userSettings)
+		location_thread = threading.Thread(target = self.location.getLocation, args = (self, ), name = 'weather_thread', daemon = True)
+		location_thread.start()
 
 		# ---- Initialize GUI State Update ----
 
@@ -1039,6 +1037,23 @@ class ironVanApp(MDApp):
 
 		# Unlock messageBuffer
 		self.messageBufferLock = False
+
+	def write2MessageBuffer(self, key: str, msg: str, msgType: str):
+		'''
+		Writes msg to the messageBuffer. Use of this function is required to protect the messageBuffer from changing sizes while being parsed.
+
+		Returns True if the message was added successfully and False if a timeout occured
+		'''
+		timeoutStart = time.time()
+		while(self.messageBufferLock == True):
+			if(time.time() >= timeoutStart + 10):
+				print(f'Timeout occured on messageBuffer - {key}')
+				return False
+			else:
+				continue
+		self.messageBuffer[key] = [msg, msgType]
+
+		return True
 
 	# ---- Dialog Boxes ----
 

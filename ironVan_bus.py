@@ -572,15 +572,15 @@ class Bus():
 						self.activeDevices[device].address,
 						self.activeDevices[device].request['device_status']
 					)
-					success = self.write2MessageBuffer(app, key, f"{self.responseBuffer[key]}", 'normal')
+					success = app.write2MessageBuffer(app, key, f"{self.responseBuffer[key]}", 'normal')
 
 					if(activeError == True):
-						success = self.write2MessageBuffer(app, key, f"{device} reacquired at {time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}. Current device status: {self.responseBuffer[key]}", 'normal')
+						success = app.write2MessageBuffer(app, key, f"{device} reacquired at {time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}. Current device status: {self.responseBuffer[key]}", 'normal')
 				
 				activeError = False
 
 			except:
-				success = self.write2MessageBuffer(app, key, f"Communication lost with: {key} at {time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}. Attempting to reacquire device...", 'error')
+				success = app.write2MessageBuffer(app, key, f"Communication lost with: {key} at {time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}. Attempting to reacquire device...", 'error')
 				if(success == False):
 					print(f'Timeout occured on messageBuffer - {key}')
 				activeError = True
@@ -601,23 +601,6 @@ class Bus():
 				deviceName = event[:divider]
 				requestTime = int(event[(divider + 1):])
 				self.activeDevices[deviceName].updateDevice(app, requestTime, self.responseBuffer[event])
-
-	def write2MessageBuffer(self, app, key: str, msg: str, msgType: str):
-		'''
-		Writes msg to the messageBuffer. Use of this function is required to protect the messageBuffer from changing sizes while being parsed.
-
-		Returns True if the message was added successfully and False if a timeout occured
-		'''
-		timeoutStart = time.time()
-		while(app.messageBufferLock == True):
-			if(time.time() >= timeoutStart + 10):
-				print(f'Timeout occured on messageBuffer - {key}')
-				return False
-			else:
-				continue
-		app.messageBuffer[key] = [msg, msgType]
-
-		return True
 
 	def rawMsg2Str(self, msg):
 		# Store the raw message in a list as integers representing ASCII values, then 
