@@ -39,6 +39,25 @@ class Device():
 		
 		# --- UTILITIES ---
 		if('util' in deviceType):
+
+			self.command = {
+				'water_pump_auto': [0x00],
+				'water_pump_off': [0x01],
+				'shower_fan_auto': [0x02],
+				'shower_fan_off': [0x03],
+				'tank_heater_auto': [0x04],
+				'tank_heater_off': [0x05],
+				'tank_valve_open': [0x06],
+				'tank_valve_close': [0x07]
+			}
+
+			# Define available requests
+			
+			self.request = {
+				'device_type':	[0x20, 14],
+				'device_status':  [0x21, 1]
+			}
+			
 			# Choose PCB version
 			
 			if("b100" in deviceType):
