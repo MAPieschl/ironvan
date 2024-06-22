@@ -808,8 +808,6 @@ class ironVanApp(MDApp):
 		self.messageBuffer = {}
 		self.messageBufferLock = False
 
-		self.log.print2Debug(self, 'Initializing threads...', 'normal')
-
 		bus_thread = threading.Thread(target = self.bus.regularScan, args = (self,), name = 'bus_thread', daemon = True)
 		bus_thread.start()
 
