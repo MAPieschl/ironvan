@@ -71,7 +71,7 @@ class Weather():
         except:
             print('No weather data received -- check WiFi connection.')
             return
-
+        print(forecastResponse)
         # Extract and print current weather
         try:
             iconName = currentResponse.get('weather')[0].get('icon')
