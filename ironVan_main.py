@@ -816,8 +816,10 @@ class ironVanApp(MDApp):
 		wifi_thread = threading.Thread(target = self.wifi.updateWifi, args = (self, ), name = 'wifi_thread', daemon = True)
 		wifi_thread.start()
 
-		weather_thread = threading.Thread(target = self.location.weather.getWeather, args = (self, self.userSettings), name = 'weather_thread', daemon = True)
-		weather_thread.start()
+		# weather_thread = threading.Thread(target = self.location.weather.getWeather, args = (self, self.userSettings), name = 'weather_thread', daemon = True)
+		# weather_thread.start()
+		
+		self.location.weather.getWeather(self, self.userSettings)
 
 		# ---- Initialize GUI State Update ----
 
