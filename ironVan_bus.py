@@ -540,7 +540,7 @@ class Bus():
 		
 	def regularScan(self, app):
 		'''
-		Asynchronous function scheduled by ironVanApp.build() that fills the responseBuffer with time-stamped responses. The responses are parsed and cleared in parseResponses.
+		Individual thread started in ironVanApp.build() to continuously ping devices for status updates.
 		'''
 		activeError = False
 		while(self.bus != ''):
@@ -554,12 +554,16 @@ class Bus():
 					)
 
 					if(activeError == True):
-						app.messageBuffer[key] = [f"{device} reaquired at {time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}. Current device status: {self.responseBuffer[key]}", 'normal']
+						success = self.write2MessageBuffer(app, key, f"{device} reacquired at {time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}. Current device status: {self.responseBuffer[key]}", 'normal')
+						if(success == False):
+							print(f'Timeout occured on messageBuffer - {key}')
 				
 				activeError = False
 
 			except:
-				app.messageBuffer[key] = [f"Communication lost with: {key} at {time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}. Attempting to reacquire device...", 'error']
+				success = self.write2MessageBuffer(app, key, f"Communication lost with: {key} at {time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}. Attempting to reacquire device...", 'error')
+				if(success == False):
+					print(f'Timeout occured on messageBuffer - {key}')
 				activeError = True
 	
 	async def parseResponses(self, app):
@@ -568,7 +572,6 @@ class Bus():
 		'''
 		if(len(self.responseBuffer) > 100):
 			self.responseBuffer.clear()
-			# The following console print should be replaced by an error log
 			app.messageBuffer[f'parser_{time.gmtime}'] = ['Parser overflow. Clearing buffer...', 'error']
 			return
 		elif(len(self.responseBuffer) < 1):
@@ -579,6 +582,22 @@ class Bus():
 				deviceName = event[:divider]
 				requestTime = int(event[(divider + 1):])
 				self.activeDevices[deviceName].updateDevice(app, requestTime, self.responseBuffer[event])
+
+	def write2MessageBuffer(self, app, key: str, msg: str, msgType: str):
+		'''
+		Writes msg to the messageBuffer. Use of this function is required to protect the messageBuffer from changing sizes while being parsed.
+
+		Returns True if the message was added successfully and False if a timeout occured
+		'''
+		timeoutStart = time.time()
+		while(app.messageBufferLock == True):
+			if(time.time() >= timeoutStart + 1):
+				return False
+			else:
+				continue
+		app.messageBuffer[key] = [f"Communication lost with: {key} at {time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}. Attempting to reacquire device...", 'error']
+
+		return True
 
 	def rawMsg2Str(self, msg):
 		# Store the raw message in a list as integers representing ASCII values, then 

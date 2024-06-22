@@ -804,8 +804,9 @@ class ironVanApp(MDApp):
 
 		# ---- Initiate Background Threads ----
 
-		# messageBuffer holds messages to be printed to the debug frame within the main app thread. MEssages are added to the message buffer by outside threads, then handled within the main thread using the stateUpdate() method. Format is messageBuffer[device_gmtime] = {[msg, msgType]}, where msgType is 'normal' or 'error' and effects the color of the line printout in the debug frame
+		# messageBuffer holds messages to be printed to the debug frame within the main app thread. Messages are added to the message buffer by outside threads, then handled within the main thread using the stateUpdate() method. Format is messageBuffer[device_gmtime] = {[msg, msgType]}, where msgType is 'normal' or 'error' and effects the color of the line printout in the debug frame. When messageBufferLock is set to True in self.stateUpdate(), the message buffer writing function (bus.write2MessageBuffer) will pause processing on the bus thread to ensure the size & contents of the messageBuffer do not change while being read.
 		self.messageBuffer = {}
+		self.messageBufferLock = False
 
 		self.log.print2Debug(self, 'Initializing threads...', 'normal')
 		bus_thread = threading.Thread(target = self.bus.regularScan, args = (self,), name = 'bus_thread', daemon = True)
@@ -1082,8 +1083,14 @@ class ironVanApp(MDApp):
 		# else:
 		# 	self.updateCounter = 0
 
+		# Lock messageBuffer
+		self.messageBufferLock = True
+
 		for key in self.messageBuffer.keys():
 			self.log.print2Debug(self, self.messageBuffer[key][0], self.messageBuffer[key][1])
+
+		# Unlock messageBuffer
+		self.messageBufferLock = False
 
 	# ---- Dialog Boxes ----
 

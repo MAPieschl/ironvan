@@ -7,11 +7,22 @@
 #### TABLE OF CONTENTS
 
 **1. General Theory**
-**n1. ADC ISR**
+**2. I2C Bus Communication**
+**3. ADC Processing**
 
 ___
 
 **1. General Theory**
+
+*Processing Loop*
+
+The lighting device will likely slow down the bus to some degree. Testing will be required to determine if the delays are acceptable. The processing loop occurs as follows:
+
+`Setup` -> `First conversion (ADC0) begins` -|
+
+`ADC ISR` <--> `I2C ISR`
+
+The ISRs should execute in the order of occurance. Except for every `ADC_SAMPLES` interval (the number of samples between the `average` - `set` - `sequence` routine), the ADC interrupts will occur about every 208us and last only a few microseconds. Contrarily, the I2C interrupt will occur at irregular intervals and will be expected to wait until the ADC interrupt processing completes, if required.
 
 *Light feedback structure*
 
@@ -1070,7 +1081,173 @@ For example, the centerline lighting is expected to draw `~2.08A` per light, or 
 
 This means that, while the UI still commands the user-selected value of a 50% duty cycle (decimal value 127), the actual value sent to the light channel is `(byte)127/1.2 = 105`, or a duty cycle of 41.1%. Applied to our power formula, this means that `12V * 5.00A(41.1%) = 24.7W`, which approximately corrects the power consumed by the lighting system back down to the value commanded by the user.
 
-**n1. ADC ISR**
+NOTE: It may be necessary to limit these corrections to 20-30% duty cycle or greater to ensure that a single noisy signal does not cause the lights to flicker.
+
+**2. I2C Bus Communication**
+
+*Request/Command Structure*
+
+v0.2.0 of all ironVan-connected devices should implement a requested-command structure whenever practical, ensuring that the control center maintains a closed communication loop with all devices. For the the light system, the following message responses will be implemented:
+
+|Type|Key (Host Side)|Code|Return Size|Return Contents|
+|---|---|---|---|---|
+|Request|`ls_1_toggle`|`0x01`|1 byte|`{ dutyCycle_ls[0] }`|
+|Request|`ls_2_toggle`|`0x02`|1 byte|`{ dutyCycle_ls[1] }`|
+|Request|`ls_3_toggle`|`0x03`|1 byte|`{ dutyCycle_ls[2] }`|
+|Request|`ls_4_toggle`|`0x04`|1 byte|`{ dutyCycle_ls[3] }`|
+|Request|`device_type`|`0x20`|14 bytes|`ltsy_b100_v020`|
+|Request|`device_status`|`0x21`|8 bytes|`{ dutyCycle_ls[0],`
+||||                                    | `adc_correction[0],`
+||||                                    | `dutyCycle_ls[1],`
+||||                                    | `adc_correction[1],`
+||||                                    | `dutyCycle_ls[2],`
+||||                                    | `adc_correction[2],`
+||||                                    | `dutyCycle_ls[3],`
+||||                                    | `adc_correction[3],}`|
+
+*I2C Bus Initialization*
+
+The Arduino `Wire.h` library is currently implemented for all I2C communications.
+
+    // ------------- I2C Setup -----------------
+
+    // -- Enable pull-up resistors on I2C line --
+
+    // 0 - pull-up resistors enabled / 1 - pull-up resistors disabled
+    MCUCR &= ~(1 << PUD);
+
+    // With DDCn set to 0 (input), 0 - pull-up disabled for pin / 1 - pull-up enabled for pin
+    PORTC |= (1 << PC5 | 1 << PC4);
+
+    // 0 - pin configured as input / 1 - pin configured as output
+    DDRC &= ~(1 << DDC5 | 1 << DDC4);
+
+    // -- Initialize I2C --
+
+    // Set device address (declared in GLOBAL CONSTANTS, above)
+    Wire.begin(DEVICE_ADDR);
+
+    // When a transmission is requested from device at DEVICE_ADDR, requestEvent() interrupt will be triggered
+    Wire.onRequest(requestEvent);
+
+*Interrupt Handling*
+
+    GLOBAL VARIABLES
+
+    GLOBAL CONSTANTS
+    const char DEVICE_TYPE[] = "ltsy_b100_v020";
+
+    void receiveEvent(int howMany)
+    {
+
+        while (Wire.available())
+        {
+            byte msg = Wire.read();
+
+            switch (msg)
+            {
+
+                // COMMAND STRUCTURE
+                // 0x01 - 0x04:  Signal the light targeted by the PWM value (10 - 255) in the second byte of the command.
+                // Default:
+                //  1. If a light has been signaled for command, the default case will assign the second byte as the PWM value to the pin.
+                //  2. If note, it will store value written by master to the global variable requestNumber. This when sending SMBus commands from the Python master script, a value is written to the slave prior to requesting a value. For example:
+                //
+                //  bus.read_i2c_block_data(8, 10, 14)
+                //
+                // This command will first write the value 10 to the slave at address 8, then request a block of data containing 14 bytes. The specific requestNumber values are broken out in requestEvent().
+                //
+                // NOTE:  The light commands (currently 0x01 - 0x04) MUST fall between the off value (0x00) and the minimum value set by the user (normally 0x0A). Otherwise, the PWM signal will not fall to the default case.
+
+                case 0x01:
+                active_LS_pin = pin_LS_1;
+                break;
+
+                case 0x02:
+                active_LS_pin = pin_LS_2;
+                break;
+
+                case 0x03:
+                active_LS_pin = pin_LS_3;
+                break;
+
+                case 0x04:
+                active_LS_pin = pin_LS_4;
+                break;
+
+                default:
+                if (active_LS_pin != 0)
+                {
+
+                    switch (active_LS_pin)
+                    {
+                    case pin_LS_1:
+                    dutyCycle_LS_1 = msg;
+                    break;
+
+                    case pin_LS_2:
+                    dutyCycle_LS_2 = msg;
+                    break;
+
+                    case pin_LS_3:
+                    dutyCycle_LS_3 = msg;
+                    break;
+
+                    case pin_LS_4:
+                    dutyCycle_LS_4 = msg;
+                    break;
+                    }
+
+                    analogWrite(active_LS_pin, msg);
+
+                    active_LS_pin = 0;
+                }
+
+                else
+                {
+                    requestNumber = msg;
+                }
+
+                break;
+                }
+            }
+        }
+
+        void requestEvent()
+        {
+            switch(requestNumber)
+            {
+                case 0x20:
+                    Wire.write(DEVICE_TYPE);
+                    break;
+                case 0x21:
+                    Wire.write({dutyCycle_LS[0],
+                                adc_correction[0],
+                                dutyCycle_LS[1],
+                                adc_correction[1],
+                                dutyCycle_LS[2],
+                                adc_correction[2],
+                                dutyCycle_LS[3],
+                                adc_correction[3]});
+                    break;
+                case 0x22:
+                    Wire.write(dutyCycle_LS[0]);
+                    break;
+                case 0x23:
+                    Wire.write(dutyCycle_LS[1]);
+                    break;
+                case 0x24:
+                    Wire.write(dutyCycle_LS[2]);
+                    break;
+                case 0x25:
+                    Wire.write(dutyCycle_LS[3]);
+                    break;
+            }
+        }
+
+**3. ADC Processing**
+
+Due to processing constraints, the ADC portion will be written directly in native C using the iom328p.h and interrupt.h files imported along with the Arduino.h header.
 
     GLOBAL VARIABLES
 
@@ -1083,6 +1260,24 @@ This means that, while the UI still commands the user-selected value of a 50% du
     GLOBAL CONSTANTS
 
     const short ADC_SAMPLES = 10;
+
+*ADC Initialization*
+
+    // AVCC voltage reference / output right aligned / begins on ADCO
+    ADMUX |= (1 << REFS0);
+
+    // ADC enabled / ADC start conversion LOW (begins when set HIGH) / Trigger disabled (single conversion mode) / Interrupt enabled / 62.5kHz clock
+    ADCSRA |= (1 << ADEN | 1 << ADIE | 1 << ADPS2 | 1 << ADPS1 | 1 << ADPS0);
+
+    // ADCSRB set to defaults - ACME disabled / ADTS ignored
+
+The majority of the setup done during initializaiton will remain throughout the processing routine. The exceptions are:
+- ADMUX: The MUX1-0 pins will be altered in sequence to address each of the 4 ADCs in use.
+- ADCSRA: The ADSC pin will be set HIGH at the end of each interrupt routine to start the next conversion.
+
+The decision was made to slow the routine by handling the interrupt, then setting the ADSC pin HIGH to start the next conversion (single conversion mode). This *may* slow the routine down when compared , but the datasheet is not clear when exactly the next conversion starts in free-running mode, so the decision will ensure that ADC sequencing and data capture occur as expected.
+
+*ADC Interrupt Handling*
 
     ISR(ADC_vect){
 
