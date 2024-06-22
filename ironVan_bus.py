@@ -579,6 +579,7 @@ class Bus():
 					)
 
 					success = self.write2MessageBuffer(app, key, f"{self.responseBuffer[key]}", 'normal')
+					print("success = ", success)
 					if(success == False):
 						print(f'Timeout occured on messageBuffer - {key}')
 
