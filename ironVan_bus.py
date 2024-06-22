@@ -577,7 +577,7 @@ class Bus():
 						self.activeDevices[device].address,
 						self.activeDevices[device].request['device_status']
 					)
-
+					print("responseBuffer = " self.responseBuffer[key])
 					success = self.write2MessageBuffer(app, key, f"{self.responseBuffer[key]}", 'normal')
 					print("success = ", success)
 					if(success == False):
