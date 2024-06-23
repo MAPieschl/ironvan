@@ -1052,20 +1052,22 @@ class ironVanApp(MDApp):
 
 			try:
 				currentDevices = []
-				deviceItems = []
+				deviceItem = None
+
 				for child in self.root.ids['settings_device_card_layout'].children:
-					currentDevices.append(child.text)
-					print(currentDevices)
+					if child.text not in self.bus.activeDevices.keys():
+						self.root.ids['settings_device_card_layout'].remove_widget(child)
+					else:
+						currentDevices.append(child.text)
 
 				for device in self.bus.activeDevices.keys():
-					deviceItems.append(
-						OneLineIconListItem(text = self.bus.activeDevices[device].name)
-					)
+					if(device not in currentDevices):
+						deviceItem = OneLineIconListItem(text = self.bus.activeDevices[device].name)
 
-					deviceItems[len(deviceItems) - 1].add_widget(IconLeftWidget(icon = self.bus.activeDevices[device].icon))
+						deviceItem.add_widget(IconLeftWidget(icon = self.bus.activeDevices[device].icon))
 
-					self.root.ids['settings_device_card_layout'].add_widget(deviceItems[len(deviceItems) - 1])
-					print(f"{device} added to list")
+						self.root.ids['settings_device_card_layout'].add_widget(deviceItem)
+						
 			except ValueError:
 				return
 			
