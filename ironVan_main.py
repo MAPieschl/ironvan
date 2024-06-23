@@ -1033,7 +1033,7 @@ class ironVanApp(MDApp):
 		# 	self.updateCounter = 0
 
 		# -- 1 second loop --
-		time.time()
+		
 		# Lock messageBuffer
 		self.messageBufferLock = True
 
@@ -1052,8 +1052,8 @@ class ironVanApp(MDApp):
 
 			try:
 				deviceItems = []
-				for child in self.root.ids['settings_device_card_layout'].children:
-					self.root.ids['settings_device_card_layout'].remove_widget(child)
+				print(self.root.ids['settings_device_card_layout'].children)
+				print(self.root.ids['settings_device_card_layout'].children)
 
 				for device in self.bus.activeDevices.keys():
 					deviceItems.append(
@@ -1067,10 +1067,13 @@ class ironVanApp(MDApp):
 			except ValueError:
 				return
 			
-		# -- 10 minute loop --
+		# -- 10 minute loop + counter increment --
 
 		if(self.stateLoopCounter % 600 == 0):
 			self.stateLoopCounter = 0
+
+		else:
+			self.stateLoopCounter += 1
 
 	def write2MessageBuffer(self, key: str, msg: str, msgType: str):
 		'''
