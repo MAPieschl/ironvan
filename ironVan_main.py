@@ -1052,12 +1052,12 @@ class ironVanApp(MDApp):
 
 			try:
 				deviceItems = []
-				for device in self.activeDevices.keys():
+				for device in self.bus.activeDevices.keys():
 					deviceItems.append(
-						OneLineIconListItem(text = self.activeDevices[device].name)
+						OneLineIconListItem(text = self.bus.activeDevices[device].name)
 					)
 
-					deviceItems[len(deviceItems) - 1].add_widget(IconLeftWidget(icon = self.activeDevices[device].icon))
+					deviceItems[len(deviceItems) - 1].add_widget(IconLeftWidget(icon = self.bus.activeDevices[device].icon))
 
 					self.root.ids['settings_device_card_layout'].add_widget(deviceItems[len(deviceItems) - 1])
 					print(f"{device} added to list")

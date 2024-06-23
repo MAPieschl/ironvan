@@ -554,7 +554,6 @@ class Bus():
 				self.activeDevices['thermostat'] = Device('thermostat', deviceType, deviceAddress[deviceType])
 		print(self.activeDevices)
 		
-		
 	def send(self, app, msgType: str, addr: int, message: int):
 		# Channel through which all commands and requests should be sent outside of the initial scan for active devicess
 		#
