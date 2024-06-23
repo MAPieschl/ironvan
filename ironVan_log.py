@@ -27,4 +27,4 @@ class Log():
                                                         height = 50))
 
         if(len(app.root.ids['debug_layout'].children) > 100):
-            app.root.ids['debug_layout'].remove_widget(app.root.ids['debug_layout'].children[0])
+            app.root.ids['debug_layout'].remove_widget(app.root.ids['debug_layout'].children[len(app.root.ids['debug_layout'].children) - 1])
