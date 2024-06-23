@@ -19,12 +19,12 @@ class Log():
             case _:
                 color = (44/255, 252/255, 3/255, 1)
 
-        app.root.ids['debug_layout'].add_widget(MDLabel(text = '[b]{}\n[/b]'.format(msg),
+        app.root.ids['debug_layout'].add_widget(MDLabel(text = '[b]{}[/b]'.format(msg),
                                                         markup = True,
                                                         theme_text_color = 'Custom',
                                                         text_color = color,
                                                         size_hint_y = None,
                                                         height = 50))
 
-        if(len(app.root.ids['debug_layout'].children) > 100):
+        if(len(app.root.ids['debug_layout'].children) > 20):
             app.root.ids['debug_layout'].remove_widget(app.root.ids['debug_layout'].children[len(app.root.ids['debug_layout'].children) - 1])

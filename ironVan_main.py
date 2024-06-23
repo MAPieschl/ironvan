@@ -1088,8 +1088,8 @@ class ironVanApp(MDApp):
 				return False
 			else:
 				continue
-		numChildren = len(self.root.ids['debug_layout'].children)
-		self.messageBuffer[key] = [f"{numChildren} {msg}", msgType]
+			
+		self.messageBuffer[key] = [f"{msg}", msgType]
 
 		return True
 
