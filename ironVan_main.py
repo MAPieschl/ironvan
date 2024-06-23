@@ -1051,8 +1051,11 @@ class ironVanApp(MDApp):
 		if(self.stateLoopCounter % 10 == 0):
 
 			try:
+				currentDevices = []
 				deviceItems = []
-				print(self.root.ids['settings_device_card_layout'].children.text)
+				for child in self.root.ids['settings_device_card_layout'].children:
+					currentDevices.append(child.text)
+					print(currentDevices)
 
 				for device in self.bus.activeDevices.keys():
 					deviceItems.append(
