@@ -612,7 +612,6 @@ class Bus():
 				activeError = True
 
 			if(time.time() + 10 >= self.lastScanTime):
-				print('Attempting scan')
 				self.scanBus(app)
 				self.lastScanTime = time.time()
 	
