@@ -553,19 +553,7 @@ class Bus():
 			elif 'temp' in deviceType and 'thermostat' not in self.activeDevices.keys():
 				self.activeDevices['thermostat'] = Device('thermostat', deviceType, deviceAddress[deviceType])
 		print(self.activeDevices)
-		try:
-			deviceItems = []
-			for device in self.activeDevices.keys():
-				deviceItems.append(
-					OneLineIconListItem(text = self.activeDevices[device].name)
-				)
-
-				deviceItems[len(deviceItems) - 1].add_widget(IconLeftWidget(icon = self.activeDevices[device].icon))
-
-				app.root.ids['settings_device_card_layout'].add_widget(deviceItems[len(deviceItems) - 1])
-				print(f"{device} added to list")
-		except ValueError:
-			return
+		
 		
 	def send(self, app, msgType: str, addr: int, message: int):
 		# Channel through which all commands and requests should be sent outside of the initial scan for active devicess
@@ -624,7 +612,7 @@ class Bus():
 				if(success == False):
 					print(f'Timeout occured on messageBuffer - {key}')
 				activeError = True
-				
+
 			print(time.time() + 10, self.lastScanTime)
 			if(time.time() + 10 >= self.lastScanTime):
 				print('Attempting scan')

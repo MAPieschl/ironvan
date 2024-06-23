@@ -822,6 +822,8 @@ class ironVanApp(MDApp):
 
 		# ---- Initialize GUI State Update ----
 
+		# The stateLoopCounter is used to subdivide updates so that only time-essential updates are made every second. The stateLoopCounter is reset at a value of 600 (~ every 10 minutes), making the minimum update frequency once every 10 minutes
+		self.stateLoopCounter = 0
 		self.stateLoop = Clock.schedule_interval(self.stateUpdate, 1)
 
 		return
@@ -1030,6 +1032,8 @@ class ironVanApp(MDApp):
 		# else:
 		# 	self.updateCounter = 0
 
+		# -- 1 second loop --
+
 		# Lock messageBuffer
 		self.messageBufferLock = True
 
@@ -1040,6 +1044,30 @@ class ironVanApp(MDApp):
 
 		# Unlock messageBuffer
 		self.messageBufferLock = False
+
+
+		# -- 10 second loop --
+
+		if(self.stateLoopCounter % 10 == 0):
+
+			try:
+				deviceItems = []
+				for device in self.activeDevices.keys():
+					deviceItems.append(
+						OneLineIconListItem(text = self.activeDevices[device].name)
+					)
+
+					deviceItems[len(deviceItems) - 1].add_widget(IconLeftWidget(icon = self.activeDevices[device].icon))
+
+					self.root.ids['settings_device_card_layout'].add_widget(deviceItems[len(deviceItems) - 1])
+					print(f"{device} added to list")
+			except ValueError:
+				return
+			
+		# -- 10 minute loop --
+
+		if(self.stateLoopCounter % 600 == 0):
+			self.stateLoopCounter = 0
 
 	def write2MessageBuffer(self, key: str, msg: str, msgType: str):
 		'''
