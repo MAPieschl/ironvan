@@ -10,6 +10,7 @@
 import asyncio
 import time
 
+from kivymd.uix.list import OneLineIconListItem, IconLeftWidget
 from kivymd.uix.label import MDLabel
 
 try:	
@@ -29,6 +30,7 @@ class Device():
 		self.address = deviceAddr
 		self.command = None
 		self.request = None
+		self.icon = None
 		self.errorCount = 0
 
 		# {gmtime: [byte_1, byte_2, ...]}
@@ -39,6 +41,8 @@ class Device():
 		
 		# --- UTILITIES ---
 		if('util' in deviceType):
+
+			self.icon = 'pipe-valve'
 
 			self.command = {
 				'water_pump_auto': [0x00],
@@ -86,6 +90,9 @@ class Device():
 					
 		# --- LIGHTING ---
 		if('ltsy' in deviceType):
+
+			self.icon = 'lightbulb-on-outline'
+
 		# Choose PCB version
 			self.command = {
 				'ls_1_toggle': [0x01],
@@ -124,6 +131,9 @@ class Device():
 
 		# --- LIGHT SWITCH & THERMOMETER ---
 		if('ltsw' in deviceType):
+
+			self.icon = 'light-switch-off'
+
 		# Choose PCB version
 		
 			if("b100" in deviceType):
@@ -157,6 +167,9 @@ class Device():
 
 		# --- THERMOSTAT ---
 		if('temp' in deviceType):
+
+			self.icon = 'thermostat'
+
 			# Choose PCB version
 			
 			if("b100" in deviceType):
@@ -539,6 +552,16 @@ class Bus():
 				self.activeDevices[f'light_switch_{deviceAddress[deviceType]}']
 			elif 'temp' in deviceType and 'thermostat' not in self.activeDevices.keys():
 				self.activeDevices['thermostat'] = Device('thermostat', deviceType, deviceAddress[deviceType])
+
+		deviceItems = []
+		for device in self.activeDevices.keys():
+			deviceItems.append(
+				OneLineIconListItem(text = self.activeDevices[device].name)
+			)
+
+			deviceItems[len(deviceItems) - 1].add_widget(IconLeftWidget(icon = self.activeDevices[device].icon))
+
+			app.root.ids['settings_device_card_layout'].add_widget(deviceItems[len(deviceItems) - 1])
 
 	def send(self, app, msgType: str, addr: int, message: int):
 		# Channel through which all commands and requests should be sent outside of the initial scan for active devicess

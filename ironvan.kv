@@ -955,6 +955,25 @@ MDFloatLayout:
                             id: settings_user_settings_fill_bottom
                             size_hint: (1, 0.7)
 
+        DeviceScreen:
+            name: 'settings_device_page'
+
+            MDFloatLayout:
+                id: settings_device_page_layout
+                size_hint: (0.95, 1)
+                pos_hint: {'center_x': 0.525, 'center_y': 0.5}
+
+                MDCard:
+                    id: settings_device_card
+                    md_bg_color: app.theme_cls.bg_darkest
+                    size_hint: (0.85, 0.9)
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                    padding: (100, 50)
+
+                    MDBoxLayout:
+                        id: settings_device_card_layout
+                        orientation: 'vertical'
+
         DebugScreen:
             name: 'settings_debug_page'
 
@@ -982,21 +1001,6 @@ MDFloatLayout:
                             size_hint_y: None
                             height: self.minimum_height
                             padding: dp(10)
-
-        DeviceScreen:
-            name: 'settings_device_page'
-
-            MDFloatLayout:
-                id: settings_device_page_layout
-                size_hint: (0.95, 1)
-                pos_hint: {'center_x': 0.525, 'center_y': 0.5}
-
-                MDCard:
-                    id: settings_device_card
-                    md_bg_color: app.theme_cls.bg_darkest
-                    size_hint: (0.85, 0.9)
-                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-                    padding: (100, 50)
 
 <Keyboard>
     orientation: 'vertical'
