@@ -1033,7 +1033,7 @@ class ironVanApp(MDApp):
 		# 	self.updateCounter = 0
 
 		# -- 1 second loop --
-
+		time.time()
 		# Lock messageBuffer
 		self.messageBufferLock = True
 
@@ -1052,6 +1052,9 @@ class ironVanApp(MDApp):
 
 			try:
 				deviceItems = []
+				for child in self.root.ids['settings_device_card_layout'].children:
+					self.root.ids['settings_device_card_layout'].remove_widget(child)
+
 				for device in self.bus.activeDevices.keys():
 					deviceItems.append(
 						OneLineIconListItem(text = self.bus.activeDevices[device].name)
