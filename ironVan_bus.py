@@ -497,6 +497,9 @@ class Bus():
 		# Dictionary -> {'deviceType_time': response}
 		self.responseBuffer = {}
 
+		# The central computer will scan the bus periodically as defined in self.scanBus. self.lastScanTime stores the time of the last scan.
+		self.lastScanTime = time.time()
+
 		# Initialize bus from location -1 on RPi
 		try:
 			self.bus = SMBus(1)
@@ -506,6 +509,10 @@ class Bus():
 			print('No active bus...')
 			return
 
+		self.scanBus('')
+
+	def scanBus(self, app):
+
 		# Stores {device type: addr}
 		deviceAddress = {}
 		
@@ -514,32 +521,24 @@ class Bus():
 				# Request device type from address (addr)
 
 				# Request 14 char DEVICE_TYPE from each address
-				deviceType = self.send('', 'request', addr, [0x20, 14])
+				deviceType = self.send(app, 'request', addr, [0x20, 14])
 
 				# Store device type defined by address if found - stored separate from self.storeDevices to allow for future development of dynamic addressing
 				if(deviceType != None):
 					deviceAddress[deviceType] = addr
 				
 			except:
-				continue	
-
-		print("Devices found on bus: ", deviceAddress)
-		print("Initializing devices...")
-
-		# Temp code -- should be replaced with subroutine that checks a log document to see if device has previously been stored, then either automatically runs the Device() setup or sends user to a GUI setup page
-		self.value = []
+				continue
 
 		for deviceType in deviceAddress:
-			if 'util' in deviceType:
+			if 'util' in deviceType and 'utilities' not in self.activeDevices.keys():
 				self.activeDevices['utilities'] = Device('utilities', deviceType, deviceAddress[deviceType])
-			elif 'ltsy' in deviceType:
+			elif 'ltsy' in deviceType and 'lighting' not in self.activeDevices.keys():
 				self.activeDevices['lighting'] = Device('lighting', deviceType, deviceAddress[deviceType])
-			elif 'ltsw' in deviceType:
+			elif 'ltsw' in deviceType and f'light_switch_{deviceAddress[deviceType]}' not in self.activeDevices.keys():
 				self.activeDevices[f'light_switch_{deviceAddress[deviceType]}']
-			elif 'temp' in deviceType:
+			elif 'temp' in deviceType and 'thermostat' not in self.activeDevices.keys():
 				self.activeDevices['thermostat'] = Device('thermostat', deviceType, deviceAddress[deviceType])
-
-		print(self.activeDevices)
 
 	def send(self, app, msgType: str, addr: int, message: int):
 		# Channel through which all commands and requests should be sent outside of the initial scan for active devicess
@@ -598,6 +597,9 @@ class Bus():
 				if(success == False):
 					print(f'Timeout occured on messageBuffer - {key}')
 				activeError = True
+
+		if(time.time() + 10 >= self.lastScanTime):
+			self.scanBus(app)
 	
 	async def parseResponses(self, app):
 		'''

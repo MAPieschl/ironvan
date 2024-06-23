@@ -680,6 +680,9 @@ class SettingsHomeScreen(Screen):
 class UserSettingsScreen(Screen):
 	pass
 
+class DeviceScreen(Screen):
+	pass
+
 class DebugScreen(Screen):
 	pass
 
@@ -975,6 +978,8 @@ class ironVanApp(MDApp):
 		match id:
 			case 'user_settings_button':
 				self.root.ids.page_manager.current = 'settings_user_settings_page'
+			case 'device_button':
+				self.root.ids.page_manager.current = 'settings_device_page'
 			case 'debug_button':
 				self.root.ids.page_manager.current = 'settings_debug_page'
 

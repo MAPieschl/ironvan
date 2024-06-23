@@ -810,7 +810,7 @@ MDFloatLayout:
 
                         MDFillRoundFlatIconButton:
                             id: user_settings_button
-                            text: 'User Settings'
+                            text: '    User Settings   '
                             icon: 'dip-switch'
                             size_hint: (0.8, 0.2)
                             pos_hint: {'center_x': 0.5, 'y': 0.75}
@@ -823,11 +823,25 @@ MDFloatLayout:
                                 app.selectSettingsScreen('user_settings_button')
                         
                         MDFillRoundFlatIconButton:
-                            id: debug_button
-                            text: 'Debug'
-                            icon: 'bug'
+                            id: device_button
+                            text: '       Devices      '
+                            icon: 'transit-connection-horizontal'
                             size_hint: (0.8, 0.2)
                             pos_hint: {'center_x': 0.5, 'y': 0.45}
+                            theme_text_color: 'Custom'
+                            text_color: app.theme_cls.accent_dark if self.theme_cls.theme_style == 'Light' else self.theme_cls.accent_light
+                            icon_color: app.theme_cls.accent_dark if self.theme_cls.theme_style == 'Light' else self.theme_cls.accent_light
+                            md_bg_color: self.theme_cls.primary_light if self.theme_cls.theme_style == 'Light' else self.theme_cls.primary_dark
+                            font_size: 48
+                            on_release:
+                                app.selectSettingsScreen('device_button')
+                        
+                        MDFillRoundFlatIconButton:
+                            id: debug_button
+                            text: '        Debug       '
+                            icon: 'bug'
+                            size_hint: (0.8, 0.2)
+                            pos_hint: {'center_x': 0.5, 'y': 0.15}
                             theme_text_color: 'Custom'
                             text_color: app.theme_cls.accent_dark if self.theme_cls.theme_style == 'Light' else self.theme_cls.accent_light
                             icon_color: app.theme_cls.accent_dark if self.theme_cls.theme_style == 'Light' else self.theme_cls.accent_light
@@ -945,12 +959,12 @@ MDFloatLayout:
             name: 'settings_debug_page'
 
             MDFloatLayout:
-                id: settings_user_settings_page_layout
+                id: settings_debug_page_layout
                 size_hint: (0.95, 1)
                 pos_hint: {'center_x': 0.525, 'center_y': 0.5}
 
                 MDCard:
-                    id: settings_user_settings_card
+                    id: settings_debug_card
                     md_bg_color: app.theme_cls.bg_darkest
                     size_hint: (0.85, 0.9)
                     pos_hint: {'center_x': 0.5, 'center_y': 0.5}
@@ -968,6 +982,21 @@ MDFloatLayout:
                             size_hint_y: None
                             height: self.minimum_height
                             padding: dp(10)
+
+        DeviceScreen:
+            name: 'settings_device_page'
+
+            MDFloatLayout:
+                id: settings_device_page_layout
+                size_hint: (0.95, 1)
+                pos_hint: {'center_x': 0.525, 'center_y': 0.5}
+
+                MDCard:
+                    id: settings_device_card
+                    md_bg_color: app.theme_cls.bg_darkest
+                    size_hint: (0.85, 0.9)
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                    padding: (100, 50)
 
 <Keyboard>
     orientation: 'vertical'
