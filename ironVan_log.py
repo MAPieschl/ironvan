@@ -25,3 +25,6 @@ class Log():
                                                         text_color = color,
                                                         size_hint_y = None,
                                                         height = 50))
+
+        if(len(app.root.ids['debug_layout'].children) > 100):
+            app.root.ids['debug_layout'].remove_widget(app.root.ids['debug_layout'].children[0])

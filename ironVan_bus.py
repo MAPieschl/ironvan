@@ -542,7 +542,7 @@ class Bus():
 				
 			except:
 				continue
-		print(deviceAddress)
+			
 		for deviceType in deviceAddress:
 			if 'util' in deviceType and 'utilities' not in self.activeDevices.keys():
 				self.activeDevices['utilities'] = Device('utilities', deviceType, deviceAddress[deviceType])
@@ -552,7 +552,6 @@ class Bus():
 				self.activeDevices[f'light_switch_{deviceAddress[deviceType]}']
 			elif 'temp' in deviceType and 'thermostat' not in self.activeDevices.keys():
 				self.activeDevices['thermostat'] = Device('thermostat', deviceType, deviceAddress[deviceType])
-		print(self.activeDevices)
 		
 	def send(self, app, msgType: str, addr: int, message: int):
 		# Channel through which all commands and requests should be sent outside of the initial scan for active devicess
@@ -612,7 +611,6 @@ class Bus():
 					print(f'Timeout occured on messageBuffer - {key}')
 				activeError = True
 
-			print(time.time() + 10, self.lastScanTime)
 			if(time.time() + 10 >= self.lastScanTime):
 				print('Attempting scan')
 				self.scanBus(app)
