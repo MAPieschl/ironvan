@@ -1089,7 +1089,7 @@ class ironVanApp(MDApp):
 			else:
 				continue
 			
-		self.messageBuffer[key] = [f"{msg}", msgType]
+		self.messageBuffer[key] = [f"{key}: {msg}", msgType]
 
 		return True
 

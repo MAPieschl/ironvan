@@ -970,9 +970,19 @@ MDFloatLayout:
                     pos_hint: {'center_x': 0.5, 'center_y': 0.5}
                     padding: (100, 50)
 
-                    MDBoxLayout:
-                        id: settings_device_card_layout
-                        orientation: 'vertical'
+
+                    MDScrollView:
+                        id: device_scroll
+                        size: (kivy.core.window.Window.width, 0.8*kivy.core.window.Window.height)
+                        do_scroll_y: True
+                        scroll_y: 1
+
+                        MDBoxLayout:
+                            id: settings_device_card_layout
+                            orientation: 'vertical'
+                            size_hint_y: None
+                            height: self.minimum_height
+                            padding: dp(10)
 
         DebugScreen:
             name: 'settings_debug_page'
