@@ -517,7 +517,8 @@ class Bus():
 				deviceType = self.send('', 'request', addr, [0x20, 14])
 
 				# Store device type defined by address if found - stored separate from self.storeDevices to allow for future development of dynamic addressing
-				deviceAddress[deviceType] = addr
+				if(deviceType != None):
+					deviceAddress[deviceType] = addr
 				
 			except:
 				continue	
