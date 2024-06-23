@@ -1014,24 +1014,6 @@ class ironVanApp(MDApp):
 
 	def stateUpdate(self, *args):
 
-		# # Update time & date
-		# if(self.userSettings.time24hr == True):
-		# 	self.root.ids['home_time_label'].text = time.strftime('%H:%M')
-		# 	self.root.ids['home_time_label'].font_style = 'H5'
-		# else:
-		# 	self.root.ids['home_time_label'].text = time.strftime('%I:%M %p')
-		# 	self.root.ids['home_time_label'].font_style = 'H6'
-
-		# 	if(self.root.ids['home_time_label'].text[0] == '0'):
-		# 		self.root.ids['home_time_label'].text = self.root.ids['home_time_label'].text[1:]
-
-		# self.root.ids['home_date_label'].text = time.strftime('%A\n %d %B %y')
-
-		# if(self.updateCounter < 3600):
-		# 	self.updateCounter += 1
-		# else:
-		# 	self.updateCounter = 0
-
 		# -- 1 second loop --
 		
 		# Lock messageBuffer
@@ -1050,6 +1032,7 @@ class ironVanApp(MDApp):
 
 		if(self.stateLoopCounter % 10 == 0):
 
+			# Update device list
 			try:
 				currentDevices = []
 				deviceItem = None
@@ -1071,6 +1054,19 @@ class ironVanApp(MDApp):
 			except ValueError:
 				return
 			
+			# Update time & date
+			if(self.userSettings.time24hr == True):
+				self.root.ids['home_time_label'].text = time.strftime('%H:%M')
+				self.root.ids['home_time_label'].font_style = 'H5'
+			else:
+				self.root.ids['home_time_label'].text = time.strftime('%I:%M %p')
+				self.root.ids['home_time_label'].font_style = 'H6'
+
+				if(self.root.ids['home_time_label'].text[0] == '0'):
+					self.root.ids['home_time_label'].text = self.root.ids['home_time_label'].text[1:]
+
+			self.root.ids['home_date_label'].text = time.strftime('%A\n %d %B %y')
+				
 		# -- 10 minute loop + counter increment --
 
 		if(self.stateLoopCounter % 600 == 0):
