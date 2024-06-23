@@ -624,11 +624,12 @@ class Bus():
 				if(success == False):
 					print(f'Timeout occured on messageBuffer - {key}')
 				activeError = True
-		print(time.time() + 10, self.lastScanTime)
-		if(time.time() + 10 >= self.lastScanTime):
-			print('Attempting scan')
-			self.scanBus(app)
-			self.lastScanTime = time.time()
+				
+			print(time.time() + 10, self.lastScanTime)
+			if(time.time() + 10 >= self.lastScanTime):
+				print('Attempting scan')
+				self.scanBus(app)
+				self.lastScanTime = time.time()
 	
 	async def parseResponses(self, app):
 		'''
