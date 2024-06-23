@@ -514,7 +514,7 @@ class Bus():
 				# Request device type from address (addr)
 
 				# Request 14 char DEVICE_TYPE from each address
-				deviceType = self.send('request', addr, [0x20, 14])
+				deviceType = self.send('', 'request', addr, [0x20, 14])
 
 				# Store device type defined by address if found - stored separate from self.storeDevices to allow for future development of dynamic addressing
 				deviceAddress[deviceType] = addr
@@ -540,7 +540,7 @@ class Bus():
 
 		print(self.activeDevices)
 
-	def send(self, msgType: str, addr: int, message: int):
+	def send(self, app, msgType: str, addr: int, message: int):
 		# Channel through which all commands and requests should be sent outside of the initial scan for active devicess
 		#
 		# Parameters:
@@ -548,14 +548,27 @@ class Bus():
 		# - addr - Device().address
 		# - message - Device().command['x_command'] or Device().request('')
 		
-		if('command' in msgType):
-			#self.bus.write_byte_data(addr, 0, message)
-			self.bus.write_i2c_block_data(addr, 0, message)
-			return 'command sent'
-		
-		elif('request' in msgType):
-			msg = self.rawMsg2Str(self.bus.read_i2c_block_data(addr, message[0], message[1]))
-			return msg
+		for i in range(0, 10):
+			try:
+				if('command' in msgType):
+					#self.bus.write_byte_data(addr, 0, message)
+					self.bus.write_i2c_block_data(addr, 0, message)
+					return 'command sent'
+				
+				elif('request' in msgType):
+					msg = self.rawMsg2Str(self.bus.read_i2c_block_data(addr, message[0], message[1]))
+					return msg
+			
+			except OSError:
+				if(app != ''):
+					if(i >= 9):
+						app.write2MessageBuffer(f"IO Error_{time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}", "IO timeout occurred - command execution failed.", "error")
+						return 'error'
+					else:
+						app.write2MessageBuffer(f"IO Error_{time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}", "IO error occurred - attempting to resend command.", "error")
+						continue
+				else:
+					continue
 		
 	def regularScan(self, app):
 		'''
@@ -567,7 +580,7 @@ class Bus():
 			try:
 				for device in self.activeDevices.keys():
 					key = f"{device}_{time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}"
-					self.responseBuffer[key] = self.send(
+					self.responseBuffer[key] = self.send(app,
 						'request',
 						self.activeDevices[device].address,
 						self.activeDevices[device].request['device_status']

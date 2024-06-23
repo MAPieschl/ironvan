@@ -207,7 +207,7 @@ class EnvFanToggleButton(ToggleButtonBehavior, MDIconButton):
 			try:
 				if self.value == 'fan_high_off':
 					print(f'Turning high fan on')
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['thermostat'].address,
 						self.app.bus.activeDevices['thermostat'].command['fan_high_on']
@@ -216,7 +216,7 @@ class EnvFanToggleButton(ToggleButtonBehavior, MDIconButton):
 					self.md_bg_color = self.app.toggleOn
 				else:
 					print('Turning high fan off')
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['thermostat'].address,
 						self.app.bus.activeDevices['thermostat'].command['fan_high_off']
@@ -239,7 +239,7 @@ class EnvCoolToggleButton(ToggleButtonBehavior, MDIconButton):
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
 				if self.value == 'ac_off':
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['thermostat'].address,
 						self.app.bus.activeDevices['thermostat'].command['ac_on']
@@ -247,7 +247,7 @@ class EnvCoolToggleButton(ToggleButtonBehavior, MDIconButton):
 					self.value = 'ac_on'
 					self.md_bg_color = self.app.toggleOn
 				else:
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['thermostat'].address,
 						self.app.bus.activeDevices['thermostat'].command['ac_off']
@@ -270,7 +270,7 @@ class EnvHeatToggleButton(ToggleButtonBehavior, MDIconButton):
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
 				if self.value == 'heat_off':
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['thermostat'].address,
 						self.app.bus.activeDevices['thermostat'].command['heat_on']
@@ -278,7 +278,7 @@ class EnvHeatToggleButton(ToggleButtonBehavior, MDIconButton):
 					self.value = 'heat_on'
 					self.md_bg_color = self.app.toggleOn
 				else:
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['thermostat'].address,
 						self.app.bus.activeDevices['thermostat'].command['heat_off']
@@ -351,7 +351,7 @@ class WSPumpToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 			try:
 				if self.value == 'water_pump_off':
 					print('Turning pump on...')
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['utilities'].address,
 						self.app.bus.activeDevices['utilities'].command['water_pump_auto']
@@ -363,7 +363,7 @@ class WSPumpToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 					self.app.root.ids['ws_pump_switch'].md_bg_color = self.app.toggleOn
 				else:
 					print('Turning pump off...')
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['utilities'].address,
 						self.app.bus.activeDevices['utilities'].command['water_pump_off']
@@ -419,7 +419,7 @@ class ShowerFanToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
 				if self.value == 'shower_fan_off':
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['utilities'].address,
 						self.app.bus.activeDevices['utilities'].command['shower_fan_auto']
@@ -427,7 +427,7 @@ class ShowerFanToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 					self.value = 'shower_fan_auto'
 					self.md_bg_color = self.app.toggleOn
 				else:
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['utilities'].address,
 						self.app.bus.activeDevices['utilities'].command['shower_fan_off']
@@ -453,7 +453,7 @@ class TankHeaterToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
 				if self.value == 'tank_heater_off':
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['utilities'].address,
 						self.app.bus.activeDevices['utilities'].command['tank_heater_auto']
@@ -461,7 +461,7 @@ class TankHeaterToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 					self.value = 'tank_heater_auto'
 					self.md_bg_color = self.app.toggleOn
 				else:
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['utilities'].address,
 						self.app.bus.activeDevices['utilities'].command['tank_heater_off']
@@ -484,7 +484,7 @@ class TankValveToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
 				if self.value == 'tank_valve_close':
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['utilities'].address,
 						self.app.bus.activeDevices['utilities'].command['tank_valve_open']
@@ -492,7 +492,7 @@ class TankValveToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 					self.value = 'tank_valve_open'
 					self.md_bg_color = self.app.toggleOn
 				else:
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['utilities'].address,
 						self.app.bus.activeDevices['utilities'].command['tank_valve_close']
@@ -520,7 +520,7 @@ class DiningLightToggleButton(ToggleButtonBehavior, MDIconButton):
 				if self.value == 'ls_1_off':
 					command = self.app.bus.activeDevices['lighting'].command['ls_1_toggle'][:]
 					command.append(int(self.app.root.ids['ls_1_slider'].value))
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['lighting'].address,
 						command
@@ -533,7 +533,7 @@ class DiningLightToggleButton(ToggleButtonBehavior, MDIconButton):
 				else:
 					command = self.app.bus.activeDevices['lighting'].command['ls_1_toggle'][:]
 					command.append(0)
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['lighting'].address,
 						command
@@ -563,7 +563,7 @@ class BedroomLightToggleButton(ToggleButtonBehavior, MDIconButton):
 				if self.value == 'ls_2_off':
 					command = self.app.bus.activeDevices['lighting'].command['ls_2_toggle'][:]
 					command.append(int(self.app.root.ids['ls_2_slider'].value))
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['lighting'].address,
 						command
@@ -575,7 +575,7 @@ class BedroomLightToggleButton(ToggleButtonBehavior, MDIconButton):
 				else:
 					command = self.app.bus.activeDevices['lighting'].command['ls_2_toggle'][:]
 					command.append(0)
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['lighting'].address,
 						command
@@ -605,7 +605,7 @@ class KitchenLightToggleButton(ToggleButtonBehavior, MDIconButton):
 				if self.value == 'ls_3_off':
 					command = self.app.bus.activeDevices['lighting'].command['ls_3_toggle'][:]
 					command.append(int(self.app.root.ids['ls_3_slider'].value))
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['lighting'].address,
 						command
@@ -617,7 +617,7 @@ class KitchenLightToggleButton(ToggleButtonBehavior, MDIconButton):
 				else:
 					command = self.app.bus.activeDevices['lighting'].command['ls_3_toggle'][:]
 					command.append(0)
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['lighting'].address,
 						command
@@ -647,7 +647,7 @@ class BathroomLightToggleButton(ToggleButtonBehavior, MDIconButton):
 				if self.value == 'ls_4_off':
 					command = self.app.bus.activeDevices['lighting'].command['ls_4_toggle'][:]
 					command.append(int(self.app.root.ids['ls_4_slider'].value))
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['lighting'].address,
 						command
@@ -659,7 +659,7 @@ class BathroomLightToggleButton(ToggleButtonBehavior, MDIconButton):
 				else:
 					command = self.app.bus.activeDevices['lighting'].command['ls_4_toggle'][:]
 					command.append(0)
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['lighting'].address,
 						command
@@ -997,7 +997,7 @@ class ironVanApp(MDApp):
 					return
 				
 			command.append(int(self.root.ids[sliderID].value))
-			self.bus.send(
+			self.bus.send(self, 
 			'command',
 			self.bus.activeDevices['lighting'].address,
 			command
