@@ -39,11 +39,11 @@ class Location():
         
     def getPublicIP(self, app):
         try:
-            response = requests.get('https://api.ipify.org')
-            publicIP = response.text.strip()
-            # publicIP = '192.168.1.3'
-            # print('ipify request skipped for testing -- reconfigure in weather.getPublicIP()')
-            # print(f'IP address hardcoded as {publicIP}')
+            # response = requests.get('https://api.ipify.org')
+            # publicIP = response.text.strip()
+            publicIP = '192.168.1.3'
+            print('ipify request skipped for testing -- reconfigure in weather.getPublicIP()')
+            print(f'IP address hardcoded as {publicIP}')
             return publicIP
         except:
             app.write2MessageBuffer(f"requestIP_{time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}", f"IP address could not be determined. Default IP set - 1.1.1.1", "error")
