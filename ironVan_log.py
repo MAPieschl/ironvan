@@ -25,5 +25,3 @@ class Log():
                                                         text_color = color,
                                                         size_hint_y = None,
                                                         height = 50))
-        
-        print(app.root.ids['debug_layout'].children)
