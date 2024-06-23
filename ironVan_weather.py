@@ -26,9 +26,9 @@ class Location():
             # self.longitude = float(response.get('data').get('location').get('longitude'))
             # self.timezone = response.get('data').get('timezone').get('id')
 
-            self.latitude = 32.33
-            self.longitude = -99.78
-            self.timezone = '-5:00'
+            self.latitude = 39.84
+            self.longitude = -84.05
+            self.timezone = '-4:00'
             print('ipify location services skipped for testing -- reconfigure in weather.getLocation()')
             print(f'Location is hardcoded as {self.latitude}, {self.longitude}, {self.timezone}')
 
