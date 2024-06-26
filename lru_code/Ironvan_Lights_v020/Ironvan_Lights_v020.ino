@@ -4,6 +4,7 @@
 
 #include <Wire.h>
 #include <Arduino.h>
+#include <avr/wdt.h>
 
 // I2C VARIABLES
 
@@ -22,7 +23,7 @@ byte requestNumber;
 
 // FEEDBACK VARIABLES
 // Sample arrays are based on gathering exactly one period of the 490Hz PWM signal, then averaging the value to determine the setting. Once averaged, the value will be converted to an 8-bit value associated with the PWM setting.
-short adc_sample_array[4][150] = {0};
+short adc_sample_array[4][10] = {0};
 
 // OUTPUT VARIABLES
 
@@ -34,6 +35,12 @@ int active_LS_pin = 0;
 
 void setup()
 {
+
+  // ------------- Begin Setup -----------------
+
+  // Disable interrupts
+  cli();
+
   // ------------- I2C Setup -----------------
 
   // -- Enable pull-up resistors on I2C line --
@@ -42,10 +49,10 @@ void setup()
   MCUCR &= ~(1 << PUD);
 
   // With DDCn set to 0 (input), 0 - pull-up disabled for pin / 1 - pull-up enabled for pin
-  PORTC |= (1 << PC5 | 1 << PC4);
+  PORTC |= (1 << PC5) | (1 << PC4);
 
   // 0 - pin configured as input / 1 - pin configured as output
-  DDRC &= ~(1 << DDC5 | 1 << DDC4);
+  DDRC &= ~(1 << DDC5) | ~(1 << DDC4);
 
   // -- Initialize I2C --
 
@@ -74,11 +81,31 @@ void setup()
   ADMUX |= (1 << REFS0);
 
   // ADC enabled / ADC start conversion LOW (begins when set HIGH) / Trigger disabled (single conversion mode) / Interrupt enabled / 62.5kHz clock
-  ADCSRA |= (1 << ADEN | 1 << ADIE | 1 << ADPS2 | 1 << ADPS1 | 1 << ADPS0);
+  ADCSRA |= (1 << ADEN) | (1 << ADIE) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
 
   // ADCSRB set to defaults - ACME disabled / ADTS ignored
 
+  // ------------- Watchdog Timer Setup -----------------
+
+  // Reset watchdog timer
+  wdt_reset();
+
+  // Clear the system reset flag
+  MCUSR &= ~(1 << WDRF);
+
+  // Begin timed changed sequence (pg 46)
+  WDTCSR |= (1 << WDCE) | (1 << WDE);
+
+  // Set prescaler value (0.5s reset timer)
+  WDTCSR |= (1 << WDE) | (1 << WDP2) | (1 << WDP0);
+
+  // ------------- Final Setup -----------------
+
+  // Enable interrupts
+  sei();
+
   // Start ADC
+  ADCSRA |= (1 << ADSC);
 }
 
 void loop()
@@ -112,19 +139,19 @@ void receiveEvent(int howMany)
       // NOTE:  The light commands (currently 0x01 - 0x04) MUST fall between the off value (0x00) and the minimum value set by the user (normally 0x0A). Otherwise, the PWM signal will not fall to the default case.
 
     case 0x01:
-      active_LS_pin = pin_LS_1;
+      active_LS_pin = pin_LS[0];
       break;
 
     case 0x02:
-      active_LS_pin = pin_LS_2;
+      active_LS_pin = pin_LS[1];
       break;
 
     case 0x03:
-      active_LS_pin = pin_LS_3;
+      active_LS_pin = pin_LS[2];
       break;
 
     case 0x04:
-      active_LS_pin = pin_LS_4;
+      active_LS_pin = pin_LS[3];
       break;
 
     default:
@@ -133,20 +160,20 @@ void receiveEvent(int howMany)
 
         switch (active_LS_pin)
         {
-        case pin_LS_1:
-          dutyCycle_LS_1 = msg;
+        case pin_LS[0]:
+          dutyCycle_LS[0] = msg;
           break;
 
-        case pin_LS_2:
-          dutyCycle_LS_2 = msg;
+        case pin_LS[1]:
+          dutyCycle_LS[1] = msg;
           break;
 
-        case pin_LS_3:
-          dutyCycle_LS_3 = msg;
+        case pin_LS[2]:
+          dutyCycle_LS[2] = msg;
           break;
 
-        case pin_LS_4:
-          dutyCycle_LS_4 = msg;
+        case pin_LS[3]:
+          dutyCycle_LS[3] = msg;
           break;
         }
 
@@ -179,6 +206,8 @@ void requestEvent()
 }
 
 // ADC Interrupt Sequences
-ISR(ADV_vect)
+ISR(ADC_vect)
 {
+  ADCSRA |= (1 << ADSC);
+  wdt_reset();
 }

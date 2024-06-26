@@ -7,9 +7,10 @@
 #### TABLE OF CONTENTS
 
 **1. General Theory**
-**2. I2C Bus Communication**
-**3. ADC Processing**
-
+**2. Fuse Settings**
+**3. I2C Bus Communication**
+**4. ADC Processing**
+**5. Watchdog Protection**
 ___
 
 **1. General Theory**
@@ -18,7 +19,7 @@ ___
 
 The lighting device will likely slow down the bus to some degree. Testing will be required to determine if the delays are acceptable. The processing loop occurs as follows:
 
-`Setup` -> `First conversion (ADC0) begins` -|
+`Setup` -> `Await control center check-in` -> `Respond to check-in` -> `First conversion (ADC0) begins` -|
 
 `ADC ISR` <--> `I2C ISR`
 
@@ -1083,7 +1084,27 @@ This means that, while the UI still commands the user-selected value of a 50% du
 
 NOTE: It may be necessary to limit these corrections to 20-30% duty cycle or greater to ensure that a single noisy signal does not cause the lights to flicker.
 
-**2. I2C Bus Communication**
+**2. Fuse Settings**
+
+*Programming*
+
+- Standard ATMEGA328P:  Fuses can be set in-system. The stock fuse settings are:
+    - High byte:  `0xD9` <-> `b11011001`
+    - Low byte:  `0x62` <-> `b01100010`
+
+- Arduino ATMEGA328P:  Must be programmed on an Arduino board due to the requirement for an external oscillator.
+    - High byte:  `0xDE` <-> `b11011110`
+    - Low byte:  `0xFF` <-> `b11111111`
+
+- Ironvan_Lights_v0.2.0 Settings
+    - High byte:  `0xDF` <-> `b11011111`
+    - Low byte:  `0xA2` <-> `b10100010`
+
+<img src = "images/fuseHighByte.png" width = 500 />
+
+<img src = "images/fuseLowByte.png" width = 500 />
+
+**3. I2C Bus Communication**
 
 *Request/Command Structure*
 
@@ -1245,7 +1266,7 @@ The Arduino `Wire.h` library is currently implemented for all I2C communications
             }
         }
 
-**3. ADC Processing**
+**4. ADC Processing**
 
 Due to processing constraints, the ADC portion will be written directly in native C using the iom328p.h and interrupt.h files imported along with the Arduino.h header.
 
@@ -1322,3 +1343,7 @@ The decision was made to slow the routine by handling the interrupt, then settin
             ADCSRA |= (1 << ADSC);
         }
     }
+
+**5. Watchdog Protection**
+
+The watchdog timer will be set to `system reset` mode to restart the device each when a timeout occurs. The watchdog timer utilizes a 128kHz clock (t = 7.8125us) and will be prescaled down to a 2Hz (t = 0.5s) to avoid unnecessary resets. The watchdog timer reset will occur each time the ADC interrupt vector is called using the `avr/wdt.h` function `wdt_reset()`, which implements the `wdr` instruction using inline assembly.
