@@ -1,15 +1,21 @@
 from datetime import datetime, date
+from kivy.clock import Clock
 import requests
 import json
+import time
 
 class Location():
     def __init__(self):
+        self.weather = Weather()
         self.api_key = 'ipb_live_FKgcNeSzddarJZyyDS22NSgfNaEtFR7lf0tx4SRM'
         self.base_url = 'https://api.ipbase.com/v2/info?apikey=ipb_live_FKgcNeSzddarJZyyDS22NSgfNaEtFR7lf0tx4SRM&ip'
 
+    def startThreadScheduler(self, app):
+        self.threadScheduler = Clock.schedule_interval(self.getLocation(app), 600)
+
     def getLocation(self, app):
 
-        publicIP = self.getPublicIP()
+        publicIP = self.getPublicIP(app)
         self.current_url = f'{self.base_url}={publicIP}'
         
         try:
@@ -19,26 +25,29 @@ class Location():
             # self.latitude = float(response.get('data').get('location').get('latitude'))
             # self.longitude = float(response.get('data').get('location').get('longitude'))
             # self.timezone = response.get('data').get('timezone').get('id')
-            self.latitude = 32.33
-            self.longitude = -99.78
-            self.timezone = '-5:00'
+
+            self.latitude = 39.84
+            self.longitude = -84.05
+            self.timezone = '-4:00'
             print('ipify location services skipped for testing -- reconfigure in weather.getLocation()')
             print(f'Location is hardcoded as {self.latitude}, {self.longitude}, {self.timezone}')
+
+            self.weather.getWeather(app)
             
         except:
-            print('No location data received -- check WiFi connection.')
+            app.write2MessageBuffer(f"locationServices_{time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}", f"No location data received -- check WiFi connection.")
             return
         
-    def getPublicIP(self):
+    def getPublicIP(self, app):
         try:
-            #response = requests.get('https://api.ipify.org')
-            #publicIP = response.text.strip()
+            # response = requests.get('https://api.ipify.org')
+            # publicIP = response.text.strip()
             publicIP = '192.168.1.3'
             print('ipify request skipped for testing -- reconfigure in weather.getPublicIP()')
             print(f'IP address hardcoded as {publicIP}')
             return publicIP
         except:
-            print('Could not locate current IP address.')
+            app.write2MessageBuffer(f"requestIP_{time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}", f"IP address could not be determined. Default IP set - 1.1.1.1", "error")
             return '1.1.1.1'
 
 class Weather():
@@ -49,7 +58,7 @@ class Weather():
         
     def getWeather(self, *args):
         app = args[0]
-        userSettings = args[1]
+        userSettings = app.userSettings
 
         currentTemp = '--'
         minTemp = '--'
@@ -63,14 +72,14 @@ class Weather():
             currentResponse = rawResponse.json()
             
             self.forecast_url = self.base_forecast_url + '&lat=' + str(app.location.latitude) + '&lon=' + str(app.location.longitude) +'&appid=' + self.api_key
-
+            
             rawResponse = requests.get(self.forecast_url)
             forecastResponse = rawResponse.json()
             
         except:
-            print('No weather data received -- check WiFi connection.')
+            app.write2MessageBuffer(f"weatherServices_{time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}", f"No weather data received -- check WiFi connection.", "error")
             return
-
+        
         # Extract and print current weather
         try:
             iconName = currentResponse.get('weather')[0].get('icon')
@@ -81,7 +90,7 @@ class Weather():
             location = currentResponse.get('name')
 
         except:
-            print('Weather data received; error extracting data.')
+            app.write2MessageBuffer(f"weatherServices_{time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}", f"Weather data received - error extracting data.", "error")
 
         # Extract and print forecasted weather
         
@@ -97,7 +106,7 @@ class Weather():
                     forecastList[systemDate] = DailyForecast(forecast, userSettings)
 
         except:
-            print('Forecast data received; error extracting data.')
+            app.write2MessageBuffer(f"weatherServices_{time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}", f"Forecast data received - error extracting data.", "error")
 
         app.root.ids['outside_temp_quick_label'].text = f'{currentTemp}' + u'\N{DEGREE SIGN}'
         app.root.ids['weather_icon'].source = iconURL
@@ -116,8 +125,7 @@ class Weather():
                 if(int(temp) > newHigh):
                     app.root.ids['high_temp_quick_label'].text = f'{maxTemp}' + u'\N{DEGREE SIGN}'
         except:
-            print('Could not extract min/max temperature from forecast data.')
-            
+            app.write2MessageBuffer(f"weatherServices_{time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}", f"Could not extract min/max temperature from weather data.", "error")
 
 class DailyForecast():
     def __init__(self, forecast, userSettings):

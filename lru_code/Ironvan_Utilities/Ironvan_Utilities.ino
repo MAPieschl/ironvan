@@ -72,12 +72,12 @@ void receiveEvent(int howMany)
       // This command will first write the value 10 to the slave at address 8, then request a block of data containing 14 bytes. The specific requestNumber values are broken out in requestEvent().
 
     case 0x00:
-      // Turns water pump ON (PUMP_OV must be shorted)
+      // Turns water pump ON
       digitalWrite(12, HIGH);
       break;
 
     case 0x01:
-      // Turns water pump OFF (regardless of state of PUMP_OV)
+      // Turns water pump OFF
       digitalWrite(12, LOW);
       break;
 

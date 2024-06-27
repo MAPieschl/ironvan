@@ -17,6 +17,7 @@ from kivymd.uix.floatlayout import MDFloatLayout
 from kivymd.uix.relativelayout import MDRelativeLayout
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.behaviors.toggle_behavior import MDToggleButton
+from kivymd.uix.label import MDLabel
 
 import ironVan_log as ivLog
 import ironVan_bus as ivBus
@@ -25,6 +26,8 @@ import ironVan_wifi as network
 import ironVan_settings as settings
 
 import time
+import subprocess
+import threading
 
 class appElementIDs():
 	"""
@@ -37,8 +40,6 @@ class appElementIDs():
 		self.labels = [
 			'fresh_water_label',
 			'grey_water_label',
-			'fresh_water_quick_label',
-			'grey_water_quick_label',
 			'settings_user_settings_title_icon',
 			'settings_user_settings_title',
 			'settings_user_settings_temp_select_label',
@@ -197,31 +198,32 @@ class EnvFanToggleButton(ToggleButtonBehavior, MDIconButton):
 	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
 		self.app = ironVanApp.get_running_app()
-		self.value = 'fan_low_off'
+		self.value = 'fan_high_off'
 		#self.set_disabled(True)
 
 	def on_state(self, instance, value):
-		if value == 'normal' and time.time() >= self.app.buttonReset:
+		if (value == 'normal' and time.time() >= self.app.buttonReset) or value == 'override':
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
-				if self.value == 'fan_low_off':
-					print(f'Turning on...{self.value}')
-					self.app.bus.send(
+				if self.value == 'fan_high_off':
+					print(f'Turning high fan on')
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['thermostat'].address,
-						self.app.bus.activeDevices['thermostat'].command[self.value]
+						self.app.bus.activeDevices['thermostat'].command['fan_high_on']
 					)
-					self.value = 'fan_low_on'
+					self.value = 'fan_high_on'
 					self.md_bg_color = self.app.toggleOn
 				else:
-					self.app.bus.send(
+					print('Turning high fan off')
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['thermostat'].address,
-						self.app.bus.activeDevices['thermostat'].command[self.value]
+						self.app.bus.activeDevices['thermostat'].command['fan_high_off']
 					)
-					self.value = 'fan_low_off'
+					self.value = 'fan_high_off'
 					self.md_bg_color = self.app.toggleOff
-			except KeyError:
+			except:
 					self.app.noDeviceFound_dialog('Fan')
 
 class EnvCoolToggleButton(ToggleButtonBehavior, MDIconButton):
@@ -233,22 +235,22 @@ class EnvCoolToggleButton(ToggleButtonBehavior, MDIconButton):
 		#self.set_disabled(True)
 
 	def on_state(self, instance, value):
-		if value == 'normal' and time.time() >= self.app.buttonReset:
+		if (value == 'normal' and time.time() >= self.app.buttonReset) or value == 'override':
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
 				if self.value == 'ac_off':
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['thermostat'].address,
-						self.app.bus.activeDevices['thermostat'].command[self.value]
+						self.app.bus.activeDevices['thermostat'].command['ac_on']
 					)
 					self.value = 'ac_on'
 					self.md_bg_color = self.app.toggleOn
 				else:
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['thermostat'].address,
-						self.app.bus.activeDevices['thermostat'].command[self.value]
+						self.app.bus.activeDevices['thermostat'].command['ac_off']
 					)
 					self.value = 'ac_off'
 					self.md_bg_color = self.app.toggleOff
@@ -264,22 +266,22 @@ class EnvHeatToggleButton(ToggleButtonBehavior, MDIconButton):
 		#self.set_disabled(True)
 
 	def on_state(self, instance, value):
-		if value == 'normal' and time.time() >= self.app.buttonReset:
+		if (value == 'normal' and time.time() >= self.app.buttonReset) or value == 'override':
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
 				if self.value == 'heat_off':
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['thermostat'].address,
-						self.app.bus.activeDevices['thermostat'].command[self.value]
+						self.app.bus.activeDevices['thermostat'].command['heat_on']
 					)
 					self.value = 'heat_on'
 					self.md_bg_color = self.app.toggleOn
 				else:
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['thermostat'].address,
-						self.app.bus.activeDevices['thermostat'].command[self.value]
+						self.app.bus.activeDevices['thermostat'].command['heat_off']
 					)
 					self.value = 'heat_off'
 					self.md_bg_color = self.app.toggleOff
@@ -343,14 +345,16 @@ class WSPumpToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 		self.set_disabled(False)
 
 	def on_state(self, instance, value):
-		if value == 'normal' and time.time() >= self.app.buttonReset:
+		if (value == 'normal' and time.time() >= self.app.buttonReset) or value == 'override':
+			print('Entered water pump on_state()')
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
 				if self.value == 'water_pump_off':
-					self.app.bus.send(
+					print('Turning pump on...')
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['utilities'].address,
-						self.app.bus.activeDevices['utilities'].command[self.value]
+						self.app.bus.activeDevices['utilities'].command['water_pump_auto']
 					)
 					self.app.root.ids['ws_pump_quick_switch'].value = 'water_pump_auto'
 					self.app.root.ids['ws_pump_quick_switch'].md_bg_color = self.app.toggleOn
@@ -358,10 +362,11 @@ class WSPumpToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 					self.app.root.ids['ws_pump_switch'].value = 'water_pump_auto'
 					self.app.root.ids['ws_pump_switch'].md_bg_color = self.app.toggleOn
 				else:
-					self.app.bus.send(
+					print('Turning pump off...')
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['utilities'].address,
-						self.app.bus.activeDevices['utilities'].command[self.value]
+						self.app.bus.activeDevices['utilities'].command['water_pump_off']
 					)
 					self.app.root.ids['ws_pump_quick_switch'].value = 'water_pump_off'
 					self.app.root.ids['ws_pump_quick_switch'].md_bg_color = self.app.toggleOff
@@ -383,7 +388,7 @@ class WSHeaterToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 		self.set_disabled(True)
 
 	def on_state(self, instance, value):
-		if value == 'normal' and time.time() >= self.app.buttonReset:
+		if (value == 'normal' and time.time() >= self.app.buttonReset) or value == 'override':
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			if self.value == 'water_heater_off':
 					self.app.root.ids['ws_heater_quick_switch'].value = 'water_heater_auto'
@@ -410,22 +415,22 @@ class ShowerFanToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 		self.set_disabled(False)
 
 	def on_state(self, instance, value):
-		if value == 'normal' and time.time() >= self.app.buttonReset:
+		if (value == 'normal' and time.time() >= self.app.buttonReset) or value == 'override':
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
 				if self.value == 'shower_fan_off':
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['utilities'].address,
-						self.app.bus.activeDevices['utilities'].command[self.value]
+						self.app.bus.activeDevices['utilities'].command['shower_fan_auto']
 					)
 					self.value = 'shower_fan_auto'
 					self.md_bg_color = self.app.toggleOn
 				else:
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['utilities'].address,
-						self.app.bus.activeDevices['utilities'].command[self.value]
+						self.app.bus.activeDevices['utilities'].command['shower_fan_off']
 					)
 					self.value = 'shower_fan_off'
 					self.md_bg_color = self.app.toggleOff
@@ -444,22 +449,22 @@ class TankHeaterToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 		self.set_disabled(False)
 
 	def on_state(self, instance, value):
-		if value == 'normal' and time.time() >= self.app.buttonReset:
+		if (value == 'normal' and time.time() >= self.app.buttonReset) or value == 'override':
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
 				if self.value == 'tank_heater_off':
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['utilities'].address,
-						self.app.bus.activeDevices['utilities'].command[self.value]
+						self.app.bus.activeDevices['utilities'].command['tank_heater_auto']
 					)
 					self.value = 'tank_heater_auto'
 					self.md_bg_color = self.app.toggleOn
 				else:
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['utilities'].address,
-						self.app.bus.activeDevices['utilities'].command[self.value]
+						self.app.bus.activeDevices['utilities'].command['tank_heater_off']
 					)
 					self.value = 'tank_heater_off'
 					self.md_bg_color = self.app.toggleOff
@@ -471,28 +476,28 @@ class TankValveToggleButton(ToggleButtonBehavior, MDFillRoundFlatButton):
 	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
 		self.app = ironVanApp.get_running_app()
-		self.value = 'tank_valve_off'
+		self.value = 'tank_valve_close'
 		self.set_disabled(False)
 
 	def on_state(self, instance, value):
-		if value == 'normal' and time.time() >= self.app.buttonReset:
+		if (value == 'normal' and time.time() >= self.app.buttonReset) or value == 'override':
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
-				if self.value == 'tank_valve_off':
-					self.app.bus.send(
+				if self.value == 'tank_valve_close':
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['utilities'].address,
-						self.app.bus.activeDevices['utilities'].command[self.value]
+						self.app.bus.activeDevices['utilities'].command['tank_valve_open']
 					)
-					self.value = 'tank_valve_auto'
+					self.value = 'tank_valve_open'
 					self.md_bg_color = self.app.toggleOn
 				else:
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['utilities'].address,
-						self.app.bus.activeDevices['utilities'].command[self.value]
+						self.app.bus.activeDevices['utilities'].command['tank_valve_close']
 					)
-					self.value = 'tank_valve_off'
+					self.value = 'tank_valve_close'
 					self.md_bg_color = self.app.toggleOff
 			except KeyError:
 					self.app.noDeviceFound_dialog('Grey tank dump valve')
@@ -506,17 +511,16 @@ class DiningLightToggleButton(ToggleButtonBehavior, MDIconButton):
 		super().__init__(**kwargs)
 		self.app = ironVanApp.get_running_app()
 		self.value = 'ls_1_off'
-		#self.set_disabled(True)
+		self.set_disabled(False)
 
 	def on_state(self, instance, value):
-		if value == 'normal' and time.time() >= self.app.buttonReset:
+		if (value == 'normal' and time.time() >= self.app.buttonReset) or value == 'override':
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
 				if self.value == 'ls_1_off':
-					print(self.app.bus.activeDevices['lighting'].command)
 					command = self.app.bus.activeDevices['lighting'].command['ls_1_toggle'][:]
 					command.append(int(self.app.root.ids['ls_1_slider'].value))
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['lighting'].address,
 						command
@@ -529,7 +533,7 @@ class DiningLightToggleButton(ToggleButtonBehavior, MDIconButton):
 				else:
 					command = self.app.bus.activeDevices['lighting'].command['ls_1_toggle'][:]
 					command.append(0)
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['lighting'].address,
 						command
@@ -550,16 +554,16 @@ class BedroomLightToggleButton(ToggleButtonBehavior, MDIconButton):
 		super().__init__(**kwargs)
 		self.app = ironVanApp.get_running_app()
 		self.value = 'ls_2_off'
-		#self.set_disabled(True)
+		self.set_disabled(False)
 
 	def on_state(self, instance, value):
-		if value == 'normal' and time.time() >= self.app.buttonReset:
+		if (value == 'normal' and time.time() >= self.app.buttonReset) or value == 'override':
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
 				if self.value == 'ls_2_off':
 					command = self.app.bus.activeDevices['lighting'].command['ls_2_toggle'][:]
 					command.append(int(self.app.root.ids['ls_2_slider'].value))
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['lighting'].address,
 						command
@@ -571,7 +575,7 @@ class BedroomLightToggleButton(ToggleButtonBehavior, MDIconButton):
 				else:
 					command = self.app.bus.activeDevices['lighting'].command['ls_2_toggle'][:]
 					command.append(0)
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['lighting'].address,
 						command
@@ -592,16 +596,16 @@ class KitchenLightToggleButton(ToggleButtonBehavior, MDIconButton):
 		super().__init__(**kwargs)
 		self.app = ironVanApp.get_running_app()
 		self.value = 'ls_3_off'
-		#self.set_disabled(True)
+		self.set_disabled(False)
 
 	def on_state(self, instance, value):
-		if value == 'normal' and time.time() >= self.app.buttonReset:
+		if (value == 'normal' and time.time() >= self.app.buttonReset) or value == 'override':
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
 				if self.value == 'ls_3_off':
 					command = self.app.bus.activeDevices['lighting'].command['ls_3_toggle'][:]
 					command.append(int(self.app.root.ids['ls_3_slider'].value))
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['lighting'].address,
 						command
@@ -613,7 +617,7 @@ class KitchenLightToggleButton(ToggleButtonBehavior, MDIconButton):
 				else:
 					command = self.app.bus.activeDevices['lighting'].command['ls_3_toggle'][:]
 					command.append(0)
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['lighting'].address,
 						command
@@ -634,16 +638,16 @@ class BathroomLightToggleButton(ToggleButtonBehavior, MDIconButton):
 		super().__init__(**kwargs)
 		self.app = ironVanApp.get_running_app()
 		self.value = 'ls_4_off'
-		#self.set_disabled(True)
+		self.set_disabled(False)
 
 	def on_state(self, instance, value):
-		if value == 'normal' and time.time() >= self.app.buttonReset:
+		if (value == 'normal' and time.time() >= self.app.buttonReset) or value == 'override':
 			self.app.buttonReset = time.time() + self.app.buttonDelay
 			try:
 				if self.value == 'ls_4_off':
 					command = self.app.bus.activeDevices['lighting'].command['ls_4_toggle'][:]
 					command.append(int(self.app.root.ids['ls_4_slider'].value))
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['lighting'].address,
 						command
@@ -655,7 +659,7 @@ class BathroomLightToggleButton(ToggleButtonBehavior, MDIconButton):
 				else:
 					command = self.app.bus.activeDevices['lighting'].command['ls_4_toggle'][:]
 					command.append(0)
-					self.app.bus.send(
+					self.app.bus.send(self.app, 
 						'command',
 						self.app.bus.activeDevices['lighting'].address,
 						command
@@ -674,6 +678,12 @@ class SettingsHomeScreen(Screen):
 	pass
 
 class UserSettingsScreen(Screen):
+	pass
+
+class DeviceScreen(Screen):
+	pass
+
+class DebugScreen(Screen):
 	pass
 
 class LSHomeScreen(Screen):
@@ -738,9 +748,7 @@ class ironVanApp(MDApp):
 	appIDs = appElementIDs()
 	log = ivLog.Log()
 	bus = ivBus.Bus(log)
-
 	location = weather.Location()
-	weather = weather.Weather()
 	wifi = network.Wifi()
 	userSettings = settings.UserSettings()
 
@@ -751,7 +759,10 @@ class ironVanApp(MDApp):
 		# Note:  When uncommenting Window.fullscreen, ensure to delete comment out `size: (700, 480)` in the .kv file.
 		Window.fullscreen = 'auto'
 		
+
 		# ---- Build App Theme ----
+
+		# self.switchThemes() (below) is used to toggle between themes
 
 		# Custom variables to hold color themes
 		self.lightPrimary = 'Teal'
@@ -767,6 +778,12 @@ class ironVanApp(MDApp):
 		self.theme_cls.accent_light_hue = '300'
 		self.theme_cls.accent_dark_hue = '800'
 
+		self.toggleOn = self.theme_cls.primary_light
+		self.toggleOff = self.theme_cls.accent_light
+
+
+		# ---- Initialize Debounce Functionality ----
+
 		# Master reset for allowing button presses - used globally for debouncing
 		# Note:  every button that uses buttonReset MUST reset self.buttonReset after use
 
@@ -774,8 +791,8 @@ class ironVanApp(MDApp):
 		self.buttonDelay = 0.25
 		self.buttonReset = time.time() + self.buttonDelay
 
-		self.toggleOn = self.theme_cls.primary_light
-		self.toggleOff = self.theme_cls.accent_light
+
+		# ---- Build Dialog Boxes ----
 
 		# All pop-up windows must be instantiated under the self.dialogBox object to ensure that dialog boxes do not stack
 		self.dialogBox = None
@@ -783,15 +800,31 @@ class ironVanApp(MDApp):
 		# The keyboard is a special type of dialog box and will be instantiated under self.keyboard
 		self.keyboard = None
 
-		self.userSettings.initUserSettings(self)
-		self.location.getLocation(self)
-		
-		Clock.schedule_interval(self.stateUpdate, 10)
 
-		# Initialize bus scan
-		# if(len(self.bus.activeDevices) != 0):
-		# 	Clock.schedule_interval(self.bus.regularScan, 1)
-		# 	Clock.schedule_interval(self.bus.parseResponses, 1)
+		# ---- Initialize User Settings ----
+
+		self.userSettings.initUserSettings(self)
+
+		# ---- Initiate Background Threads ----
+
+		# messageBuffer holds messages to be printed to the debug frame within the main app thread. Messages are added to the message buffer by outside threads, then handled within the main thread using the stateUpdate() method. Format is messageBuffer[device_gmtime] = {[msg, msgType]}, where msgType is 'normal' or 'error' and effects the color of the line printout in the debug frame. When messageBufferLock is set to True in self.stateUpdate(), the message buffer writing function (bus.write2MessageBuffer) will pause processing on the bus thread to ensure the size & contents of the messageBuffer do not change while being read.
+		self.messageBuffer = {}
+		self.messageBufferLock = False
+
+		bus_thread = threading.Thread(target = self.bus.regularScan, args = (self,), name = 'bus_thread', daemon = True)
+		bus_thread.start()
+
+		wifi_thread = threading.Thread(target = self.wifi.updateWifi, args = (self,), name = 'wifi_thread', daemon = True)
+		wifi_thread.start()
+
+		location_thread = threading.Thread(target = self.location.getLocation, args = (self, ), name = 'weather_thread', daemon = True)
+		location_thread.start()
+
+		# ---- Initialize GUI State Update ----
+
+		# The stateLoopCounter is used to subdivide updates so that only time-essential updates are made every second. The stateLoopCounter is reset at a value of 600 (~ every 10 minutes), making the minimum update frequency once every 10 minutes
+		self.stateLoopCounter = 0
+		self.stateLoop = Clock.schedule_interval(self.stateUpdate, 1)
 
 		return
 
@@ -945,8 +978,12 @@ class ironVanApp(MDApp):
 
 	def selectSettingsScreen(self, id):
 		match id:
-			case user_settings_screen:
+			case 'user_settings_button':
 				self.root.ids.page_manager.current = 'settings_user_settings_page'
+			case 'device_button':
+				self.root.ids.page_manager.current = 'settings_device_page'
+			case 'debug_button':
+				self.root.ids.page_manager.current = 'settings_debug_page'
 
 	def lightingAdjust(self, *args):
 		value = args[1]
@@ -967,7 +1004,7 @@ class ironVanApp(MDApp):
 					return
 				
 			command.append(int(self.root.ids[sliderID].value))
-			self.bus.send(
+			self.bus.send(self, 
 			'command',
 			self.bus.activeDevices['lighting'].address,
 			command
@@ -976,58 +1013,85 @@ class ironVanApp(MDApp):
 			self.noDeviceFound_dialog('Light')
 
 	def stateUpdate(self, *args):
-		'''
-		This function runs {asynchronously - intended...currently running synchronously} in the main build() function at some defined interval, updating the following items:
 
-		- Wi-Fi signal
-		- Weather update
-		- Time/date update
+		# -- 1 second loop --
+		
+		# Lock messageBuffer
+		self.messageBufferLock = True
 
-		'''
-		# Check/update Wi-Fi signal
-		self.wifi.networkStatus = self.wifi.parseWifiStatus()
-		try:
-			if(self.wifi.networkStatus['SSID'] != ''):
-				if(int(self.wifi.networkStatus['agrCtlRSSI']) > -50):
-					self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-4'
-				elif(int(self.wifi.networkStatus['agrCtlRSSI']) > -70):
-					self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-3'
-				elif(int(self.wifi.networkStatus['agrCtlRSSI']) > -90):
-					self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-2'
-				else:
-					self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-1'
+		for key in self.messageBuffer.keys():
+			self.log.print2Debug(self, self.messageBuffer[key][0], self.messageBuffer[key][1])
 
-			else:
-				self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-off-outline'
+		self.messageBuffer = {}
+
+		# Unlock messageBuffer
+		self.messageBufferLock = False
+
+
+		# -- 10 second loop --
+
+		if(self.stateLoopCounter % 10 == 0):
+
+			# Update device list
+			try:
+				currentDevices = []
+				deviceItem = None
+
+				for child in self.root.ids['settings_device_card_layout'].children:
+					if child.text not in self.bus.activeDevices.keys():
+						self.root.ids['settings_device_card_layout'].remove_widget(child)
+					else:
+						currentDevices.append(child.text)
+
+				for device in self.bus.activeDevices.keys():
+					if(device not in currentDevices):
+						deviceItem = OneLineIconListItem(text = self.bus.activeDevices[device].name)
+
+						deviceItem.add_widget(IconLeftWidget(icon = self.bus.activeDevices[device].icon))
+
+						self.root.ids['settings_device_card_layout'].add_widget(deviceItem)
+						
+			except ValueError:
+				return
 			
-			self.root.ids['wifi_quick_switch'].md_bg_color = self.toggleOn
+			# Update time & date
+			if(self.userSettings.time24hr == True):
+				self.root.ids['home_time_label'].text = time.strftime('%H:%M')
+				self.root.ids['home_time_label'].font_style = 'H5'
+			else:
+				self.root.ids['home_time_label'].text = time.strftime('%I:%M %p')
+				self.root.ids['home_time_label'].font_style = 'H6'
 
-			self.root.ids['wifi_quick_switch'].value = 'wifi_on'
+				if(self.root.ids['home_time_label'].text[0] == '0'):
+					self.root.ids['home_time_label'].text = self.root.ids['home_time_label'].text[1:]
 
-		except TypeError:
-			self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-alert-outline'
-			self.root.ids['wifi_quick_switch'].md_bg_color = self.toggleOn
+			self.root.ids['home_date_label'].text = time.strftime('%A\n %d %B %y')
+				
+		# -- 10 minute loop + counter increment --
 
-		except KeyError:
-			self.root.ids['wifi_quick_switch'].icon = 'wifi-strength-off-outline'
-			self.root.ids['wifi_quick_switch'].md_bg_color = self.toggleOff
-			self.root.ids['wifi_quick_switch'].value = 'wifi_off'
+		if(self.stateLoopCounter % 600 == 0):
+			self.stateLoopCounter = 0
 
-		# Update weather solution
-		self.weather.getWeather(self, self.userSettings)
-
-		# Update time & date
-		if(self.userSettings.time24hr == True):
-			self.root.ids['home_time_label'].text = time.strftime('%H:%M')
-			self.root.ids['home_time_label'].font_style = 'H5'
 		else:
-			self.root.ids['home_time_label'].text = time.strftime('%I:%M %p')
-			self.root.ids['home_time_label'].font_style = 'H6'
+			self.stateLoopCounter += 1
 
-			if(self.root.ids['home_time_label'].text[0] == '0'):
-				self.root.ids['home_time_label'].text = self.root.ids['home_time_label'].text[1:]
+	def write2MessageBuffer(self, key: str, msg: str, msgType: str):
+		'''
+		Writes msg to the messageBuffer. Use of this function is required to protect the messageBuffer from changing sizes while being parsed.
 
-		self.root.ids['home_date_label'].text = time.strftime('%A\n %d %B %y')
+		Returns True if the message was added successfully and False if a timeout occured
+		'''
+		timeoutStart = time.time()
+		while(self.messageBufferLock == True):
+			if(time.time() >= timeoutStart + 10):
+				print(f'Timeout occured on messageBuffer - {key}')
+				return False
+			else:
+				continue
+			
+		self.messageBuffer[key] = [f"{key}: {msg}", msgType]
+
+		return True
 
 	# ---- Dialog Boxes ----
 
@@ -1165,6 +1229,32 @@ class ironVanApp(MDApp):
 					MDFillRoundFlatButton(
 						text = 'Submit',
 						on_release=lambda x: self.checkIfPasswordProtected(ssid, True)
+					)
+				]
+			)
+
+			self.dialogBox.open()
+
+	def closeApp(tag: str):
+		subprocess.run(["sudo", "shutdown", tag, "now"])
+	
+	def power_dialog(self, obj):
+		if not self.dialogBox:
+			self.dialogBox = MDDialog(
+				title = 'How would you like to power down?',
+				type = 'simple',
+				buttons = [
+					MDRoundFlatButton(
+						text = 'Cancel',
+						on_release = self.closeDialogBox
+					),
+					MDFillRoundFlatButton(
+						text = 'Restart',
+						on_release = lambda x: self.closeApp('-r')
+					),
+					MDFillRoundFlatButton(
+						text = 'Shutdown',
+						on_release = lambda x: self.closeApp('')
 					)
 				]
 			)
@@ -1425,4 +1515,5 @@ class ironVanApp(MDApp):
 			self.keyboard.dismiss()
 			self.keyboard = None
 
-ironVanApp().run()
+if __name__ == '__main__':
+	ironVanApp().run()
