@@ -18,20 +18,59 @@ const byte DEVICE_ADDR = 0x09;
 // NOTE:  All DEVICE_TYPE strings will be 14 bytes (ASCII)
 const char DEVICE_TYPE[] = "ltsy_b100_v020";
 
-// Request number used to determine what value to return to the master. Value is set in receiveEvent() and used in requestEvent(). DEFAULT:  Send DEVICE_TYPE
+// Initial check-in (false - awaiting // true - complete)
+bool check_in = false;
+
+// Request number used to determine what value to return to the master. Value is set in receiveEvent() and used in requestEvent().
 byte requestNumber;
 
 // FEEDBACK VARIABLES
-// Sample arrays are based on gathering exactly one period of the 490Hz PWM signal, then averaging the value to determine the setting. Once averaged, the value will be converted to an 8-bit value associated with the PWM setting.
-short adc_sample_array[4][10] = {0};
+const short ADC_SAMPLES = 10;
+short adc_sample_array[4][ADC_SAMPLES] = {0};
+short adc_sample_ave[4] = {0};
+short adc_on_nominal[4] = {0};
+float adc_correction[4] = {1};
+short sample_num = 0;
 
 // OUTPUT VARIABLES
-
 const int pin_LS[4] = {11, 10, 9, 8};
 byte dutyCycle_LS[4] = {191, 191, 191, 191}; // Current duty cycle -> 0 = 0% & 255 = 100%
+byte corrected_dutyCycle_LS[4] = {191, 191, 191, 191};
 
 //   pin_LS_n currently selected by I2C command
 int active_LS_pin = 0;
+
+void calibrationSequence()
+{
+  // Set all light circuits to 100% duty cycle
+  analogWrite(pin_LS[0], 255);
+  analogWrite(pin_LS[1], 255);
+  analogWrite(pin_LS[2], 255);
+  analogWrite(pin_LS[3], 255);
+
+  // Start ADC
+  ADCSRA |= (1 << ADSC);
+
+  // Wait 0.25 seconds for calibration to complete
+  delay(250);
+
+  // Stop ADC
+  ADCSRA &= ~(1 << ADSC);
+
+  // Turn off lights and await control center check-in
+  analogWrite(pin_LS[0], 0);
+  analogWrite(pin_LS[1], 0);
+  analogWrite(pin_LS[2], 0);
+  analogWrite(pin_LS[3], 0);
+
+  // Reset and stop watchdog timer to await check-in
+  wdt_reset();
+
+  if (check_in == false)
+  {
+    WDTCSR &= ~(1 << WDE);
+  }
+}
 
 void setup()
 {
@@ -68,10 +107,10 @@ void setup()
   // ------------- Lighting Output Setup -----------------
 
   // OUTPUT PIN INITIALIZATION
-  pinMode(pin_LS_1, OUTPUT);
-  pinMode(pin_LS_2, OUTPUT);
-  pinMode(pin_LS_3, OUTPUT);
-  pinMode(pin_LS_4, OUTPUT);
+  pinMode(pin_LS[0], OUTPUT);
+  pinMode(pin_LS[1], OUTPUT);
+  pinMode(pin_LS[2], OUTPUT);
+  pinMode(pin_LS[3], OUTPUT);
 
   // ------------- Feedback ADC Setup -----------------
 
@@ -104,8 +143,8 @@ void setup()
   // Enable interrupts
   sei();
 
-  // Start ADC
-  ADCSRA |= (1 << ADSC);
+  // Run calibration sequence
+  calibrationSequence();
 }
 
 void loop()
@@ -198,16 +237,104 @@ void requestEvent()
   {
   case 0x20:
     Wire.write(DEVICE_TYPE);
+    WDTSR |= (1 << WDE);
     break;
-    //    case 0x21:
-    //        Wire.write({pin_ADC3_LS_1, pin_ADC2_LS_2, pin_ADC1_LS_3, pin_ADC0_LS_4});
-    //        break;
+  case 0x21:
+    Wire.write({dutyCycle_LS[0],
+                corrected_dutyCycle_LS[0],
+                dutyCycle_LS[1],
+                corrected_dutyCycle_LS[1],
+                dutyCycle_LS[2],
+                corrected_dutyCycle_LS[2],
+                dutyCycle_LS[3],
+                corrected_dutyCycle_LS[3]});
+    break;
+  case 0x22:
+    Wire.write(dutyCycle_LS[0]);
+    break;
+  case 0x23:
+    Wire.write(dutyCycle_LS[1]);
+    break;
+  case 0x24:
+    Wire.write(dutyCycle_LS[2]);
+    break;
+  case 0x25:
+    Wire.write(dutyCycle_LS[3]);
+    break;
   }
+  wdt_reset();
 }
 
 // ADC Interrupt Sequences
 ISR(ADC_vect)
 {
-  ADCSRA |= (1 << ADSC);
-  wdt_reset();
+  byte current_adc = ADMUX & 0b00000011;
+  adc_sample_array[current_adc][sample_num] = (ADCH << 8) + ADCL;
+
+  if (sample_num >= ADC_SAMPLES)
+  {
+    // Esnure ADC is stopped
+    ADCSRA &= ~(1 << ADSC);
+
+    // Compute and send correction
+    int num_samples_on = 0;
+    int sample_accumulator = 0;
+
+    for (byte i = 0; i < ADC_SAMPLES; i++)
+    {
+      if (adc_sample_array[current_adc][i] > 50)
+      {
+        // Assumes that any value 0.5A read across the sense resistor means that the circuit is "on"
+
+        sample_accumulator += adc_sample_array[current_adc][i];
+        num_samples_on += 1;
+      }
+    }
+
+    if (num_samples_on != 0)
+    {
+      adc_sample_ave[current_adc] = sample_accumulator / num_samples_on;
+
+      if (adc_on_nominal[current_adc] != 0)
+      {
+        adc_correction[current_adc] = adc_sample_ave[current_adc] / adc_on_nominal[current_adc];
+      }
+      else
+      {
+        adc_on_nominal[current_adc] = adc_sample_ave[current_adc];
+      }
+
+      corrected_dutyCycle_LS[current_adc] = (byte)(dutyCycle_LS[current_adc] / adc_correction[current_adc]);
+      if (corrected_dutyCycle_LS[current_adc] > 255)
+      {
+        corrected_dutyCycle_LS[current_adc] = 255;
+      }
+    }
+    else
+    {
+      adc_sample_ave[current_adc] = 0;
+      corrected_dutyCycle_LS[current_adc] = dutyCycle_LS[current_adc];
+    }
+
+    analogWrite(pin_LS[current_adc], corrected_dutyCycle_LS[current_adc]);
+
+    // Reset ADC ISR
+    sample_num = 0;
+    if (current_adc < 3)
+    {
+      current_adc += 1;
+    }
+    else
+    {
+      current_adc = 0;
+    }
+    ADMUX &= ~(1 << MUX3 | 1 << MUX2 | 1 << MUX1 | 1 << MUX0);
+    ADMUX |= current_adc;
+    ADCSRA |= (1 << ADSC);
+  }
+  else
+  {
+    sample_num += 1;
+    ADCSRA |= (1 << ADSC);
+  }
 }

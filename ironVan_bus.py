@@ -105,29 +105,56 @@ class Device():
 			
 			self.request = {
 				'device_type':	[0x20, 14],
-				'device_status': [0x21, 4]
+				'device_status': [0x21, 8],
+				'ls_1_check': [0x22, 1],
+				'ls_2_check': [0x23, 1],
+				'ls_3_check': [0x24, 1],
+				'ls_4_check': [0x25, 1]
 			}
 		
-			# if("b100" in deviceType):
-			# 	# Choose firmware major version
+			if("b100" in deviceType):
+				# Choose firmware major version
 
-			# 	if("v0" in deviceType):
-			# 		# Define available commands
-	 		# 		# Note:  The 'ls_n_toggle' commands are appended with a 1 byte value from either -- the toggle button (0 or current slider value) -- or -- app.lightingAdjust() (slider value)
+				if("v01" in deviceType):
+					# Define available commands
+	 				# Note:  The 'ls_n_toggle' commands are appended with a 1 byte value from either -- the toggle button (0 or current slider value) -- or -- app.lightingAdjust() (slider value)
 
-			# 		self.command = {
-			# 			'ls_1_toggle': [0x01],
-			# 			'ls_2_toggle': [0x02],
-			# 			'ls_3_toggle': [0x03],
-			# 			'ls_4_toggle': [0x04]
-			# 		}
+					# self.command = {
+					# 	'ls_1_toggle': [0x01],
+					# 	'ls_2_toggle': [0x02],
+					# 	'ls_3_toggle': [0x03],
+					# 	'ls_4_toggle': [0x04]
+					# }
 
-			# 		# Define available requests
+					# # Define available requests
 					
-			# 		self.request = {
-			# 			'device_type':	[0x20, 14],
-			# 			'device_status': [0x21, 4]
-			# 		}
+					# self.request = {
+					# 	'device_type':	[0x20, 14],
+					# 	'device_status': [0x21, 4]
+					# }
+					pass
+
+				elif("v02" in deviceType):
+					# Define available commands
+	 				# Note:  The 'ls_n_toggle' commands are appended with a 1 byte value from either -- the toggle button (0 or current slider value) -- or -- app.lightingAdjust() (slider value)
+
+					self.command = {
+						'ls_1_toggle': [0x01],
+						'ls_2_toggle': [0x02],
+						'ls_3_toggle': [0x03],
+						'ls_4_toggle': [0x04]
+					}
+
+					# Define available requests
+					
+					self.request = {
+						'device_type':	[0x20, 14],
+						'device_status': [0x21, 8],
+						'ls_1_check': [0x22, 1],
+						'ls_2_check': [0x23, 1],
+						'ls_3_check': [0x24, 1],
+						'ls_4_check': [0x25, 1]
+					}
 
 		# --- LIGHT SWITCH & THERMOMETER ---
 		if('ltsw' in deviceType):
@@ -589,7 +616,7 @@ class Bus():
 		'''
 		activeError = False
 		while(self.bus != ''):
-			time.sleep(5)
+			time.sleep(0.25)
 			try:
 				for device in self.activeDevices.keys():
 					key = f"{device}_{time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}"

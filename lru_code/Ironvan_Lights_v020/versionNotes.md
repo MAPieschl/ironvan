@@ -1062,11 +1062,11 @@ The light feedback structure is based on the schematic in Figure 1. Resistor, RS
 
 On power up, the device should following the calibration sequence below for each channel (sequentially):
 
-1. ADCn PWM is set to 255 (maximum value)
+1. LS_n PWM is set to 255 (maximum value)
 2. Approximately 10 samples are collected into `adc_sample_array[n]` (where `n` is the ADC number)
 3. The samples are averaged, truncated, and that value is stored in `adc_on_nominal[n]`.
 
-The value stored in `adc_on_nominal[n]` will be used to check for component heating and protect against thermal runaway. Each time the ADC runs it will look for the average value of the "on" state, compares it to the value of `adc_on_nominal[n]`, and applies a correction factor to `adc_correction[n]`. This will ensure constant power output in the event the transistor heating causes increased current supply to the lights. The formula for the correction factor is:
+The value stored in `adc_on_nominal[n]` will be used to check for component heating and protect against thermal runaway. Each time the ADC runs it will look for the average value of the "on" state, compare it to the value of `adc_on_nominal[n]`, and applies a correction factor to `adc_correction[n]`. This will ensure constant power output in the event the transistor heating causes increased current supply to the lights. The formula for the correction factor is:
 
     adc_correction[n] = adc_sample_ave[n]/adc_on_nominal[n]
 
@@ -1083,6 +1083,10 @@ For example, the centerline lighting is expected to draw `~2.08A` per light, or 
 This means that, while the UI still commands the user-selected value of a 50% duty cycle (decimal value 127), the actual value sent to the light channel is `(byte)127/1.2 = 105`, or a duty cycle of 41.1%. Applied to our power formula, this means that `12V * 5.00A(41.1%) = 24.7W`, which approximately corrects the power consumed by the lighting system back down to the value commanded by the user.
 
 NOTE: It may be necessary to limit these corrections to 20-30% duty cycle or greater to ensure that a single noisy signal does not cause the lights to flicker.
+
+The code for the calibration sequence is as follows:
+
+
 
 **2. Fuse Settings**
 
@@ -1307,7 +1311,7 @@ The decision was made to slow the routine by handling the interrupt, then settin
 
         if(sample_num >= ADC_SAMPLES){
             // Stop ADC
-            ADCSRA &= ~(1 << ADC)
+            ADCSRA &= ~(1 << ADSC)
 
             // Compute and send correction
             int num_samples_on = 0;
@@ -1346,4 +1350,4 @@ The decision was made to slow the routine by handling the interrupt, then settin
 
 **5. Watchdog Protection**
 
-The watchdog timer will be set to `system reset` mode to restart the device each when a timeout occurs. The watchdog timer utilizes a 128kHz clock (t = 7.8125us) and will be prescaled down to a 2Hz (t = 0.5s) to avoid unnecessary resets. The watchdog timer reset will occur each time the ADC interrupt vector is called using the `avr/wdt.h` function `wdt_reset()`, which implements the `wdr` instruction using inline assembly.
+The watchdog timer will be set to `system reset` mode to restart the device each when a timeout occurs. The watchdog timer utilizes a 128kHz clock (t = 7.8125us) and will be prescaled down to a 2Hz (t = 0.5s) to avoid unnecessary resets. The watchdog timer reset start when the devicce first checks in with the control center and the timer will reset each time the device status is checked by calling the `avr/wdt.h` function `wdt_reset()`, which implements the `wdr` instruction using inline assembly.
