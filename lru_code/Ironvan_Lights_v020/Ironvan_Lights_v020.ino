@@ -136,7 +136,7 @@ void setup()
   WDTCSR |= (1 << WDCE) | (1 << WDE);
 
   // Set prescaler value (0.5s reset timer)
-  WDTCSR |= (1 << WDE) | (1 << WDP2) | (1 << WDP0);
+  WDTCSR |= (1 << WDE) | (1 << WDP3) | (1 << WDP0);
 
   // ------------- Final Setup -----------------
 
