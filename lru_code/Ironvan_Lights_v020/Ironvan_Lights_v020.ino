@@ -33,7 +33,7 @@ float adc_correction[4] = {1};
 short sample_num = 0;
 
 // OUTPUT VARIABLES
-constexpr int pin_LS[4] = {11, 10, 9, 8};
+constexpr int pin_LS[4] = {11, 10, 9, 3};
 uint8_t dutyCycle_LS[4] = {191, 191, 191, 191}; // Current set duty cycle -> 0 = 0% & 255 = 100%
 uint8_t corrected_dutyCycle_LS[4] = {191, 191, 191, 191}; // Current corrected duty cycle -> 0 = 0% & 255 = 100%
 
@@ -64,7 +64,7 @@ void calibrationSequence()
   analogWrite(pin_LS[3], 0);
 
   // Reset and stop watchdog timer to await check-in
-  wdt_reset();
+  //wdt_reset();
 
   if (check_in == false)
   {
@@ -111,6 +111,7 @@ void setup()
   pinMode(pin_LS[1], OUTPUT);
   pinMode(pin_LS[2], OUTPUT);
   pinMode(pin_LS[3], OUTPUT);
+  analogWrite(pin_LS[3], 5);
 
   // ------------- Feedback ADC Setup -----------------
 
@@ -127,16 +128,23 @@ void setup()
   // ------------- Watchdog Timer Setup -----------------
 
   // Reset watchdog timer
-  wdt_reset();
+  //wdt_reset();
 
   // Clear the system reset flag
-  MCUSR &= ~(1 << WDRF);
+  //MCUSR &= ~(1 << WDRF);
 
   // Begin timed changed sequence (pg 46)
-  WDTCSR |= (1 << WDCE) | (1 << WDE);
+  //WDTCSR |= (1 << WDCE) | (1 << WDE);
 
   // Set prescaler value (0.5s reset timer)
-  WDTCSR |= (1 << WDE) | (1 << WDP3) | (1 << WDP0);
+  //WDTCSR |= (1 << WDE) | (1 << WDP3) | (1 << WDP0);
+
+  // Stop watchdog timer until control center check-in
+  //WDTCSR &= ~(1 << WDE);
+
+  wdt_disable();
+  delay(3000);
+  wdt_enable(WDTO_8S);
 
   // ------------- Final Setup -----------------
 
@@ -237,11 +245,11 @@ void requestEvent()
   {
   case 0x20:
     Wire.write(DEVICE_TYPE);
-    if(check_in == false){
+    //if(check_in == false){
       //ADCSRA |= (1 << ADSC);
-      WDTCSR |= (1 << WDE);
-    }
-    check_in = true;
+      //WDTCSR |= (1 << WDE);
+    //}
+    //check_in = true;
     break;
   case 0x21:
     //Wire.write(ADMUX&0b00001111);
