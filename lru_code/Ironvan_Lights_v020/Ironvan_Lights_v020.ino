@@ -33,9 +33,9 @@ float adc_correction[4] = {1};
 short sample_num = 0;
 
 // OUTPUT VARIABLES
-const int pin_LS[4] = {11, 10, 9, 8};
-byte dutyCycle_LS[4] = {191, 191, 191, 191}; // Current duty cycle -> 0 = 0% & 255 = 100%
-byte corrected_dutyCycle_LS[4] = {191, 191, 191, 191};
+constexpr int pin_LS[4] = {11, 10, 9, 8};
+uint8_t dutyCycle_LS[4] = {191, 191, 191, 191}; // Current set duty cycle -> 0 = 0% & 255 = 100%
+uint8_t corrected_dutyCycle_LS[4] = {191, 191, 191, 191}; // Current corrected duty cycle -> 0 = 0% & 255 = 100%
 
 //   pin_LS_n currently selected by I2C command
 int active_LS_pin = 0;
@@ -237,17 +237,17 @@ void requestEvent()
   {
   case 0x20:
     Wire.write(DEVICE_TYPE);
-    WDTSR |= (1 << WDE);
+    WDTCSR |= (1 << WDE);
     break;
   case 0x21:
-    Wire.write({dutyCycle_LS[0],
-                corrected_dutyCycle_LS[0],
-                dutyCycle_LS[1],
-                corrected_dutyCycle_LS[1],
-                dutyCycle_LS[2],
-                corrected_dutyCycle_LS[2],
-                dutyCycle_LS[3],
-                corrected_dutyCycle_LS[3]});
+    Wire.write(dutyCycle_LS[0]);
+    Wire.write(corrected_dutyCycle_LS[0]);
+    Wire.write(dutyCycle_LS[1]);
+    Wire.write(corrected_dutyCycle_LS[1]);
+    Wire.write(dutyCycle_LS[2]);
+    Wire.write(corrected_dutyCycle_LS[2]);
+    Wire.write(dutyCycle_LS[3]);
+    Wire.write(corrected_dutyCycle_LS[3]);
     break;
   case 0x22:
     Wire.write(dutyCycle_LS[0]);
