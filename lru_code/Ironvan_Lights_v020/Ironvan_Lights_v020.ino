@@ -117,10 +117,10 @@ void setup()
   // Configure pins
 
   // AVCC voltage reference / output right aligned / begins on ADCO
-  ADMUX |= (1 << REFS0);
+  //ADMUX |= (1 << REFS0);
 
   // ADC enabled / ADC start conversion LOW (begins when set HIGH) / Trigger disabled (single conversion mode) / Interrupt enabled / 62.5kHz clock
-  ADCSRA |= (1 << ADEN) | (1 << ADIE) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
+  //ADCSRA |= (1 << ADEN) | (1 << ADIE) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
 
   // ADCSRB set to defaults - ACME disabled / ADTS ignored
 
@@ -144,7 +144,7 @@ void setup()
   sei();
 
   // Run calibration sequence
-  calibrationSequence();
+  //calibrationSequence();
 }
 
 void loop()
@@ -237,17 +237,24 @@ void requestEvent()
   {
   case 0x20:
     Wire.write(DEVICE_TYPE);
-    WDTCSR |= (1 << WDE);
+    if(check_in == false){
+      //ADCSRA |= (1 << ADSC);
+      WDTCSR |= (1 << WDE);
+    }
+    check_in = true;
     break;
   case 0x21:
-    Wire.write(dutyCycle_LS[0]);
-    Wire.write(corrected_dutyCycle_LS[0]);
-    Wire.write(dutyCycle_LS[1]);
-    Wire.write(corrected_dutyCycle_LS[1]);
-    Wire.write(dutyCycle_LS[2]);
-    Wire.write(corrected_dutyCycle_LS[2]);
-    Wire.write(dutyCycle_LS[3]);
-    Wire.write(corrected_dutyCycle_LS[3]);
+    //Wire.write(ADMUX&0b00001111);
+    //Wire.write(ADCH);
+    //Wire.write(ADCL);
+    //Wire.write(dutyCycle_LS[0]);
+    //Wire.write(corrected_dutyCycle_LS[0]);
+    //Wire.write(dutyCycle_LS[1]);
+    //Wire.write(corrected_dutyCycle_LS[1]);
+    //Wire.write(dutyCycle_LS[2]);
+    //Wire.write(corrected_dutyCycle_LS[2]);
+    //Wire.write(dutyCycle_LS[3]);
+    //Wire.write(corrected_dutyCycle_LS[3]);
     break;
   case 0x22:
     Wire.write(dutyCycle_LS[0]);
@@ -316,7 +323,8 @@ ISR(ADC_vect)
       corrected_dutyCycle_LS[current_adc] = dutyCycle_LS[current_adc];
     }
 
-    analogWrite(pin_LS[current_adc], corrected_dutyCycle_LS[current_adc]);
+    //analogWrite(pin_LS[current_adc], corrected_dutyCycle_LS[current_adc]);
+    analogWrite(pin_LS[current_adc], dutyCycle_LS[current_adc]);
 
     // Reset ADC ISR
     sample_num = 0;
