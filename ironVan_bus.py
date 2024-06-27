@@ -616,6 +616,7 @@ class Bus():
 		'''
 		activeError = False
 		while(self.bus != ''):
+			time.sleep(1)
 			try:
 				for device in self.activeDevices.keys():
 					key = f"{device}_{time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}"
