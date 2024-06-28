@@ -34,7 +34,7 @@ short sample_num = 0;
 
 // OUTPUT VARIABLES
 constexpr int pin_LS[4] = {11, 10, 9, 3};
-uint8_t dutyCycle_LS[4] = {191, 191, 191, 191}; // Current set duty cycle -> 0 = 0% & 255 = 100%
+uint8_t dutyCycle_LS[4] = {191, 191, 191, 191};           // Current set duty cycle -> 0 = 0% & 255 = 100%
 uint8_t corrected_dutyCycle_LS[4] = {191, 191, 191, 191}; // Current corrected duty cycle -> 0 = 0% & 255 = 100%
 
 //   pin_LS_n currently selected by I2C command
@@ -64,7 +64,7 @@ void calibrationSequence()
   analogWrite(pin_LS[3], 0);
 
   // Reset and stop watchdog timer to await check-in
-  //wdt_reset();
+  // wdt_reset();
 
   if (check_in == false)
   {
@@ -118,31 +118,30 @@ void setup()
   // Configure pins
 
   // AVCC voltage reference / output right aligned / begins on ADCO
-  //ADMUX |= (1 << REFS0);
+  // ADMUX |= (1 << REFS0);
 
   // ADC enabled / ADC start conversion LOW (begins when set HIGH) / Trigger disabled (single conversion mode) / Interrupt enabled / 62.5kHz clock
-  //ADCSRA |= (1 << ADEN) | (1 << ADIE) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
+  // ADCSRA |= (1 << ADEN) | (1 << ADIE) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
 
   // ADCSRB set to defaults - ACME disabled / ADTS ignored
 
   // ------------- Watchdog Timer Setup -----------------
 
-  // Reset watchdog timer
-  //wdt_reset();
+  wdt_disable();
 
   // Clear the system reset flag
-  //MCUSR &= ~(1 << WDRF);
+  MCUSR &= ~(1 << WDRF);
 
-  // Begin timed changed sequence (pg 46)
-  //WDTCSR |= (1 << WDCE) | (1 << WDE);
+  // Begin timed changed sequence (pg 46) then ensure watchdog timer is properly disabled
+  WDTCSR |= (1 << WDCE) | (1 << WDE);
+  WDTCSR = 0x00;
 
   // Set prescaler value (0.5s reset timer)
-  //WDTCSR |= (1 << WDE) | (1 << WDP3) | (1 << WDP0);
+  // WDTCSR |= (1 << WDE) | (1 << WDP3) | (1 << WDP0);
 
   // Stop watchdog timer until control center check-in
-  //WDTCSR &= ~(1 << WDE);
+  // WDTCSR &= ~(1 << WDE);
 
-  wdt_disable();
   delay(3000);
   wdt_enable(WDTO_8S);
 
@@ -152,7 +151,7 @@ void setup()
   sei();
 
   // Run calibration sequence
-  //calibrationSequence();
+  // calibrationSequence();
 }
 
 void loop()
@@ -245,24 +244,24 @@ void requestEvent()
   {
   case 0x20:
     Wire.write(DEVICE_TYPE);
-    //if(check_in == false){
-      //ADCSRA |= (1 << ADSC);
-      //WDTCSR |= (1 << WDE);
+    // if(check_in == false){
+    // ADCSRA |= (1 << ADSC);
+    // WDTCSR |= (1 << WDE);
     //}
-    //check_in = true;
+    // check_in = true;
     break;
   case 0x21:
-    //Wire.write(ADMUX&0b00001111);
-    //Wire.write(ADCH);
-    //Wire.write(ADCL);
-    //Wire.write(dutyCycle_LS[0]);
-    //Wire.write(corrected_dutyCycle_LS[0]);
-    //Wire.write(dutyCycle_LS[1]);
-    //Wire.write(corrected_dutyCycle_LS[1]);
-    //Wire.write(dutyCycle_LS[2]);
-    //Wire.write(corrected_dutyCycle_LS[2]);
-    //Wire.write(dutyCycle_LS[3]);
-    //Wire.write(corrected_dutyCycle_LS[3]);
+    // Wire.write(ADMUX&0b00001111);
+    // Wire.write(ADCH);
+    // Wire.write(ADCL);
+    // Wire.write(dutyCycle_LS[0]);
+    // Wire.write(corrected_dutyCycle_LS[0]);
+    // Wire.write(dutyCycle_LS[1]);
+    // Wire.write(corrected_dutyCycle_LS[1]);
+    // Wire.write(dutyCycle_LS[2]);
+    // Wire.write(corrected_dutyCycle_LS[2]);
+    // Wire.write(dutyCycle_LS[3]);
+    // Wire.write(corrected_dutyCycle_LS[3]);
     break;
   case 0x22:
     Wire.write(dutyCycle_LS[0]);
@@ -331,7 +330,7 @@ ISR(ADC_vect)
       corrected_dutyCycle_LS[current_adc] = dutyCycle_LS[current_adc];
     }
 
-    //analogWrite(pin_LS[current_adc], corrected_dutyCycle_LS[current_adc]);
+    // analogWrite(pin_LS[current_adc], corrected_dutyCycle_LS[current_adc]);
     analogWrite(pin_LS[current_adc], dutyCycle_LS[current_adc]);
 
     // Reset ADC ISR
