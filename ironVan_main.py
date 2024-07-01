@@ -812,7 +812,7 @@ class ironVanApp(MDApp):
 		self.messageBufferLock = False
 
 		bus_thread = threading.Thread(target = self.bus.regularScan, args = (self,), name = 'bus_thread', daemon = True)
-		bus_thread.start()
+		#bus_thread.start()
 
 		wifi_thread = threading.Thread(target = self.wifi.updateWifi, args = (self,), name = 'wifi_thread', daemon = True)
 		wifi_thread.start()
