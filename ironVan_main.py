@@ -752,7 +752,7 @@ class SettingsToggleButton(MDRoundFlatButton, MDToggleButton):
 
 			case 'Day':
 				self.app.userSettings.brightness = True
-				self.app.changeBrightness(12)
+				self.app.changeBrightness(128)
 
 class ironVanApp(MDApp):
 
