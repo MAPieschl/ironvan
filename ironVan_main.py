@@ -1006,7 +1006,8 @@ class ironVanApp(MDApp):
 				# Add fail to message buffer
 				return
 		
-		cmd = ["sudo", "sh", "-c", "'echo", str(level), ">", "/sys/class/backlight/10-0045/brightness'"]
+		cmd = ["ls"]
+		# cmd = ["sudo", "sh", "-c", "'echo", str(level), ">", "/sys/class/backlight/10-0045/brightness'"]
 
 		subprocess.call(cmd)
 
