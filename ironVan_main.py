@@ -1009,7 +1009,7 @@ class ironVanApp(MDApp):
 		cmd = ["ls"]
 		# cmd = ["sudo", "sh", "-c", "'echo", str(level), ">", "/sys/class/backlight/10-0045/brightness'"]
 
-		subprocess.call(cmd)
+		subprocess.call(cmd, shell = True)
 
 	def lightingAdjust(self, *args):
 		value = args[1]
