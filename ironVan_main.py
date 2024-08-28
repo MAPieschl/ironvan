@@ -1006,7 +1006,7 @@ class ironVanApp(MDApp):
 				# Add fail to message buffer
 				return
 		
-		subprocess.run("sudo sh -c 'echo %i > /sys/class/backlight/10-0045/brightness" % level, shell = True)
+		subprocess.run("sudo sh -c 'echo %i > /sys/class/backlight/10-0045/brightness'" % level, shell = True)
 
 	def lightingAdjust(self, *args):
 		value = args[1]
