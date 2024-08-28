@@ -8,11 +8,15 @@ class UserSettings():
         # True -> display time in a 24 hour format // False -> display time in a 12 hour format with associated 'am' or 'pm' value
         self.time24hr = None
 
+        # True -> daytime brightness (128) // False -> nighttime brightness (12)
+        self.brightness = None
+
     def initUserSettings(self, *args):
         app = args[0]
 
         app.root.ids['fahrenheit_toggle'].state = 'down'
         app.root.ids['hour24_toggle'].state = 'down'
+        app.root.ids['day_toggle'].state = 'down'
 
     def kelvinTo(self, kelvin, isCelsius):
         temperature = None

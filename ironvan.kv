@@ -880,8 +880,8 @@ MDFloatLayout:
                                 theme_text_color: 'Custom'
                                 text_color: app.theme_cls.accent_dark if self.theme_cls.theme_style == 'Light' else self.theme_cls.accent_light
                                 md_bg_color: self.theme_cls.primary_light if self.theme_cls.theme_style == 'Light' else self.theme_cls.primary_dark
-                                pos_hint: {'center_x': 0, 'center_y': 0.5}
-                                size_hint: (0.05, 0.7)
+                                pos_hint: {'center_x': -0.1, 'center_y': 0.5}
+                                size_hint: (0.1, 1.4)
                                 on_release: app.navButtonRouter('nav_button_settings')
 
                             MDIconButton:
@@ -890,7 +890,7 @@ MDFloatLayout:
                                 theme_text_color: 'Custom'
                                 text_color: app.theme_cls.accent_dark
                                 md_bg_color: app.theme_cls.bg_darkest if app.theme_cls.theme_style == 'Light' else app.theme_cls.bg_light
-                                pos_hint: {'x': 0.35, 'center_y': 0.5}
+                                pos_hint: {'x': 0.15, 'center_y': 0.5}
                                 size_hint: (0.05, 0.7)
 
                             MDLabel:
@@ -899,7 +899,7 @@ MDFloatLayout:
                                 theme_text_color: 'Custom'
                                 text_color: app.theme_cls.accent_dark
                                 font_size: 48
-                                pos_hint: {'x': 0.4, 'center_y': 0.5}
+                                pos_hint: {'x': 0.25, 'center_y': 0.5}
 
                         MDFloatLayout:
                             id: settings_user_settings_top_fill
@@ -926,7 +926,7 @@ MDFloatLayout:
                                 id: fahrenheit_toggle
                                 text: 'Fahrenheit'
                                 group: 'tempScale'
-                                pos_hint: {'center_x': 0.6, 'center_y': 0.5}
+                                pos_hint: {'center_x': 0.8, 'center_y': 0.5}
                         
                         MDFloatLayout:
                             id: settings_user_settings_time_select
@@ -949,11 +949,34 @@ MDFloatLayout:
                                 id: hour24_toggle
                                 text: '24 hour'
                                 group: 'timeFormat'
-                                pos_hint: {'center_x': 0.6, 'center_y': 0.5}
+                                pos_hint: {'center_x': 0.8, 'center_y': 0.5}
+                        
+                        MDFloatLayout:
+                            id: settings_user_settings_brightness_select
+                            size_hint: (1, 0.1)
+
+                            MDLabel:
+                                id: settings_user_settings_brightness_select_label
+                                text: 'Screen Brightness:'
+                                theme_text_color: 'Custom'
+                                text_color: app.theme_cls.accent_dark
+                                pos_hint: {'x': 0, 'center_y': 0.5}
+
+                            SettingsToggleButton:
+                                id: night_toggle
+                                text: 'Night'
+                                group: 'brightness'
+                                pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+
+                            SettingsToggleButton:
+                                id: day_toggle
+                                text: 'Day'
+                                group: 'brightness'
+                                pos_hint: {'center_x': 0.8, 'center_y': 0.5}
                         
                         MDFloatLayout:
                             id: settings_user_settings_fill_bottom
-                            size_hint: (1, 0.7)
+                            size_hint: (1, 0.6)
 
         DeviceScreen:
             name: 'settings_device_page'

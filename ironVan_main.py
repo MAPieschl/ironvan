@@ -85,7 +85,9 @@ class appElementIDs():
 			'celsius_toggle',
 			'fahrenheit_toggle',
 			'hour12_toggle',
-			'hour24_toggle'
+			'hour24_toggle',
+			'day_toggle',
+			'night_toggle'
 		]
 		self.cards = [
 			'weather_quick_card',
@@ -743,6 +745,15 @@ class SettingsToggleButton(MDRoundFlatButton, MDToggleButton):
 			case '12 hour':
 				self.app.userSettings.time24hr = False
 
+			# Brightness selection
+			case 'Night':
+				self.app.userSettings.brightness = False
+				self.app.changeBrightness(12)
+
+			case 'Day':
+				self.app.userSettings.brightness = True
+				self.app.changeBrightness(12)
+
 class ironVanApp(MDApp):
 
 	appIDs = appElementIDs()
@@ -984,6 +995,20 @@ class ironVanApp(MDApp):
 				self.root.ids.page_manager.current = 'settings_device_page'
 			case 'debug_button':
 				self.root.ids.page_manager.current = 'settings_debug_page'
+
+	def changeBrightness(self, level):
+		if(level > 255):
+			level = 255
+		elif(level < 12):
+			level = 12
+		else:
+			if(type(level) != int):
+				# Add fail to message buffer
+				return
+		
+		cmd = ["sudo", "sh", "-c", "'echo", str(level), ">", "/sys/class/backlight/10-0045/brightness'"]
+
+		subprocess.call(cmd)
 
 	def lightingAdjust(self, *args):
 		value = args[1]
