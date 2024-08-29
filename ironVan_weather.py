@@ -90,7 +90,7 @@ class Weather():
             location = currentResponse.get('name')
 
             if(len(location) > 12):
-                location = location[:11]
+                location = location[:11] + '...'
 
         except:
             app.write2MessageBuffer(f"weatherServices_{time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}", f"Weather data received - error extracting data.", "error")
