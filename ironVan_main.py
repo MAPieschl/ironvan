@@ -895,7 +895,7 @@ class ironVanApp(MDApp):
 			if self.theme_cls.theme_style == 'Light':
 				if 'down' in self.root.ids[id].state:
 					self.root.ids[id].md_bg_color = self.theme_cls.primary_light
-					self.root.ids[id].text_color = self.theme_cls.accent_light
+					self.root.ids[id].text_color = self.theme_cls.accent_dark
 				else:
 					self.root.ids[id].md_bg_color = self.theme_cls.accent_light
 					self.root.ids[id].text_color = self.theme_cls.accent_dark
