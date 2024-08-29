@@ -999,15 +999,8 @@ class ironVanApp(MDApp):
 			case 'debug_button':
 				self.root.ids.page_manager.current = 'settings_debug_page'
 
-	def changeBrightness(self, level):
-		if(level > 255):
-			level = 255
-		elif(level < 12):
-			level = 12
-		else:
-			if(type(level) != int):
-				# Add fail to message buffer
-				return
+	def changeBrightness(self, *args):
+		level = args[1]
 		
 		subprocess.run("sudo sh -c 'echo %i > /sys/class/backlight/10-0045/brightness'" % level, shell = True)
 

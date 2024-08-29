@@ -978,17 +978,16 @@ MDFloatLayout:
                                 text_color: app.theme_cls.accent_dark
                                 pos_hint: {'x': 0, 'center_y': 0.5}
 
-                            SettingsToggleButton:
-                                id: night_toggle
-                                text: 'Night'
-                                group: 'brightness'
-                                pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-
-                            SettingsToggleButton:
-                                id: day_toggle
-                                text: 'Day'
-                                group: 'brightness'
-                                pos_hint: {'center_x': 0.8, 'center_y': 0.5}
+                            MDSlider:
+                                id: brightness_slider
+                                orientation: 'horizontal'
+                                min: 12
+                                max: 255
+                                step: 1
+                                value: 128
+                                hint: False
+                                show_off: False
+                                on_value: app.brightnessAdjust(*args)
                         
                         MDFloatLayout:
                             id: settings_user_settings_fill_bottom
