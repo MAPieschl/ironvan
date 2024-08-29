@@ -15,8 +15,9 @@ class UserSettings():
         app = args[0]
 
         app.root.ids['fahrenheit_toggle'].state = 'down'
+        app.root.ids['celsius_toggle'].state = 'normal'
         app.root.ids['hour24_toggle'].state = 'down'
-        app.root.ids['day_toggle'].state = 'down'
+        app.root.ids['hour12_toggle'].state = 'normal'
 
     def kelvinTo(self, kelvin, isCelsius):
         temperature = None

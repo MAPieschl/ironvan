@@ -723,7 +723,7 @@ class PasswordTextEntry(MDRelativeLayout):
 class KeyboardButton(MDFillRoundFlatButton):
 	pass
 
-class SettingsToggleButton(MDRoundFlatButton, MDToggleButton):
+class SettingsToggleButton(ToggleButtonBehavior, MDRoundFlatButton):
 	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
 		self.app = ironVanApp.get_running_app()
@@ -733,26 +733,29 @@ class SettingsToggleButton(MDRoundFlatButton, MDToggleButton):
 			
 			# Temperature scale selection
 			case 'Fahrenheit':
-				self.app.userSettings.tempCelsius = False
+				if(obj.state == 'down'):
+					self.app.userSettings.tempCelsius = False
+					self.app.root.ids['celsius_toggle'].md_bg_color = self.app.toggleOff
+					self.app.root.ids['fahrenheit_toggle'].md_bg_color = self.app.toggleOn
 		
 			case 'Celsius':
-				self.app.userSettings.tempCelsius = True
+				if(obj.state == 'down'):
+					self.app.userSettings.tempCelsius = True
+					self.app.root.ids['fahrenheit_toggle'].md_bg_color = self.app.toggleOff
+					self.app.root.ids['celsius_toggle'].md_bg_color = self.app.toggleOn
 
 			# Time format selection
 			case '24 hour':
-				self.app.userSettings.time24hr = True
+				if(obj.state == 'down'):
+					self.app.userSettings.time24hr = True
+					self.app.root.ids['hour12_toggle'].md_bg_color = self.app.toggleOff
+					self.app.root.ids['hour24_toggle'].md_bg_color = self.app.toggleOn
 
 			case '12 hour':
-				self.app.userSettings.time24hr = False
-
-			# Brightness selection
-			case 'Night':
-				self.app.userSettings.brightness = False
-				self.app.changeBrightness(12)
-
-			case 'Day':
-				self.app.userSettings.brightness = True
-				self.app.changeBrightness(128)
+				if(obj.state == 'down'):
+					self.app.userSettings.time24hr = False
+					self.app.root.ids['hour24_toggle'].md_bg_color = self.app.toggleOff
+					self.app.root.ids['hour12_toggle'].md_bg_color = self.app.toggleOn
 
 class ironVanApp(MDApp):
 

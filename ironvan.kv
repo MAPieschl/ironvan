@@ -919,14 +919,22 @@ MDFloatLayout:
                             SettingsToggleButton:
                                 id: celsius_toggle
                                 text: 'Celsius'
-                                group: 'tempScale'
+                                theme_text_color: 'Custom'
+                                md_bg_color: app.theme_cls.accent_light
+                                text_color: app.theme_cls.accent_dark
+                                ripple_scale: 0
                                 pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                                on_release: self.state = 'down' if self.state == 'normal' else 'normal'
 
                             SettingsToggleButton:
                                 id: fahrenheit_toggle
                                 text: 'Fahrenheit'
-                                group: 'tempScale'
+                                theme_text_color: 'Custom'
+                                md_bg_color: app.theme_cls.accent_light
+                                text_color: app.theme_cls.accent_dark
+                                ripple_scale: 0
                                 pos_hint: {'center_x': 0.8, 'center_y': 0.5}
+                                on_release: self.state = 'down' if self.state == 'normal' else 'normal'
                         
                         MDFloatLayout:
                             id: settings_user_settings_time_select
@@ -942,14 +950,22 @@ MDFloatLayout:
                             SettingsToggleButton:
                                 id: hour12_toggle
                                 text: '12 hour'
-                                group: 'timeFormat'
+                                theme_text_color: 'Custom'
+                                md_bg_color: app.theme_cls.accent_light
+                                text_color: app.theme_cls.accent_dark
+                                ripple_scale: 0
                                 pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                                on_release: self.state = 'down' if self.state == 'normal' else 'normal'
 
                             SettingsToggleButton:
                                 id: hour24_toggle
                                 text: '24 hour'
-                                group: 'timeFormat'
+                                theme_text_color: 'Custom'
+                                md_bg_color: app.theme_cls.accent_light
+                                text_color: app.theme_cls.accent_dark
+                                ripple_scale: 0
                                 pos_hint: {'center_x': 0.8, 'center_y': 0.5}
+                                on_release: self.state = 'down' if self.state == 'normal' else 'normal'
                         
                         MDFloatLayout:
                             id: settings_user_settings_brightness_select
