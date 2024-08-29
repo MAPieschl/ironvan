@@ -85,9 +85,7 @@ class appElementIDs():
 			'celsius_toggle',
 			'fahrenheit_toggle',
 			'hour12_toggle',
-			'hour24_toggle',
-			'day_toggle',
-			'night_toggle'
+			'hour24_toggle'
 		]
 		self.cards = [
 			'weather_quick_card',
