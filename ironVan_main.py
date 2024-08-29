@@ -43,7 +43,8 @@ class appElementIDs():
 			'settings_user_settings_title_icon',
 			'settings_user_settings_title',
 			'settings_user_settings_temp_select_label',
-			'settings_user_settings_time_select_label'
+			'settings_user_settings_time_select_label',
+			'settings_user_settings_brightness_select_label'
 		]
 		self.navButtons = [
 			'nav_button_home',
@@ -79,9 +80,7 @@ class appElementIDs():
 			'ls_1_switch',
 			'ls_2_switch',
 			'ls_3_switch',
-			'ls_4_switch'
-		]
-		self.toggles = [
+			'ls_4_switch',
 			'celsius_toggle',
 			'fahrenheit_toggle',
 			'hour12_toggle',
@@ -889,17 +888,7 @@ class ironVanApp(MDApp):
 					self.root.ids[id].md_bg_color = self.theme_cls.accent_dark
 				else:
 					self.root.ids[id].md_bg_color = self.theme_cls.primary_dark
-
-		for id in self.appIDs.toggles:
-			if self.theme_cls.theme_style == 'Light':
-				if 'down' in self.root.ids[id].state:
-					self.root.ids[id].md_bg_color = self.theme_cls.primary_light
-					self.root.ids[id].text_color = self.theme_cls.accent_dark
-			else:
-				if 'down' in self.root.ids[id].state:
-					self.root.ids[id].md_bg_color = self.theme_cls.primary_dark
-					self.root.ids[id].text_color = self.theme_cls.accent_light
-				
+					
 		for id in self.appIDs.cards:
 			self.root.ids[id].md_bg_color = (
 				self.theme_cls.bg_darkest if self.theme_cls.theme_style == 'Light' else self.theme_cls.bg_light
