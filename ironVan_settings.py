@@ -9,7 +9,7 @@ class UserSettings():
         self.time24hr = None
 
         # Default daytime brightness
-        self.dayBright = 128
+        self.dayBright = 64
 
         # Default nighttime brightness
         self.nightBright = 12

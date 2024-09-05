@@ -1,4 +1,5 @@
 from datetime import datetime, date
+from functools import partial
 from kivy.clock import Clock
 import requests
 import json
@@ -11,7 +12,11 @@ class Location():
         self.base_url = 'https://api.ipbase.com/v2/info?apikey=ipb_live_FKgcNeSzddarJZyyDS22NSgfNaEtFR7lf0tx4SRM&ip'
 
     def startThreadScheduler(self, app):
-        self.threadScheduler = Clock.schedule_interval(self.getLocation(app), 600)
+        # Initial location and weather grab
+        self.getLocation(app)
+
+        # Schedule future location & weather updates
+        self.threadScheduler = Clock.schedule_interval(partial(self.getLocation, app), 600)
 
     def getLocation(self, app):
 
@@ -75,7 +80,7 @@ class Weather():
             rawResponse = requests.get(self.current_url)
             currentResponse = rawResponse.json()
             
-            self.forecast_url = self.base_forecast_url + '&lat=' + str(app.location.latitude) + '&lon=' + str(app.location.longitude) +'&appid=' + self.api_key
+            self.forecast_url = self.base_forecast_url + '&lat=' + str(app.location.latitude) + '&lon=' + str(app.location.longitude) + '&appid=' + self.api_key
             
             rawResponse = requests.get(self.forecast_url)
             forecastResponse = rawResponse.json()
@@ -127,15 +132,32 @@ class Weather():
             for timeIterator in forecastList[date.today().strftime('%m/%d')].hourlyData.keys():
                 temp = forecastList[date.today().strftime('%m/%d')].hourlyData[timeIterator]['temp_min']
                 if(int(temp) < newLow):
-                    app.root.ids['low_temp_quick_label'].text = f'{minTemp}' + u'\N{DEGREE SIGN}'
+                    newLow = int(temp)
+            
+            if(newLow < minTemp):
+                minTemp = newLow
             
             newHigh = -1000
             for timeIterator in forecastList[date.today().strftime('%m/%d')].hourlyData.keys():
                 temp = forecastList[date.today().strftime('%m/%d')].hourlyData[timeIterator]['temp_max']
                 if(int(temp) > newHigh):
-                    app.root.ids['high_temp_quick_label'].text = f'{maxTemp}' + u'\N{DEGREE SIGN}'
+                    newHigh = int(temp)
+            
+            if(newHigh > maxTemp):
+                maxTemp = newHigh
+
+            # Convert temp to user units -- API not outputting Kelvin as expected - stuck in Fahrenheit
+            #minTemp = userSettings.kelvinTo(newLow, userSettings.tempCelsius)
+            #maxTemp = userSettings.kelvinTo(newHigh, userSettings.tempCelsius)
+
+            app.root.ids['low_temp_quick_label'].text = f'{minTemp}' + u'\N{DEGREE SIGN}'
+            app.root.ids['high_temp_quick_label'].text = f'{maxTemp}' + u'\N{DEGREE SIGN}'
+
         except:
             app.write2MessageBuffer(f"weatherServices_{time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}", f"Could not extract min/max temperature from weather data.", "error")
+
+            app.root.ids['low_temp_quick_label'].text = f'--' + u'\N{DEGREE SIGN}'
+            app.root.ids['high_temp_quick_label'].text = f'--' + u'\N{DEGREE SIGN}'
 
 class DailyForecast():
     def __init__(self, forecast, userSettings):

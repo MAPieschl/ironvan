@@ -830,7 +830,7 @@ class ironVanApp(MDApp):
 		wifi_thread = threading.Thread(target = self.wifi.updateWifi, args = (self,), name = 'wifi_thread', daemon = True)
 		wifi_thread.start()
 
-		location_thread = threading.Thread(target = self.location.getLocation, args = (self, ), name = 'weather_thread', daemon = True)
+		location_thread = threading.Thread(target = self.location.startThreadScheduler, args = (self, ), name = 'weather_thread', daemon = True)
 		location_thread.start()
 
 		# ---- Initialize GUI State Update ----
@@ -1100,37 +1100,30 @@ class ironVanApp(MDApp):
 				
 		# -- 10 minute loop + counter increment --
 
-		if(self.stateLoopCounter % 10 == 0 and self.stateLoopCounter != 0):
+		if(self.stateLoopCounter % 600 == 0 and self.stateLoopCounter != 0):
 			self.stateLoopCounter = 0
 
-			# Update weather
-			try:
-				self.location.weather.getWeather(self)
+			# Adjust brightness & theme for time of day
+			if(time.time() < self.location.weather.sunrise or time.time() > self.location.weather.sunset):
+				self.userSettings.daytime = False
+				if(self.theme_cls.theme_style == 'Light'):
+					self.theme_cls.theme_style == 'Dark'
+			else:
+				self.userSettings.daytime = True
+				if(self.theme_cls.theme_style == 'Dark'):
+					self.theme_cls.theme_style == 'Light'
 
-				if(time.time() < self.location.weather.sunrise or time.time() > self.location.weather.sunset):
-					self.userSettings.daytime = False
-				else:
-					self.userSettings.daytime = True
+			tempBrightness = self.userSettings.dayBright + self.userSettings.brightnessOffset
 
-				# Adjust brightness for nightime
-				tempBrightness = self.userSettings.dayBright + self.userSettings.brightnessOffset
+			if(self.userSettings.daytime == False):
+				tempBrightness = self.userSettings.nightBright + self.userSettings.brightnessOffset
 
-				if(self.userSettings.daytime == False):
-					tempBrightness = self.userSettings.nightBright + self.userSettings.brightnessOffset
+			if(tempBrightness > 255):
+				tempBrightness = 255
+			elif(tempBrightness < 12):
+				tempBrightness = 12
 
-				if(tempBrightness > 255):
-					tempBrightness = 255
-				elif(tempBrightness < 12):
-					tempBrightness = 12
-
-				self.root.ids['brightness_slider'].value = tempBrightness
-
-			except:
-				self.messageBufferLock = True
-
-				self.write2MessageBuffer(f"weatherServices_{time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}", f"Failed to acquire weather data.", "error")
-
-				self.messageBufferLock = False
+			self.root.ids['brightness_slider'].value = tempBrightness
 
 		else:
 			self.stateLoopCounter += 1
