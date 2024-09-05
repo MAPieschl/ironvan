@@ -18,7 +18,8 @@ class Location():
         # Schedule future location & weather updates
         self.threadScheduler = Clock.schedule_interval(partial(self.getLocation, app), 600)
 
-    def getLocation(self, app):
+    def getLocation(self, app, *args):
+        print(args)
 
         publicIP = self.getPublicIP(app)
         self.current_url = f'{self.base_url}={publicIP}'
