@@ -99,7 +99,7 @@ class Wifi():
         Detects current operating system. Currently supported:
 
         - macOS
-        - ...
+        - Linux
     
         '''
         operatingSystem = None
@@ -107,6 +107,8 @@ class Wifi():
 
         if('macOS' in platformRaw):
             operatingSystem = 'macOS'
+        elif('Linux' in platformRaw):
+            operatingSystem = 'Linux'
 
         return operatingSystem
     

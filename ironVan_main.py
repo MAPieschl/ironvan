@@ -1093,8 +1093,18 @@ class ironVanApp(MDApp):
 				
 		# -- 10 minute loop + counter increment --
 
-		if(self.stateLoopCounter % 600 == 0):
+		if(self.stateLoopCounter % 600 == 0 and self.stateLoopCounter != 0):
 			self.stateLoopCounter = 0
+
+			# Update weather
+			try:
+				self.location.weather.getWeather(self)
+			except:
+				self.messageBufferLock = True
+
+				self.write2MessageBuffer(f"weatherServices_{time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}", f"Failed to acquire weather data.")
+
+				self.messageBufferLock = False
 
 		else:
 			self.stateLoopCounter += 1
