@@ -22,15 +22,15 @@ class Location():
             rawResponse = requests.get(self.current_url)
             response = rawResponse.json()
 
-            # self.latitude = float(response.get('data').get('location').get('latitude'))
-            # self.longitude = float(response.get('data').get('location').get('longitude'))
-            # self.timezone = response.get('data').get('timezone').get('id')
+            self.latitude = float(response.get('data').get('location').get('latitude'))
+            self.longitude = float(response.get('data').get('location').get('longitude'))
+            self.timezone = response.get('data').get('timezone').get('id')
 
-            self.latitude = 39.84
-            self.longitude = -84.05
-            self.timezone = '-4:00'
-            print('ipify location services skipped for testing -- reconfigure in weather.getLocation()')
-            print(f'Location is hardcoded as {self.latitude}, {self.longitude}, {self.timezone}')
+            # self.latitude = 39.84
+            # self.longitude = -84.05
+            # self.timezone = '-4:00'
+            # print('ipify location services skipped for testing -- reconfigure in weather.getLocation()')
+            # print(f'Location is hardcoded as {self.latitude}, {self.longitude}, {self.timezone}')
 
             self.weather.getWeather(app)
             
@@ -40,11 +40,11 @@ class Location():
         
     def getPublicIP(self, app):
         try:
-            # response = requests.get('https://api.ipify.org')
-            # publicIP = response.text.strip()
-            publicIP = '192.168.1.3'
-            print('ipify request skipped for testing -- reconfigure in weather.getPublicIP()')
-            print(f'IP address hardcoded as {publicIP}')
+            response = requests.get('https://api.ipify.org')
+            publicIP = response.text.strip()
+            # publicIP = '192.168.1.3'
+            # print('ipify request skipped for testing -- reconfigure in weather.getPublicIP()')
+            # print(f'IP address hardcoded as {publicIP}')
             return publicIP
         except:
             app.write2MessageBuffer(f"requestIP_{time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}", f"IP address could not be determined. Default IP set - 1.1.1.1", "error")
