@@ -8,8 +8,17 @@ class UserSettings():
         # True -> display time in a 24 hour format // False -> display time in a 12 hour format with associated 'am' or 'pm' value
         self.time24hr = None
 
-        # True -> daytime brightness (128) // False -> nighttime brightness (12)
-        self.brightness = None
+        # Default daytime brightness
+        self.dayBright = 128
+
+        # Default nighttime brightness
+        self.nightBright = 12
+
+        # Offset all automatic brightness adjustments by brightnessOffset
+        self.brightnessOffset = 0
+
+        # True - daytime / False - nighttime
+        self.daytime = True
 
     def initUserSettings(self, *args):
         app = args[0]

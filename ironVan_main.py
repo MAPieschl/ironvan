@@ -1007,6 +1007,13 @@ class ironVanApp(MDApp):
 
 	def brightnessAdjust(self, *args):
 		level = args[1]
+
+		# Adjust brightness offset
+		if(self.userSettings.daytime == True):
+			self.userSettings.brightnessOffset = level - self.userSettings.dayBright
+		else:
+			self.userSettings.brightnessOffset = level - self.userSettings.nightBright
+
 		subprocess.run("sudo sh -c 'echo %i > /sys/class/backlight/10-0045/brightness'" % level, shell = True)
 
 	def lightingAdjust(self, *args):
@@ -1093,12 +1100,32 @@ class ironVanApp(MDApp):
 				
 		# -- 10 minute loop + counter increment --
 
-		if(self.stateLoopCounter % 600 == 0 and self.stateLoopCounter != 0):
+		if(self.stateLoopCounter % 30 == 0 and self.stateLoopCounter != 0):
 			self.stateLoopCounter = 0
 
 			# Update weather
 			try:
 				self.location.weather.getWeather(self)
+
+				print(time.time, ", sunrise: ", self.location.weather.sunrise, ", sunset: ", self.location.weather.sunset)
+				if(time.time < self.location.weather.sunrise and time.time > self.location.weather.sunset):
+					self.userSettings.daytime = False
+				else:
+					self.userSettings.daytime = True
+
+				# Adjust brightness for nightime
+				tempBrightness = self.userSettings.dayBright + self.userSettings.brightnessOffset
+
+				if(self.userSettings.daytime == False):
+					tempBrightness = self.userSettings.nightBright + self.userSettings.brightnessOffset
+
+				if(tempBrightness > 255):
+					tempBrightness = 255
+				elif(tempBrightness < 12):
+					tempBrightness = 12
+
+				self.root.ids['brightness_slider'].value = tempBrightness
+
 			except:
 				self.messageBufferLock = True
 
