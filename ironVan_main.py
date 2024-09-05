@@ -1100,7 +1100,7 @@ class ironVanApp(MDApp):
 				
 		# -- 10 minute loop + counter increment --
 
-		if(self.stateLoopCounter % 30 == 0 and self.stateLoopCounter != 0):
+		if(self.stateLoopCounter % 10 == 0 and self.stateLoopCounter != 0):
 			self.stateLoopCounter = 0
 
 			# Update weather
