@@ -35,7 +35,7 @@ class Location():
             self.weather.getWeather(app)
             
         except:
-            app.write2MessageBuffer(f"locationServices_{time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}", f"No location data received -- check WiFi connection.")
+            app.write2MessageBuffer(f"locationServices_{time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}", f"No location data received -- check WiFi connection.", "error")
             return
         
     def getPublicIP(self, app):
@@ -68,15 +68,12 @@ class Weather():
         minTemp = '--'
         maxTemp = '--'
         location = ''
-        sunrise = ''
-        sunset = ''
         
         try:
             self.current_url = self.base_current_url + '&lat=' + str(app.location.latitude) + '&lon=' + str(app.location.longitude) +'&appid=' + self.api_key
             
             rawResponse = requests.get(self.current_url)
             currentResponse = rawResponse.json()
-            print(currentResponse)
             
             self.forecast_url = self.base_forecast_url + '&lat=' + str(app.location.latitude) + '&lon=' + str(app.location.longitude) +'&appid=' + self.api_key
             
@@ -96,9 +93,9 @@ class Weather():
             maxTemp = userSettings.kelvinTo(int(currentResponse.get('main').get('temp_max')), userSettings.tempCelsius)
             location = currentResponse.get('name')
             
-            self.sunrise = int(currentResponse.get('sunrise'))
-            self.sunset = int(currentResponse.get('sunset'))
-            
+            self.sunrise = int(currentResponse.get('sys').get('sunrise'))
+            self.sunset = int(currentResponse.get('sys').get('sunset'))
+
             if(len(location) > 12):
                 location = location[:11] + '...'
 
@@ -127,14 +124,14 @@ class Weather():
 
         try:
             newLow = 1000
-            for time in forecastList[date.today().strftime('%m/%d')].hourlyData.keys():
-                temp = forecastList[date.today().strftime('%m/%d')].hourlyData[time]['temp_min']
+            for timeIterator in forecastList[date.today().strftime('%m/%d')].hourlyData.keys():
+                temp = forecastList[date.today().strftime('%m/%d')].hourlyData[timeIterator]['temp_min']
                 if(int(temp) < newLow):
                     app.root.ids['low_temp_quick_label'].text = f'{minTemp}' + u'\N{DEGREE SIGN}'
             
             newHigh = -1000
-            for time in forecastList[date.today().strftime('%m/%d')].hourlyData.keys():
-                temp = forecastList[date.today().strftime('%m/%d')].hourlyData[time]['temp_max']
+            for timeIterator in forecastList[date.today().strftime('%m/%d')].hourlyData.keys():
+                temp = forecastList[date.today().strftime('%m/%d')].hourlyData[timeIterator]['temp_max']
                 if(int(temp) > newHigh):
                     app.root.ids['high_temp_quick_label'].text = f'{maxTemp}' + u'\N{DEGREE SIGN}'
         except:

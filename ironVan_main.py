@@ -1107,8 +1107,7 @@ class ironVanApp(MDApp):
 			try:
 				self.location.weather.getWeather(self)
 
-				print(time.time, ", sunrise: ", self.location.weather.sunrise, ", sunset: ", self.location.weather.sunset)
-				if(time.time < self.location.weather.sunrise and time.time > self.location.weather.sunset):
+				if(time.time() < self.location.weather.sunrise or time.time() > self.location.weather.sunset):
 					self.userSettings.daytime = False
 				else:
 					self.userSettings.daytime = True
@@ -1129,7 +1128,7 @@ class ironVanApp(MDApp):
 			except:
 				self.messageBufferLock = True
 
-				self.write2MessageBuffer(f"weatherServices_{time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}", f"Failed to acquire weather data.")
+				self.write2MessageBuffer(f"weatherServices_{time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}", f"Failed to acquire weather data.", "error")
 
 				self.messageBufferLock = False
 
