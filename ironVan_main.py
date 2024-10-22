@@ -1014,7 +1014,10 @@ class ironVanApp(MDApp):
 		else:
 			self.userSettings.brightnessOffset = level - self.userSettings.nightBright
 
-		subprocess.run("sudo sh -c 'echo %i > /sys/class/backlight/10-0045/brightness'" % level, shell = True)
+		try:
+			subprocess.run("sudo sh -c 'echo %i > /sys/class/backlight/10-0045/brightness'" % level, shell = True)
+		except:
+			self.write2MessageBuffer(f"brightnessAdjust_{time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}", f"Display brightness adjustment not supported for this platform.", "error")
 
 	def lightingAdjust(self, *args):
 		value = args[1]
@@ -1106,12 +1109,12 @@ class ironVanApp(MDApp):
 			# Adjust brightness & theme for time of day
 			if(time.time() < self.location.weather.sunrise or time.time() > self.location.weather.sunset):
 				self.userSettings.daytime = False
-				if(self.theme_cls.theme_style == 'Light'):
-					self.theme_cls.theme_style == 'Dark'
+				if(self.theme_cls.theme_style == "Light"):
+					self.switchTheme()
 			else:
 				self.userSettings.daytime = True
 				if(self.theme_cls.theme_style == 'Dark'):
-					self.theme_cls.theme_style == 'Light'
+					self.switchTheme()
 
 			tempBrightness = self.userSettings.dayBright + self.userSettings.brightnessOffset
 
@@ -1123,7 +1126,8 @@ class ironVanApp(MDApp):
 			elif(tempBrightness < 12):
 				tempBrightness = 12
 
-			self.root.ids['brightness_slider'].value = tempBrightness
+			# Brightness adjust disabled
+			#self.root.ids['brightness_slider'].value = tempBrightness
 
 		else:
 			self.stateLoopCounter += 1

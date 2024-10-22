@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from functools import partial
 from kivy.clock import Clock
 import requests
@@ -63,8 +63,8 @@ class Weather():
         self.base_forecast_url = 'http://api.openweathermap.org/data/2.5/forecast?'
 
         # Values stored for settings modification
-        self.sunrise = ''
-        self.sunset = ''
+        self.sunrise = 0
+        self.sunset = 0
         
     def getWeather(self, *args):
         app = args[0]
@@ -128,10 +128,18 @@ class Weather():
         app.root.ids['weather_icon'].source = iconURL
         app.root.ids['location_label'].text = f"{'in': ^22}\n{location: ^20}"
 
+        # Shift min/max temps to next day after 1700L
+        app.root.ids['today_tomorrow_label'].text = 'Today'
+        forecastDay = datetime.today()
+
+        if datetime.today() > datetime(datetime.today().year, datetime.today().month, datetime.today().day, hour = 17):
+            app.root.ids['today_tomorrow_label'].text = 'Tomorrow'
+            forecastDay = datetime.today() + timedelta(days = 1)
+
         try:
             newLow = 1000
-            for timeIterator in forecastList[date.today().strftime('%m/%d')].hourlyData.keys():
-                temp = forecastList[date.today().strftime('%m/%d')].hourlyData[timeIterator]['temp_min']
+            for timeIterator in forecastList[forecastDay.strftime('%m/%d')].hourlyData.keys():
+                temp = forecastList[forecastDay.strftime('%m/%d')].hourlyData[timeIterator]['temp_min']
                 if(int(temp) < newLow):
                     newLow = int(temp)
             
@@ -139,20 +147,20 @@ class Weather():
                 minTemp = newLow
             
             newHigh = -1000
-            for timeIterator in forecastList[date.today().strftime('%m/%d')].hourlyData.keys():
-                temp = forecastList[date.today().strftime('%m/%d')].hourlyData[timeIterator]['temp_max']
+            for timeIterator in forecastList[forecastDay.strftime('%m/%d')].hourlyData.keys():
+                temp = forecastList[forecastDay.strftime('%m/%d')].hourlyData[timeIterator]['temp_max']
                 if(int(temp) > newHigh):
                     newHigh = int(temp)
             
             if(newHigh > maxTemp):
                 maxTemp = newHigh
 
-            # Convert temp to user units -- API not outputting Kelvin as expected - stuck in Fahrenheit
-            #minTemp = userSettings.kelvinTo(newLow, userSettings.tempCelsius)
-            #maxTemp = userSettings.kelvinTo(newHigh, userSettings.tempCelsius)
+                # Convert temp to user units -- API not outputting Kelvin as expected - stuck in Fahrenheit
+                #minTemp = userSettings.kelvinTo(newLow, userSettings.tempCelsius)
+                #maxTemp = userSettings.kelvinTo(newHigh, userSettings.tempCelsius)
 
-            app.root.ids['low_temp_quick_label'].text = f'{minTemp}' + u'\N{DEGREE SIGN}'
-            app.root.ids['high_temp_quick_label'].text = f'{maxTemp}' + u'\N{DEGREE SIGN}'
+                app.root.ids['low_temp_quick_label'].text = f'{minTemp}' + u'\N{DEGREE SIGN}'
+                app.root.ids['high_temp_quick_label'].text = f'{maxTemp}' + u'\N{DEGREE SIGN}'
 
         except:
             app.write2MessageBuffer(f"weatherServices_{time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())}", f"Could not extract min/max temperature from weather data.", "error")
