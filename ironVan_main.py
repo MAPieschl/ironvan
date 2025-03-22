@@ -1154,7 +1154,7 @@ class ironVanApp(MDApp):
 	
 	def updateApp(self):
 		result = subprocess.run(["sh", "./update_ironvan.sh"], capture_output = True)
-		if(result.stderr == None):
+		if(len(result.stderr) < 1):
 			self.closeApp('-r')
 		else:
 			self.write2MessageBuffer("updateApp", f"{str(result.stdout)} {str(result.stderr)}", "error")
