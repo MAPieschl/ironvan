@@ -1170,7 +1170,7 @@ class ironVanApp(MDApp):
 					),
 					MDFillRoundFlatButton(
 						text = 'Scan for Devices',
-						on_release = self.bus.scanBus(self)
+						on_release = self.bus.scanBus
 					)],
 			)
 			self.dialogBox.open()
