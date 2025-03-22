@@ -54,7 +54,8 @@ class appElementIDs():
 			'nav_button_power',
 			'nav_button_env',
 			'nav_button_ws',
-			'nav_button_ls'
+			'nav_button_ls',
+			'update_app_button'
 		]
 		self.buttons = [
 			'settings_user_settings_button_back',
@@ -110,6 +111,7 @@ class appElementIDs():
 			'nav_button_env',
 			'nav_button_ws',
 			'nav_button_ls',
+			'update_app_button',
 			'env_fan_quick_switch',
 			'env_cool_quick_switch',
 			'env_heat_quick_switch',
@@ -1149,6 +1151,10 @@ class ironVanApp(MDApp):
 		self.messageBuffer[key] = [f"{key}: {msg}", msgType]
 
 		return True
+	
+	def updateApp():
+		result = subprocess.run(["./update_ironvan.sh"], capture_output = True)
+		print(result.stderr)
 
 	# ---- Dialog Boxes ----
 

@@ -993,8 +993,26 @@ MDFloatLayout:
                                 on_value: app.brightnessAdjust(*args)
                         
                         MDFloatLayout:
-                            id: settings_user_settings_fill_bottom
+                            id: settings_user_settings_update_app
                             size_hint: (1, 0.2)
+
+                            MDLabel:
+                                id: settings_user_settings_update_app_label
+                                text: 'Update App:'
+                                theme_text_color: 'Custom'
+                                text_color: app.theme_cls.accent_dark
+                                pos_hint: {'x': 0, 'center_y': 0.5}
+
+                            MDIconButton:
+                                id: update_app_button
+                                icon: 'update'
+                                theme_text_color: 'Custom'
+                                text_color: app.theme_cls.accent_dark
+                                md_bg_color: app.theme_cls.primary_light
+                                ripple_scale: 0
+                                pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                                size_hint: (1.2, 0.0875)
+                                on_release: app.updateApp()
 
         DeviceScreen:
             name: 'settings_device_page'
