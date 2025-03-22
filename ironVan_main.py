@@ -1292,7 +1292,7 @@ class ironVanApp(MDApp):
 
 			self.dialogBox.open()
 
-	def closeApp(tag: str):
+	def closeApp(self, tag: str):
 		subprocess.run(["sudo", "shutdown", tag, "now"])
 	
 	def power_dialog(self, obj):

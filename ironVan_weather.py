@@ -25,8 +25,8 @@ class Location():
         self.current_url = f'{self.base_url}={publicIP}'
         
         try:
-            rawResponse = requests.get(self.current_url)
-            response = rawResponse.json()
+            # rawResponse = requests.get(self.current_url)
+            # response = rawResponse.json()
 
             # self.latitude = float(response.get('data').get('location').get('latitude'))
             # self.longitude = float(response.get('data').get('location').get('longitude'))
