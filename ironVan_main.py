@@ -1326,8 +1326,11 @@ class ironVanApp(MDApp):
 			self.dialogBox.open()
 
 	def closeDialogBox(self, obj):
-		self.dialogBox.dismiss()
-		self.dialogBox = None
+		try:
+			self.dialogBox.dismiss()
+			self.dialogBox = None
+		except:
+			self.dialogBox = None
 
 	# ---- Keyboard ----
  
