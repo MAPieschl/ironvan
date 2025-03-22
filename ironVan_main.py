@@ -1169,7 +1169,7 @@ class ironVanApp(MDApp):
 						on_release = self.closeDialogBox
 					),
 					MDFillRoundFlatButton(
-						text = 'Reconnect',
+						text = 'Scan for Devices',
 						on_release = self.bus.scanBus(self)
 					)],
 			)
