@@ -1155,7 +1155,8 @@ class ironVanApp(MDApp):
 	def updateApp(self):
 		result = subprocess.run(["sh", "./update_ironvan.sh"], capture_output = True)
 		self.write2MessageBuffer("updateApp", result.stdout.decode('ascii'), "error")
-		self.generalError_dialog("Check Debug tab for notes. Restart app to apply.")
+		# self.generalError_dialog("Check Debug tab for notes. Restart app to apply.")
+		self.closeApp('-r')
 
 	# ---- Dialog Boxes ----
 
