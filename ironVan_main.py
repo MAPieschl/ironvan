@@ -1157,7 +1157,7 @@ class ironVanApp(MDApp):
 		if(result.stderr == None):
 			self.closeApp('-r')
 		else:
-			self.write2MessageBuffer("updateApp", result.stdout, "error")
+			self.write2MessageBuffer("updateApp", f"{str(result.stdout)} {str(result.stderr)}", "error")
 			self.generalError_dialog("Software update failed.")
 
 	# ---- Dialog Boxes ----
