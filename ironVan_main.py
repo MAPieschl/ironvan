@@ -1152,7 +1152,7 @@ class ironVanApp(MDApp):
 
 		return True
 	
-	def updateApp():
+	def updateApp(args):
 		result = subprocess.run(["./update_ironvan.sh"], capture_output = True)
 		print(result.stderr)
 
