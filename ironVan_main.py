@@ -1154,11 +1154,8 @@ class ironVanApp(MDApp):
 	
 	def updateApp(self):
 		result = subprocess.run(["sh", "./update_ironvan.sh"], capture_output = True)
-		if(len(result.stderr) < 1):
-			self.closeApp('-r')
-		else:
-			self.write2MessageBuffer("updateApp", f"{str(result.stdout)} {str(result.stderr)}", "error")
-			self.generalError_dialog("Software update failed.")
+		self.write2MessageBuffer("updateApp", result.stdout.decode('ascii'), "error")
+		self.generalError_dialog("Check Debug tab for notes. Restart app to apply.")
 
 	# ---- Dialog Boxes ----
 
