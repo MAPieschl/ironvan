@@ -1169,7 +1169,8 @@ class ironVanApp(MDApp):
 						on_release = self.closeDialogBox
 					),
 					MDFillRoundFlatButton(
-						text = 'Troubleshoot',
+						text = 'Reconnect',
+						on_release = self.bus.scanBus(self)
 					)],
 			)
 			self.dialogBox.open()
