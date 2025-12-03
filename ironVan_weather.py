@@ -25,18 +25,18 @@ class Location():
         self.current_url = f'{self.base_url}={publicIP}'
         
         try:
-            # rawResponse = requests.get(self.current_url)
-            # response = rawResponse.json()
+            rawResponse = requests.get(self.current_url)
+            response = rawResponse.json()
 
-            # self.latitude = float(response.get('data').get('location').get('latitude'))
-            # self.longitude = float(response.get('data').get('location').get('longitude'))
-            # self.timezone = response.get('data').get('timezone').get('id')
+            self.latitude = float(response.get('data').get('location').get('latitude'))
+            self.longitude = float(response.get('data').get('location').get('longitude'))
+            self.timezone = response.get('data').get('timezone').get('id')
 
-            self.latitude = 39.84
-            self.longitude = -84.05
-            self.timezone = '-4:00'
-            print('ipify location services skipped for testing -- reconfigure in weather.getLocation()')
-            print(f'Location is hardcoded as {self.latitude}, {self.longitude}, {self.timezone}')
+            # self.latitude = 39.84
+            # self.longitude = -84.05
+            # self.timezone = '-4:00'
+            # print('ipify location services skipped for testing -- reconfigure in weather.getLocation()')
+            # print(f'Location is hardcoded as {self.latitude}, {self.longitude}, {self.timezone}')
 
             self.weather.getWeather(app)
             
